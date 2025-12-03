@@ -268,14 +268,34 @@ export default function Navbar() {
                 </>
             ) : (
                 <>
-                    <li>
-                        <Link href="/login" onClick={isMobile ? closeMobileMenu : undefined}>🔑 {t.navbar.login}</Link>
-                    </li>
-                    <li>
-                        <Link href="/register" className={styles.registerBtn} onClick={isMobile ? closeMobileMenu : undefined}>
-                            ✨ {t.navbar.register}
-                        </Link>
-                    </li>
+                    {!isMobile && (
+                        <>
+                            <li>
+                                <Link href="/login" onClick={closeMobileMenu} className={styles.loginBtn}>
+                                    {t.navbar.login}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/register" className={styles.registerBtn} onClick={closeMobileMenu}>
+                                    {t.navbar.register}
+                                </Link>
+                            </li>
+                        </>
+                    )}
+                    {isMobile && (
+                        <>
+                            <li>
+                                <Link href="/login" onClick={closeMobileMenu} className={styles.mobileLoginBtn}>
+                                    🔑 {t.navbar.login}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/register" className={styles.mobileRegisterBtn} onClick={closeMobileMenu}>
+                                    ✨ {t.navbar.register}
+                                </Link>
+                            </li>
+                        </>
+                    )}
                 </>
             )}
             {isMobile && (

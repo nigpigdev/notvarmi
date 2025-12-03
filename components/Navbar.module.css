@@ -96,12 +96,58 @@
     width: 100% !important;
 }
 
+/* Login and Register Buttons */
+.loginBtn {
+    background: transparent !important;
+    color: var(--text) !important;
+    padding: 0.6rem 1.5rem !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    border: 2px solid var(--border) !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+}
+
+.loginBtn::after {
+    display: none !important;
+}
+
+.loginBtn:hover {
+    border-color: var(--primary) !important;
+    background: rgba(102, 126, 234, 0.05) !important;
+    transform: translateY(-2px);
+}
+
 .registerBtn {
-    background: var(--primary-gradient);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-weight: 600;
+    background: var(--primary-gradient) !important;
+    color: white !important;
+    padding: 0.6rem 1.5rem !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+}
+
+.registerBtn::after {
+    display: none !important;
+}
+
+.registerBtn:hover {
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+/* Mobile Login/Register Buttons */
+.mobileLoginBtn {
+    background: var(--secondary) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.mobileRegisterBtn {
+    background: var(--primary-gradient) !important;
+    color: white !important;
+    margin-top: 0.5rem !important;
 }
 
 /* Hamburger Menu Button */
@@ -207,12 +253,6 @@
 .mobileMenuItems a:hover,
 .mobileMenuItems button:hover {
     background-color: var(--secondary);
-}
-
-.mobileMenuItems .registerBtn {
-    background: var(--primary-gradient);
-    color: white;
-    margin-top: 1rem;
 }
 
 /* Mobile responsiveness */

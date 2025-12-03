@@ -73,7 +73,7 @@ function SearchPageContent() {
         }
     };
 
-    const performSearch = async (searchQuery = query) => {
+    const performSearch = async (searchQuery = query, filterType = filter, sortType = sort) => {
         if (!searchQuery.trim()) {
             setResults(null);
             return;
@@ -81,7 +81,7 @@ function SearchPageContent() {
 
         setLoading(true);
         try {
-            const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&type=${filter}&sort=${sort}`);
+            const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&type=${filterType}&sort=${sortType}`);
             if (res.ok) {
                 const data = await res.json();
                 setResults(data);
@@ -261,7 +261,10 @@ function SearchPageContent() {
                             ].map(f => (
                                 <button
                                     key={f.v}
-                                    onClick={() => { setFilter(f.v); performSearch(); }}
+                                    onClick={() => {
+                                        setFilter(f.v);
+                                        performSearch(query, f.v, sort);
+                                    }}
                                     style={{
                                         padding: '0.5rem 1rem',
                                         borderRadius: '8px',
@@ -281,7 +284,10 @@ function SearchPageContent() {
 
                         <select
                             value={sort}
-                            onChange={(e) => { setSort(e.target.value); performSearch(); }}
+                            onChange={(e) => {
+                                setSort(e.target.value);
+                                performSearch(query, filter, e.target.value);
+                            }}
                             style={{
                                 padding: '0.5rem 1rem',
                                 borderRadius: '8px',
