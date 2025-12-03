@@ -1,8 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function FilePreview({ file, url, fileName, onRemove }) {
+    const { data: session } = useSession();
+    const router = useRouter();
     const [previewUrl, setPreviewUrl] = useState(null);
     const [fileType, setFileType] = useState('unknown');
     const [name, setName] = useState('');
@@ -188,10 +192,16 @@ export default function FilePreview({ file, url, fileName, onRemove }) {
         }}>
             {url ? (
                 <a
-                    href={`/api/download?url=${encodeURIComponent(url)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: 'none', display: 'block' }}
+                    href={session ? `/api/download?url=${encodeURIComponent(url)}` : '#'}
+                    target={session ? "_blank" : undefined}
+                    rel={session ? "noopener noreferrer" : undefined}
+                    style={{ textDecoration: 'none', display: 'block', cursor: session ? 'pointer' : 'not-allowed' }}
+                    onClick={(e) => {
+                        if (!session) {
+                            e.preventDefault();
+                            router.push('/login');
+                        }
+                    }}
                     onMouseEnter={(e) => {
                         const card = e.currentTarget.querySelector('div');
                         if (card) {
