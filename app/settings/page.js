@@ -7,6 +7,7 @@ import Link from 'next/link';
 import universities from '@/lib/universities';
 import departments from '@/lib/departments';
 import ToggleSwitch from '@/components/ToggleSwitch';
+import LoadingScreen from '@/components/LoadingScreen';
 
 export default function SettingsPage() {
     const { data: session, status } = useSession();
@@ -414,7 +415,7 @@ export default function SettingsPage() {
     ];
 
     if (loading) {
-        return <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>Yükleniyor...</div>;
+        return <LoadingScreen />;
     }
 
     return (

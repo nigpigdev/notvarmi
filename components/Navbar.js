@@ -235,7 +235,7 @@ export default function Navbar() {
                     {isMobile && (
                         <>
                             <li>
-                                <Link href="/profile" onClick={closeMobileMenu}>
+                                <Link href={`/profile/${session?.user?.username}`} onClick={closeMobileMenu}>
                                     👤 Profil
                                 </Link>
                             </li>

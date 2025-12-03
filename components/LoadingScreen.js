@@ -26,7 +26,7 @@ export default function LoadingScreen() {
                 gap: '2rem'
             }}>
                 {/* Logo */}
-                <span className="logo-text">Notvarmı</span>
+                <span className="logo-text" style={{ color: 'white' }}>Notvarmı</span>
 
                 {/* Modern Bouncing Dots Loader */}
                 <div className="dots-loader">
@@ -49,6 +49,8 @@ export default function LoadingScreen() {
                     letter-spacing: 1px;
                     display: inline-block;
                     position: relative;
+                    /* Fallback for when gradient hasn't loaded or supported */
+                    color: white; 
                 }
 
                 .dots-loader {

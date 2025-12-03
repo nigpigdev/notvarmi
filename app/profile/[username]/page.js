@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import LoadingScreen from '@/components/LoadingScreen';
 import Image from 'next/image';
 
 export default function UserProfile({ params }) {
@@ -25,6 +26,7 @@ export default function UserProfile({ params }) {
     const [isEditingAvatar, setIsEditingAvatar] = useState(false);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
 
     const handleImageSelect = (e) => {
         const file = e.target.files[0];
@@ -118,6 +120,15 @@ export default function UserProfile({ params }) {
     }, [status, router]);
 
     useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    useEffect(() => {
         const fetchProfile = async () => {
             console.log('Fetching profile for username:', username);
             try {
@@ -147,41 +158,7 @@ export default function UserProfile({ params }) {
     }, [status, username]);
 
     if (loading) {
-        return (
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '100vh',
-                background: 'var(--background)'
-            }}>
-                <div style={{
-                    background: 'var(--secondary)',
-                    padding: '2rem 3rem',
-                    borderRadius: '20px',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    border: '1px solid var(--border)'
-                }}>
-                    <div style={{
-                        width: '24px',
-                        height: '24px',
-                        border: '3px solid var(--accent-purple)',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite'
-                    }}></div>
-                    <span style={{ color: 'var(--accent-purple)', fontWeight: '600' }}>Yükleniyor...</span>
-                </div>
-                <style jsx>{`
-                    @keyframes spin {
-                        to { transform: rotate(360deg); }
-                    }
-                `}</style>
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     if (!profileData) {
@@ -204,7 +181,7 @@ export default function UserProfile({ params }) {
         <div style={{
             minHeight: '100vh',
             background: 'var(--background)',
-            padding: '2rem 1rem',
+            padding: isMobile ? '1rem 0.5rem' : '2rem 1rem',
             transition: 'background-color 0.3s ease'
         }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -251,7 +228,7 @@ export default function UserProfile({ params }) {
                 }}>
                     {/* Cover Image */}
                     <div style={{
-                        height: '250px',
+                        height: isMobile ? '150px' : '250px',
                         background: previewUrl
                             ? `url(${previewUrl}) center/cover no-repeat`
                             : user.coverImage
@@ -446,19 +423,19 @@ export default function UserProfile({ params }) {
                     </div>
 
                     {/* Profile Info */}
-                    <div style={{ padding: '0 2rem 2rem', position: 'relative' }}>
+                    <div style={{ padding: isMobile ? '0 1rem 1rem' : '0 2rem 2rem', position: 'relative' }}>
                         {/* Avatar */}
                         <div style={{
-                            marginTop: '-80px',
-                            marginBottom: '1.5rem',
+                            marginTop: isMobile ? '-50px' : '-80px',
+                            marginBottom: isMobile ? '1rem' : '1.5rem',
                             position: 'relative',
-                            width: '160px'
+                            width: isMobile ? '100px' : '160px'
                         }}>
                             <div
                                 style={{
                                     position: 'relative',
-                                    width: '160px',
-                                    height: '160px',
+                                    width: isMobile ? '100px' : '160px',
+                                    height: isMobile ? '100px' : '160px',
                                     cursor: session?.user?.username === user.username ? 'pointer' : 'default'
                                 }}
                                 onClick={() => {
@@ -469,10 +446,10 @@ export default function UserProfile({ params }) {
                             >
                                 {avatarPreview ? (
                                     <div style={{
-                                        width: '160px',
-                                        height: '160px',
+                                        width: isMobile ? '100px' : '160px',
+                                        height: isMobile ? '100px' : '160px',
                                         borderRadius: '50%',
-                                        border: '6px solid var(--secondary)',
+                                        border: isMobile ? '4px solid var(--secondary)' : '6px solid var(--secondary)',
                                         overflow: 'hidden',
                                         boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
                                         background: 'var(--secondary)'
@@ -485,10 +462,10 @@ export default function UserProfile({ params }) {
                                     </div>
                                 ) : user.avatar ? (
                                     <div style={{
-                                        width: '160px',
-                                        height: '160px',
+                                        width: isMobile ? '100px' : '160px',
+                                        height: isMobile ? '100px' : '160px',
                                         borderRadius: '50%',
-                                        border: '6px solid var(--secondary)',
+                                        border: isMobile ? '4px solid var(--secondary)' : '6px solid var(--secondary)',
                                         overflow: 'hidden',
                                         boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
                                         background: 'var(--secondary)'
@@ -503,15 +480,15 @@ export default function UserProfile({ params }) {
                                     </div>
                                 ) : (
                                     <div style={{
-                                        width: '160px',
-                                        height: '160px',
+                                        width: isMobile ? '100px' : '160px',
+                                        height: isMobile ? '100px' : '160px',
                                         borderRadius: '50%',
-                                        border: '6px solid var(--secondary)',
+                                        border: isMobile ? '4px solid var(--secondary)' : '6px solid var(--secondary)',
                                         background: 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        fontSize: '4rem',
+                                        fontSize: isMobile ? '2.5rem' : '4rem',
                                         boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
                                         color: 'white'
                                     }}>
@@ -527,8 +504,8 @@ export default function UserProfile({ params }) {
                                             position: 'absolute',
                                             top: 0,
                                             left: 0,
-                                            width: '160px',
-                                            height: '160px',
+                                            width: isMobile ? '100px' : '160px',
+                                            height: isMobile ? '100px' : '160px',
                                             borderRadius: '50%',
                                             background: 'rgba(0,0,0,0)',
                                             display: 'flex',
@@ -651,7 +628,7 @@ export default function UserProfile({ params }) {
 
                         {/* User Details */}
                         <h1 style={{
-                            fontSize: '2.5rem',
+                            fontSize: isMobile ? '1.75rem' : '2.5rem',
                             marginBottom: '0.5rem',
                             color: 'var(--text)',
                             fontWeight: 'bold'
@@ -660,8 +637,8 @@ export default function UserProfile({ params }) {
                         </h1>
                         <p style={{
                             color: 'var(--text-secondary)',
-                            fontSize: '1.1rem',
-                            marginBottom: '1.5rem',
+                            fontSize: isMobile ? '0.95rem' : '1.1rem',
+                            marginBottom: isMobile ? '1rem' : '1.5rem',
                             fontWeight: '500'
                         }}>
                             @{user.username}
@@ -670,20 +647,21 @@ export default function UserProfile({ params }) {
                         {/* Info Tags */}
                         <div style={{
                             display: 'flex',
-                            gap: '1rem',
+                            gap: isMobile ? '0.5rem' : '1rem',
                             flexWrap: 'wrap',
-                            marginBottom: '1.5rem'
+                            marginBottom: isMobile ? '1rem' : '1.5rem'
                         }}>
                             {user.university && (
                                 <div style={{
                                     background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                                     color: 'white',
-                                    padding: '0.75rem 1.5rem',
+                                    padding: isMobile ? '0.5rem 1rem' : '0.75rem 1.5rem',
                                     borderRadius: '50px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.5rem',
                                     fontWeight: '600',
+                                    fontSize: isMobile ? '0.85rem' : '1rem',
                                     boxShadow: '0 4px 15px rgba(240, 147, 251, 0.3)'
                                 }}>
                                     <span>🏫</span>
@@ -694,12 +672,13 @@ export default function UserProfile({ params }) {
                                 <div style={{
                                     background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
                                     color: 'white',
-                                    padding: '0.75rem 1.5rem',
+                                    padding: isMobile ? '0.5rem 1rem' : '0.75rem 1.5rem',
                                     borderRadius: '50px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.5rem',
                                     fontWeight: '600',
+                                    fontSize: isMobile ? '0.85rem' : '1rem',
                                     boxShadow: '0 4px 15px rgba(79, 172, 254, 0.3)'
                                 }}>
                                     <span>📚</span>
@@ -713,14 +692,14 @@ export default function UserProfile({ params }) {
                             <Link
                                 href={`/messages/${user.id}`}
                                 style={{
-                                    padding: '1rem 2rem',
+                                    padding: isMobile ? '0.75rem 1.5rem' : '1rem 2rem',
                                     background: 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '50px',
                                     cursor: 'pointer',
                                     fontWeight: 'bold',
-                                    fontSize: '1rem',
+                                    fontSize: isMobile ? '0.9rem' : '1rem',
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     gap: '0.5rem',
@@ -791,14 +770,14 @@ export default function UserProfile({ params }) {
                 {!isPrivate && (
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                        gap: '1.5rem',
-                        marginBottom: '2rem'
+                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))',
+                        gap: isMobile ? '1rem' : '1.5rem',
+                        marginBottom: isMobile ? '1rem' : '2rem'
                     }}>
                         <div style={{
                             background: 'var(--secondary)',
-                            borderRadius: '20px',
-                            padding: '2rem',
+                            borderRadius: isMobile ? '16px' : '20px',
+                            padding: isMobile ? '1.5rem' : '2rem',
                             textAlign: 'center',
                             boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
                             transition: 'all 0.3s ease',
@@ -847,8 +826,8 @@ export default function UserProfile({ params }) {
 
                         <div style={{
                             background: 'var(--secondary)',
-                            borderRadius: '20px',
-                            padding: '2rem',
+                            borderRadius: isMobile ? '16px' : '20px',
+                            padding: isMobile ? '1.5rem' : '2rem',
                             textAlign: 'center',
                             boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
                             transition: 'all 0.3s ease',
@@ -901,28 +880,28 @@ export default function UserProfile({ params }) {
                 {!isPrivate && (
                     <div style={{
                         background: 'var(--secondary)',
-                        borderRadius: '20px',
-                        padding: '1.5rem',
-                        marginBottom: '1.5rem',
+                        borderRadius: isMobile ? '16px' : '20px',
+                        padding: isMobile ? '1rem' : '1.5rem',
+                        marginBottom: isMobile ? '1rem' : '1.5rem',
                         boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
                         display: 'flex',
-                        gap: '1rem',
+                        gap: isMobile ? '0.5rem' : '1rem',
                         border: '1px solid var(--border)'
                     }}>
                         <button
                             onClick={() => setActiveTab('posts')}
                             style={{
                                 flex: 1,
-                                padding: '1rem 2rem',
+                                padding: isMobile ? '0.75rem 1rem' : '1rem 2rem',
                                 background: activeTab === 'posts'
                                     ? 'linear-gradient(135deg, var(--accent-purple) 0%, #764ba2 100%)'
                                     : 'transparent',
                                 color: activeTab === 'posts' ? 'white' : 'var(--text-secondary)',
                                 border: 'none',
-                                borderRadius: '15px',
+                                borderRadius: isMobile ? '12px' : '15px',
                                 cursor: 'pointer',
                                 fontWeight: '700',
-                                fontSize: '1rem',
+                                fontSize: isMobile ? '0.85rem' : '1rem',
                                 transition: 'all 0.3s ease',
                                 boxShadow: activeTab === 'posts' ? '0 5px 20px rgba(102, 126, 234, 0.4)' : 'none'
                             }}
@@ -942,16 +921,16 @@ export default function UserProfile({ params }) {
                             onClick={() => setActiveTab('replies')}
                             style={{
                                 flex: 1,
-                                padding: '1rem 2rem',
+                                padding: isMobile ? '0.75rem 1rem' : '1rem 2rem',
                                 background: activeTab === 'replies'
                                     ? 'linear-gradient(135deg, var(--accent-blue) 0%, #00f2fe 100%)'
                                     : 'transparent',
                                 color: activeTab === 'replies' ? 'white' : 'var(--text-secondary)',
                                 border: 'none',
-                                borderRadius: '15px',
+                                borderRadius: isMobile ? '12px' : '15px',
                                 cursor: 'pointer',
                                 fontWeight: '700',
-                                fontSize: '1rem',
+                                fontSize: isMobile ? '0.85rem' : '1rem',
                                 transition: 'all 0.3s ease',
                                 boxShadow: activeTab === 'replies' ? '0 5px 20px rgba(79, 172, 254, 0.4)' : 'none'
                             }}
