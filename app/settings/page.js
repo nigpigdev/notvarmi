@@ -8,10 +8,12 @@ import universities from '@/lib/universities';
 import departments from '@/lib/departments';
 import ToggleSwitch from '@/components/ToggleSwitch';
 import LoadingScreen from '@/components/LoadingScreen';
+import { useAlert } from '@/contexts/AlertContext';
 
 export default function SettingsPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const { showAlert, showConfirm } = useAlert();
     const fileInputRef = useRef(null);
     const [activeTab, setActiveTab] = useState('profile');
 
@@ -143,15 +145,15 @@ export default function SettingsPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleAvatarChange = (e) => {
+    const handleAvatarChange = async (e) => {
         const file = e.target.files?.[0];
         if (file) {
             if (!file.type.startsWith('image/')) {
-                alert('Lütfen bir resim dosyası seçin');
+                await showAlert('Lütfen bir resim dosyası seçin', 'warning');
                 return;
             }
             if (file.size > 5 * 1024 * 1024) {
-                alert('Dosya boyutu 5MB\'dan küçük olmalıdır');
+                await showAlert('Dosya boyutu 5MB\'dan küçük olmalıdır', 'warning');
                 return;
             }
             setAvatar(file);
@@ -184,7 +186,7 @@ export default function SettingsPage() {
 
             if (res.ok) {
                 const data = await res.json();
-                alert('Ayarlarınız güncellendi.');
+                await showAlert('Ayarlarınız güncellendi.', 'success');
                 if (data.avatar) {
                     setAvatarPreview(data.avatar);
                 }
@@ -193,11 +195,11 @@ export default function SettingsPage() {
                 window.location.reload();
             } else {
                 const err = await res.json();
-                alert(`Güncelleme başarısız: ${err.error || 'Bilinmeyen hata'}`);
+                await showAlert(`Güncelleme başarısız: ${err.error || 'Bilinmeyen hata'}`, 'error');
             }
         } catch (e) {
             console.error(e);
-            alert('Bir hata oluştu.');
+            await showAlert('Bir hata oluştu.', 'error');
         } finally {
             setUpdating(false);
         }
@@ -206,11 +208,11 @@ export default function SettingsPage() {
     const handlePasswordChange = async (e) => {
         e.preventDefault();
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            alert('Yeni şifreler eşleşmiyor!');
+            await showAlert('Yeni şifreler eşleşmiyor!', 'warning');
             return;
         }
         if (passwordData.newPassword.length < 6) {
-            alert('Şifre en az 6 karakter olmalıdır!');
+            await showAlert('Şifre en az 6 karakter olmalıdır!', 'warning');
             return;
         }
         setChangingPassword(true);
@@ -227,14 +229,14 @@ export default function SettingsPage() {
             const data = await res.json();
 
             if (res.ok) {
-                alert('Şifreniz başarıyla değiştirildi!');
+                await showAlert('Şifreniz başarıyla değiştirildi!', 'success');
                 setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
             } else {
-                alert(data.error || 'Şifre değiştirme başarısız!');
+                await showAlert(data.error || 'Şifre değiştirme başarısız!', 'error');
             }
         } catch (error) {
             console.error('Error changing password:', error);
-            alert('Bir hata oluştu!');
+            await showAlert('Bir hata oluştu!', 'error');
         } finally {
             setChangingPassword(false);
         }
@@ -321,7 +323,8 @@ export default function SettingsPage() {
     };
 
     const handleDeleteSession = async (sessionId) => {
-        if (!confirm('Bu oturumu sonlandırmak istediğinizden emin misiniz?')) {
+        const confirmed = await showConfirm('Bu oturumu sonlandırmak istediğinizden emin misiniz?');
+        if (!confirmed) {
             return;
         }
 
@@ -331,24 +334,26 @@ export default function SettingsPage() {
             });
 
             if (res.ok) {
-                alert('Oturum başarıyla sonlandırıldı!');
+                await showAlert('Oturum başarıyla sonlandırıldı!', 'success');
                 fetchSessions(); // Refresh list
             } else {
                 const data = await res.json();
-                alert(data.error || 'Oturum sonlandırma başarısız!');
+                await showAlert(data.error || 'Oturum sonlandırma başarısız!', 'error');
             }
         } catch (error) {
             console.error('Error deleting session:', error);
-            alert('Bir hata oluştu!');
+            await showAlert('Bir hata oluştu!', 'error');
         }
     };
 
     const handleTerminateAllSessions = async () => {
-        if (!confirm('Tüm oturumları sonlandırmak istediğinizden emin misiniz? Bu işlemden sonra tekrar giriş yapmanız gerekecek.')) {
+        const confirmed1 = await showConfirm('Tüm oturumları sonlandırmak istediğinizden emin misiniz? Bu işlemden sonra tekrar giriş yapmanız gerekecek.');
+        if (!confirmed1) {
             return;
         }
 
-        if (!confirm('SON UYARI: Tüm cihazlardaki oturumlarınız sonlandırılacak! Devam etmek istiyor musunuz?')) {
+        const confirmed2 = await showConfirm('SON UYARI: Tüm cihazlardaki oturumlarınız sonlandırılacak! Devam etmek istiyor musunuz?', 'Son Uyarı');
+        if (!confirmed2) {
             return;
         }
 
@@ -359,28 +364,30 @@ export default function SettingsPage() {
             });
 
             if (res.ok) {
-                alert('Tüm oturumlar sonlandırıldı. Yeniden giriş yapmanız gerekiyor.');
+                await showAlert('Tüm oturumlar sonlandırıldı. Yeniden giriş yapmanız gerekiyor.', 'success');
                 // Sign out and redirect
                 await signOut({ redirect: false });
                 window.location.href = '/login?t=' + Date.now();
             } else {
                 const data = await res.json();
-                alert(data.error || 'Oturum sonlandırma başarısız!');
+                await showAlert(data.error || 'Oturum sonlandırma başarısız!', 'error');
             }
         } catch (error) {
             console.error('Error terminating all sessions:', error);
-            alert('Bir hata oluştu!');
+            await showAlert('Bir hata oluştu!', 'error');
         } finally {
             setTerminatingAll(false);
         }
     };
 
     const handleDeleteAccount = async () => {
-        if (!confirm('Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
+        const confirmed1 = await showConfirm('Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!');
+        if (!confirmed1) {
             return;
         }
 
-        if (!confirm('SON UYARI: Tüm verileriniz silinecek ve bu işlem geri alınamayacak! Devam etmek istiyor musunuz?')) {
+        const confirmed2 = await showConfirm('SON UYARI: Tüm verileriniz silinecek ve bu işlem geri alınamayacak! Devam etmek istiyor musunuz?', 'Son Uyarı');
+        if (!confirmed2) {
             return;
         }
 
@@ -390,18 +397,18 @@ export default function SettingsPage() {
             });
 
             if (res.ok) {
-                alert('Hesabınız silindi. Hoşçakalın!');
+                await showAlert('Hesabınız silindi. Hoşçakalın!', 'success');
                 // Sign out without automatic redirect to allow session state to clear first
                 await signOut({ redirect: false });
                 // Force a full page refresh to home page
                 window.location.href = '/';
             } else {
                 const data = await res.json();
-                alert(data.error || 'Hesap silme başarısız!');
+                await showAlert(data.error || 'Hesap silme başarısız!', 'error');
             }
         } catch (error) {
             console.error('Error deleting account:', error);
-            alert('Bir hata oluştu!');
+            await showAlert('Bir hata oluştu!', 'error');
         }
     };
 

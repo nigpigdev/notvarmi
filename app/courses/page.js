@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Card from '@/components/Card';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 export default function Courses() {
     const [courses, setCourses] = useState([]);
@@ -25,6 +26,7 @@ export default function Courses() {
     const [isMobile, setIsMobile] = useState(false);
     const router = useRouter();
     const { t } = useLanguage();
+    const { showAlert, showConfirm } = useAlert();
 
     useEffect(() => {
         fetchCourses();
@@ -66,7 +68,7 @@ export default function Courses() {
     const handleAddCourse = async (e) => {
         e.preventDefault();
         if (!newCourse.name || !newCourse.code) {
-            alert(t.courses.nameCodeRequired || 'Ders adı ve kodu zorunludur');
+            await showAlert(t.courses.nameCodeRequired || 'Ders adı ve kodu zorunludur', 'warning');
             return;
         }
 
@@ -84,11 +86,11 @@ export default function Courses() {
                 setShowAddModal(false);
                 setNewCourse({ name: '', code: '', instructor: '', credits: '' });
             } else {
-                alert(t.courses.addError || 'Ders eklenirken hata oluştu');
+                await showAlert(t.courses.addError || 'Ders eklenirken hata oluştu', 'error');
             }
         } catch (error) {
             console.error('Error adding course:', error);
-            alert(t.courses.addError || 'Ders eklenirken hata oluştu');
+            await showAlert(t.courses.addError || 'Ders eklenirken hata oluştu', 'error');
         } finally {
             setAdding(false);
         }
@@ -102,7 +104,7 @@ export default function Courses() {
     const handleUpdateCourse = async (e) => {
         e.preventDefault();
         if (!editingCourse.name || !editingCourse.code) {
-            alert(t.courses.nameCodeRequired || 'Ders adı ve kodu zorunludur');
+            await showAlert(t.courses.nameCodeRequired || 'Ders adı ve kodu zorunludur', 'warning');
             return;
         }
 
@@ -120,18 +122,19 @@ export default function Courses() {
                 setShowEditModal(false);
                 setEditingCourse(null);
             } else {
-                alert(t.courses.updateError || 'Ders güncellenirken hata oluştu');
+                await showAlert(t.courses.updateError || 'Ders güncellenirken hata oluştu', 'error');
             }
         } catch (error) {
             console.error('Error updating course:', error);
-            alert(t.courses.updateError || 'Ders güncellenirken hata oluştu');
+            await showAlert(t.courses.updateError || 'Ders güncellenirken hata oluştu', 'error');
         } finally {
             setUpdating(false);
         }
     };
 
     const handleDeleteCourse = async () => {
-        if (!confirm('Bu dersi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+        const confirmed = await showConfirm('Bu dersi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
+        if (!confirmed) {
             return;
         }
 
@@ -146,11 +149,11 @@ export default function Courses() {
                 setShowEditModal(false);
                 setEditingCourse(null);
             } else {
-                alert(t.courses.deleteError || 'Ders silinirken hata oluştu');
+                await showAlert(t.courses.deleteError || 'Ders silinirken hata oluştu', 'error');
             }
         } catch (error) {
             console.error('Error deleting course:', error);
-            alert(t.courses.deleteError || 'Ders silinirken hata oluştu');
+            await showAlert(t.courses.deleteError || 'Ders silinirken hata oluştu', 'error');
         } finally {
             setDeleting(false);
         }
