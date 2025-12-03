@@ -1,8 +1,11 @@
 // Service Worker for PWA
-const CACHE_NAME = 'notvarmi-v2';
+const CACHE_NAME = 'notvarmi-v3';
 const urlsToCache = [
     '/',
     '/manifest.json',
+    '/icon-192x192.png',
+    '/icon-512x512.png',
+    '/apple-touch-icon.png',
     '/icon-192x192.svg',
     '/icon-512x512.svg',
 ];
