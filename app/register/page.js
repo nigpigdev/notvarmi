@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import universities from '@/lib/universities';
 import departments from '@/lib/departments';
+import { useAlert } from '@/contexts/AlertContext';
 
 export default function RegisterPage() {
     const router = useRouter();
+    const { showAlert } = useAlert();
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
         firstName: '',
@@ -97,7 +99,7 @@ export default function RegisterPage() {
 
             const data = await res.json();
             if (res.ok) {
-                alert('Kayıt başarılı! Giriş yapabilirsiniz.');
+                await showAlert('Kayıt başarılı! Giriş yapabilirsiniz.', 'success');
                 router.push('/login');
             } else {
                 setErrors({ submit: data.error || 'Kayıt başarısız oldu' });
