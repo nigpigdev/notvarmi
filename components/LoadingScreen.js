@@ -42,9 +42,8 @@ export default function LoadingScreen() {
                     font-family: var(--font-pacifico);
                     font-size: 4rem;
                     background: var(--primary-gradient);
-                    WebkitBackgroundClip: 'text';
-                    WebkitTextFillColor: transparent; /* Fallback */
-                    color: transparent;
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
                     background-clip: text;
                     font-weight: bold;
                     letter-spacing: 1px;
