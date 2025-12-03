@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAlert } from '@/contexts/AlertContext';
 import FilePreview from '@/components/FilePreview';
 
 export default function UploadNote() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const { t } = useLanguage();
+    const { showAlert, showConfirm } = useAlert();
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -49,10 +51,10 @@ export default function UploadNote() {
         }
     }, [status]);
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const selectedFiles = Array.from(e.target.files);
         if (files.length + selectedFiles.length > 5) {
-            alert(t.notes.maxFilesError || 'Max 5 files allowed');
+            await showAlert(t.notes.maxFilesError || 'Max 5 files allowed', 'warning');
             return;
         }
         setFiles([...files, ...selectedFiles]);
@@ -64,7 +66,7 @@ export default function UploadNote() {
 
     const handleCreateCourse = async () => {
         if (!newCourse.name || !newCourse.code) {
-            alert(t.notes.courseNameRequired || 'Course name and code are required');
+            await showAlert(t.notes.courseNameRequired || 'Course name and code are required', 'warning');
             return;
         }
 
@@ -83,11 +85,11 @@ export default function UploadNote() {
                 setShowNewCourseModal(false);
                 setNewCourse({ name: '', code: '', instructor: '', credits: '' });
             } else {
-                alert('Failed to create course');
+                await showAlert('Failed to create course', 'error');
             }
         } catch (error) {
             console.error('Error creating course:', error);
-            alert('Error creating course');
+            await showAlert('Error creating course', 'error');
         } finally {
             setCreatingCourse(false);
         }
@@ -128,11 +130,11 @@ export default function UploadNote() {
                 router.push('/notes');
             } else {
                 const error = await res.json();
-                alert(error.message || t.notes.uploadError);
+                await showAlert(error.message || t.notes.uploadError, 'error');
             }
         } catch (error) {
             console.error('Error uploading note:', error);
-            alert(t.notes.uploadError);
+            await showAlert(t.notes.uploadError, 'error');
         } finally {
             setLoading(false);
         }

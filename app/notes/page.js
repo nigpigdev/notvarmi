@@ -5,6 +5,7 @@ import Card from '@/components/Card';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAlert } from '@/contexts/AlertContext';
 import FileBadge from '@/components/FileBadge';
 
 export default function Notes() {
@@ -15,6 +16,7 @@ export default function Notes() {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const { t } = useLanguage();
+    const { showAlert, showConfirm } = useAlert();
 
     // Edit state
     const [showEditModal, setShowEditModal] = useState(false);
@@ -78,7 +80,7 @@ export default function Notes() {
     const handleUpdateNote = async (e) => {
         e.preventDefault();
         if (!editingNote.title || !editingNote.description || !editingNote.courseId) {
-            alert(t.notes.fillAllFields || 'Lütfen tüm alanları doldurun');
+            await showAlert(t.notes.fillAllFields || 'Lütfen tüm alanları doldurun', 'warning');
             return;
         }
 
@@ -96,18 +98,19 @@ export default function Notes() {
                 setShowEditModal(false);
                 setEditingNote(null);
             } else {
-                alert(t.notes.updateError || 'Not güncellenirken hata oluştu');
+                await showAlert(t.notes.updateError || 'Not güncellenirken hata oluştu', 'error');
             }
         } catch (error) {
             console.error('Error updating note:', error);
-            alert(t.notes.updateError || 'Not güncellenirken hata oluştu');
+            await showAlert(t.notes.updateError || 'Not güncellenirken hata oluştu', 'error');
         } finally {
             setUpdating(false);
         }
     };
 
     const handleDeleteNote = async () => {
-        if (!confirm(t.notes.deleteConfirm || 'Bu notu silmek istediğinizden emin misiniz?')) {
+        const confirmed = await showConfirm(t.notes.deleteConfirm || 'Bu notu silmek istediğinizden emin misiniz?');
+        if (!confirmed) {
             return;
         }
 
@@ -122,11 +125,11 @@ export default function Notes() {
                 setShowEditModal(false);
                 setEditingNote(null);
             } else {
-                alert(t.notes.deleteError || 'Not silinirken hata oluştu');
+                await showAlert(t.notes.deleteError || 'Not silinirken hata oluştu', 'error');
             }
         } catch (error) {
             console.error('Error deleting note:', error);
-            alert(t.notes.deleteError || 'Not silinirken hata oluştu');
+            await showAlert(t.notes.deleteError || 'Not silinirken hata oluştu', 'error');
         } finally {
             setDeleting(false);
         }
