@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import FileBadge from '@/components/FileBadge';
 
 export default function Forum() {
+    const router = useRouter();
     const [questions, setQuestions] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('newest');

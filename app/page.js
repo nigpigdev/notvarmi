@@ -1,5 +1,10 @@
 'use client';
 
+import { generateMetaTags } from '@/lib/seo';
+
+// Note: In Next.js 13+, metadata should ideally be exported from server components
+// Since this is a client component, metadata is handled in layout.js
+
 import Card from '@/components/Card';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';

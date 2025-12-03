@@ -5,6 +5,8 @@ import NotificationBell from '@/components/NotificationBell';
 import Calendar from '@/components/Calendar';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import SplashScreen from '@/components/SplashScreen';
+import SEOHead from '@/components/SEOHead';
+import { generateOrganizationSchema, generateWebSiteSchema, baseMetadata } from '@/lib/seo';
 import './globals.css'
 import { Inter, Pacifico } from 'next/font/google'
 
@@ -12,7 +14,8 @@ const inter = Inter({ subsets: ['latin'] })
 const pacifico = Pacifico({
     weight: '400',
     subsets: ['latin'],
-    variable: '--font-pacifico'
+    variable: '--font-pacifico',
+    display: 'swap', // Add font display swap for better performance
 })
 
 export const viewport = {
@@ -20,13 +23,18 @@ export const viewport = {
     initialScale: 1,
     maximumScale: 5,
     userScalable: true,
+    themeColor: '#8b5cf6',
 }
 
 export const metadata = {
-    metadataBase: new URL('https://www.xn--notvarm-xfb.com'),
-    title: 'Notvarmı',
-    description: 'University Student Platform',
-    themeColor: '#8b5cf6',
+    ...baseMetadata,
+    metadataBase: new URL('https://www.notvarmi.com'),
+    title: {
+        default: 'Notvarmı - Üniversite Öğrencileri Platformu',
+        template: '%s | Notvarmı',
+    },
+    description: 'Üniversite öğrencileri için not paylaşım, ders bilgileri ve akademik yardımlaşma platformu. Derslerinizi takip edin, notlarınızı paylaşın ve sorularınıza cevap bulun.',
+    keywords: ['üniversite notları', 'ders notları', 'öğrenci platformu', 'akademik yardımlaşma', 'not paylaşımı', 'forum', 'ders takibi', 'öğrenci forumu'],
     manifest: '/manifest.json',
     appleWebApp: {
         capable: true,
@@ -45,13 +53,65 @@ export const metadata = {
     verification: {
         google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
     },
+    openGraph: {
+        type: 'website',
+        locale: 'tr_TR',
+        url: 'https://www.notvarmi.com',
+        siteName: 'Notvarmı',
+        title: 'Notvarmı - Üniversite Öğrencileri Platformu',
+        description: 'Üniversite öğrencileri için not paylaşım ve akademik yardımlaşma platformu',
+        images: [
+            {
+                url: '/icon-512x512.svg',
+                width: 512,
+                height: 512,
+                alt: 'Notvarmı Logo',
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Notvarmı - Üniversite Öğrencileri Platformu',
+        description: 'Üniversite öğrencileri için not paylaşım ve akademik yardımlaşma platformu',
+        images: ['/icon-512x512.svg'],
+    },
+    alternates: {
+        canonical: 'https://www.notvarmi.com',
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
+    },
 }
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en" suppressHydrationWarning={true}>
+        <html lang="tr" suppressHydrationWarning={true}>
             <head>
+                {/* Preconnect to external domains for performance */}
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="preconnect" href="https://www.google-analytics.com" />
+
+                {/* DNS Prefetch */}
+                <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+                <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
                 <GoogleAnalytics />
+
+                {/* Structured Data - Organization */}
+                <SEOHead structuredData={generateOrganizationSchema()} />
+
+                {/* Structured Data - WebSite with SearchAction */}
+                <SEOHead structuredData={generateWebSiteSchema()} />
+
                 <script dangerouslySetInnerHTML={{
                     __html: `
                         if ('serviceWorker' in navigator) {

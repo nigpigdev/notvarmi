@@ -1,10 +1,25 @@
 export default function robots() {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/api/', '/admin/'],
-    },
-    sitemap: 'https://www.xn--notvarm-xfb.com/sitemap.xml',
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/_next/',
+          '/settings/',
+          '/messages/',
+        ],
+        crawlDelay: 1,
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/api/', '/admin/', '/settings/', '/messages/'],
+        crawlDelay: 0.5,
+      },
+    ],
+    sitemap: 'https://www.notvarmi.com/sitemap.xml',
   }
 }
