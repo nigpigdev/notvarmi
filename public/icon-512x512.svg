@@ -3,8 +3,8 @@
 <path d="M150 130C150 118.954 158.954 110 170 110H190C201.046 110 210 118.954 210 130V270L302 124.5C306.5 117.5 314.5 113 323 113H342C353.046 113 362 121.954 362 133V382C362 393.046 353.046 402 342 402H322C310.954 402 302 393.046 302 382V242L210 387.5C205.5 394.5 197.5 399 189 399H170C158.954 399 150 390.046 150 379V130Z" fill="white"/>
 <defs>
 <linearGradient id="bg_gradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-<stop stop-color="#8B5CF6"/>
-<stop offset="1" stop-color="#6D28D9"/>
+<stop stop-color="#FBBF24"/>
+<stop offset="1" stop-color="#F43F5E"/>
 </linearGradient>
 </defs>
 </svg>

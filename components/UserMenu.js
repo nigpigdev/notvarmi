@@ -43,31 +43,42 @@ export default function UserMenu({ user }) {
                 }}
             >
                 <div style={{
-                    width: '40px',
-                    height: '40px',
+                    width: '44px',
+                    height: '44px',
                     borderRadius: '50%',
                     overflow: 'hidden',
-                    border: '2px solid var(--accent-purple)',
-                    backgroundColor: 'var(--background)',
+                    background: 'var(--primary-gradient)',
+                    padding: '2px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}>
-                    {user.avatar ? (
-                        <img
-                            src={user.avatar}
-                            alt={user.name || user.username}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                    ) : (
-                        <span style={{
-                            fontSize: '1.2rem',
-                            fontWeight: 'bold',
-                            color: 'var(--text)'
-                        }}>
-                            {user.firstName ? user.firstName[0].toUpperCase() : (user.name ? user.name[0].toUpperCase() : '?')}
-                        </span>
-                    )}
+                    <div style={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '50%',
+                        background: 'var(--background)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden'
+                    }}>
+                        {user.avatar ? (
+                            <img
+                                src={user.avatar}
+                                alt={user.name || user.username}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                        ) : (
+                            <span style={{
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold',
+                                color: 'var(--text)'
+                            }}>
+                                {user.firstName ? user.firstName[0].toUpperCase() : (user.name ? user.name[0].toUpperCase() : '?')}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </button>
 

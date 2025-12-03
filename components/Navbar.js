@@ -143,7 +143,7 @@ export default function Navbar() {
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
-                    {isMobile && <span>Ara</span>}
+                    {isMobile && <span>🔍 Ara</span>}
                 </Link>
             </li>
             {status === 'authenticated' && !isMobile && (
@@ -161,7 +161,7 @@ export default function Navbar() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/forum" onClick={isMobile ? closeMobileMenu : undefined}>{t.navbar.forum}</Link>
+                                <Link href="/forum" onClick={isMobile ? closeMobileMenu : undefined}>📢 {t.navbar.forum}</Link>
                             </li>
                             <li>
                                 <Link href="/messages" onClick={isMobile ? closeMobileMenu : undefined} style={{ position: 'relative' }}>
@@ -192,13 +192,13 @@ export default function Navbar() {
                     ) : (
                         <>
                             <li>
-                                <Link href="/courses" onClick={isMobile ? closeMobileMenu : undefined}>{t.navbar.courses}</Link>
+                                <Link href="/courses" onClick={isMobile ? closeMobileMenu : undefined}>📚 {t.navbar.courses}</Link>
                             </li>
                             <li>
-                                <Link href="/notes" onClick={isMobile ? closeMobileMenu : undefined}>{t.navbar.notes}</Link>
+                                <Link href="/notes" onClick={isMobile ? closeMobileMenu : undefined}>📝 {t.navbar.notes}</Link>
                             </li>
                             <li>
-                                <Link href="/forum" onClick={isMobile ? closeMobileMenu : undefined}>{t.navbar.forum}</Link>
+                                <Link href="/forum" onClick={isMobile ? closeMobileMenu : undefined}>📢 {t.navbar.forum}</Link>
                             </li>
                             <li>
                                 <Link href="/messages" onClick={isMobile ? closeMobileMenu : undefined} style={{ position: 'relative' }}>
@@ -269,11 +269,11 @@ export default function Navbar() {
             ) : (
                 <>
                     <li>
-                        <Link href="/login" onClick={isMobile ? closeMobileMenu : undefined}>{t.navbar.login}</Link>
+                        <Link href="/login" onClick={isMobile ? closeMobileMenu : undefined}>🔑 {t.navbar.login}</Link>
                     </li>
                     <li>
                         <Link href="/register" className={styles.registerBtn} onClick={isMobile ? closeMobileMenu : undefined}>
-                            {t.navbar.register}
+                            ✨ {t.navbar.register}
                         </Link>
                     </li>
                 </>
