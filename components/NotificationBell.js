@@ -96,18 +96,18 @@ export default function NotificationBell() {
     if (!session) return null;
 
     return (
-        <div ref={popupRef} style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000 }}>
-            {/* Notification Bell Button */}
+        <div ref={popupRef} style={{ position: 'fixed', bottom: '2rem', right: '1.5rem', zIndex: 1000 }}>
+            {/* Notification Bell Button - Square Design */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, var(--primary), #C62368)',
+                    width: '52px',
+                    height: '52px',
+                    borderRadius: '14px',
+                    background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                     border: 'none',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 20px rgba(225, 48, 108, 0.4)',
+                    boxShadow: '0 4px 20px rgba(249, 115, 22, 0.4)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -115,12 +115,12 @@ export default function NotificationBell() {
                     transition: 'all 0.3s ease'
                 }}
                 onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.1)';
-                    e.currentTarget.style.boxShadow = '0 6px 30px rgba(225, 48, 108, 0.5)';
+                    e.currentTarget.style.transform = 'scale(1.08)';
+                    e.currentTarget.style.boxShadow = '0 6px 30px rgba(249, 115, 22, 0.5)';
                 }}
                 onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = '0 4px 20px rgba(225, 48, 108, 0.4)';
+                    e.currentTarget.style.boxShadow = '0 4px 20px rgba(249, 115, 22, 0.4)';
                 }}
             >
                 {/* Bell Icon */}
@@ -133,12 +133,12 @@ export default function NotificationBell() {
                 {unreadCount > 0 && (
                     <span style={{
                         position: 'absolute',
-                        top: '0',
-                        right: '0',
-                        background: '#ff4444',
+                        top: '-6px',
+                        right: '-6px',
+                        background: '#ef4444',
                         color: 'white',
-                        borderRadius: '50%',
-                        width: '20px',
+                        borderRadius: '8px',
+                        minWidth: '20px',
                         height: '20px',
                         display: 'flex',
                         alignItems: 'center',
@@ -146,6 +146,7 @@ export default function NotificationBell() {
                         fontSize: '10px',
                         fontWeight: 'bold',
                         border: '2px solid var(--background)',
+                        padding: '0 4px',
                         animation: 'pulse 2s ease-in-out infinite'
                     }}>
                         {unreadCount > 9 ? '9+' : unreadCount}

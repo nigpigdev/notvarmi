@@ -8,7 +8,7 @@ const ForumPostContext = createContext();
 export function ForumPostProvider({ children }) {
     const [pendingPost, setPendingPost] = useState(null);
     const [isPending, setIsPending] = useState(false);
-    const [countdown, setCountdown] = useState(20);
+    const [countdown, setCountdown] = useState(10);
     const submissionTimer = useRef(null);
     const countdownTimer = useRef(null);
     const router = useRouter();
@@ -16,7 +16,7 @@ export function ForumPostProvider({ children }) {
     const startSubmission = (postData) => {
         setPendingPost(postData);
         setIsPending(true);
-        setCountdown(20);
+        setCountdown(10);
 
         // Start countdown
         countdownTimer.current = setInterval(() => {
@@ -32,7 +32,7 @@ export function ForumPostProvider({ children }) {
         // Start submission timer
         submissionTimer.current = setTimeout(() => {
             finalizeSubmission(postData);
-        }, 20000);
+        }, 10000);
 
         router.push('/forum');
     };
@@ -41,7 +41,7 @@ export function ForumPostProvider({ children }) {
         if (submissionTimer.current) clearTimeout(submissionTimer.current);
         if (countdownTimer.current) clearInterval(countdownTimer.current);
         setIsPending(false);
-        setCountdown(20);
+        setCountdown(10);
         router.push('/forum/create');
     };
 
@@ -68,6 +68,10 @@ export function ForumPostProvider({ children }) {
             if (res.ok) {
                 setPendingPost(null);
                 router.refresh();
+                // Auto reload page to show new content
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             } else {
                 console.error('Failed to create post');
                 // Error handling moved to UI layer

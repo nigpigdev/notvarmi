@@ -8,7 +8,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
-import ProductivityMenu from './ProductivityMenu';
 
 export default function Navbar() {
     const { data: session, status } = useSession();
@@ -71,37 +70,6 @@ export default function Navbar() {
         <>
             {!isMobile && (
                 <li>
-                    <button
-                        onClick={toggleLanguage}
-                        style={{
-                            background: 'none',
-                            border: '1px solid var(--border)',
-                            color: 'var(--text)',
-                            padding: '0.4rem 0.8rem',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontSize: '0.85rem',
-                            fontWeight: '600',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.3rem',
-                            transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--primary)';
-                            e.currentTarget.style.color = 'var(--primary)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--border)';
-                            e.currentTarget.style.color = 'var(--text)';
-                        }}
-                    >
-                        🌐 {language === 'tr' ? 'TR' : 'EN'}
-                    </button>
-                </li>
-            )}
-            {!isMobile && (
-                <li>
                     <ThemeToggle />
                 </li>
             )}
@@ -132,11 +100,7 @@ export default function Navbar() {
                     {isMobile && <span>🔍 Ara</span>}
                 </Link>
             </li>
-            {status === 'authenticated' && !isMobile && (
-                <li>
-                    <ProductivityMenu />
-                </li>
-            )}
+
             {status === 'authenticated' ? (
                 <>
                     {session?.user?.role && (session.user.role === 'ADMIN' || session.user.role === 'POWERUSER') ? (
@@ -230,9 +194,7 @@ export default function Navbar() {
                                     ⚙️ Ayarlar
                                 </Link>
                             </li>
-                            <li>
-                                <ProductivityMenu isMobile={true} onOpen={closeMobileMenu} />
-                            </li>
+
                             <li>
                                 <button onClick={() => { signOut(); closeMobileMenu(); }} style={{
                                     background: 'none',

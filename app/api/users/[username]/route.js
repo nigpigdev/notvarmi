@@ -52,8 +52,27 @@ export async function GET(req, { params }) {
                 console.log(`API: Found user with case-insensitive search: "${userCaseInsensitive.username}"`);
                 // We could return this user, or just log it for now. 
                 // Let's return it to be helpful.
+                // We found the user, but we need to return it in the correct structure
+                // Re-assign user variable and let the rest of the function handle it
+                // But we can't re-assign const 'user'.
+                // So we should just return the correct structure here.
+
+                // We need to check privacy for this user too
+                const currentUser = await prisma.user.findUnique({
+                    where: { email: session.user.email },
+                    select: { id: true }
+                });
+
+                const isOwnProfile = currentUser && currentUser.id === userCaseInsensitive.id;
+                const isProfilePrivate = !userCaseInsensitive.profileVisible && !isOwnProfile;
+
+                // We won't fetch posts/replies for this fallback case to keep it simple for now, 
+                // or we could refactor. For now, let's just return the basic structure.
                 return NextResponse.json({
-                    ...userCaseInsensitive,
+                    user: userCaseInsensitive,
+                    posts: [],
+                    replies: [],
+                    isPrivate: isProfilePrivate,
                     note: 'Returned via case-insensitive match'
                 });
             }

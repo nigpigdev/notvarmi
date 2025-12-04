@@ -26,12 +26,21 @@ export default function UploadNote() {
     const [showPublicWarning, setShowPublicWarning] = useState(false);
     const [newCourse, setNewCourse] = useState({ name: '', code: '', instructor: '', credits: '' });
     const [creatingCourse, setCreatingCourse] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [dragOver, setDragOver] = useState(false);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
             router.push('/login');
         }
     }, [status, router]);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         const fetchCourses = async () => {
@@ -58,6 +67,17 @@ export default function UploadNote() {
             return;
         }
         setFiles([...files, ...selectedFiles]);
+    };
+
+    const handleDrop = async (e) => {
+        e.preventDefault();
+        setDragOver(false);
+        const droppedFiles = Array.from(e.dataTransfer.files);
+        if (files.length + droppedFiles.length > 5) {
+            await showAlert(t.notes.maxFilesError || 'Max 5 files allowed', 'warning');
+            return;
+        }
+        setFiles([...files, ...droppedFiles]);
     };
 
     const removeFile = (index) => {
@@ -140,447 +160,530 @@ export default function UploadNote() {
         }
     };
 
+    const inputStyle = {
+        width: '100%',
+        padding: '1rem 1.25rem',
+        borderRadius: '14px',
+        border: '2px solid transparent',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        color: 'var(--text)',
+        fontSize: '1rem',
+        outline: 'none',
+        transition: 'all 0.3s ease',
+        backdropFilter: 'blur(10px)'
+    };
+
     return (
-        <div style={{ maxWidth: '900px', margin: '2rem auto', padding: '0 1rem' }}>
-            {/* Header */}
-            <div style={{ marginBottom: '2rem' }}>
+        <div style={{
+            minHeight: '100vh',
+            background: 'var(--background)',
+            padding: isMobile ? '1rem' : '2rem'
+        }}>
+            {/* Animated Background Gradient */}
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '400px',
+                background: 'linear-gradient(180deg, rgba(249, 115, 22, 0.08) 0%, transparent 100%)',
+                pointerEvents: 'none',
+                zIndex: 0
+            }} />
+
+            <div style={{
+                maxWidth: '800px',
+                margin: '0 auto',
+                position: 'relative',
+                zIndex: 1
+            }}>
+                {/* Back Button */}
                 <Link href="/notes" style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',
+                    padding: '0.75rem 1.25rem',
                     marginBottom: '1.5rem',
                     color: 'var(--text-secondary)',
                     textDecoration: 'none',
                     fontSize: '0.9rem',
-                    transition: 'color 0.2s ease'
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    border: '1px solid var(--border)',
+                    transition: 'all 0.2s ease',
+                    backdropFilter: 'blur(10px)'
                 }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-blue)'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.1)';
+                        e.currentTarget.style.color = '#f97316';
+                        e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                        e.currentTarget.style.borderColor = 'var(--border)';
+                    }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
                     {t.notes.backToNotes}
                 </Link>
 
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h1 style={{
+                {/* Header */}
+                <div style={{
+                    textAlign: 'center',
+                    marginBottom: '2.5rem',
+                    padding: '2rem 1rem'
+                }}>
+                    <div style={{
+                        width: '80px',
+                        height: '80px',
+                        margin: '0 auto 1.5rem',
+                        borderRadius: '24px',
+                        background: 'var(--primary-gradient)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         fontSize: '2.5rem',
-                        marginBottom: '0.5rem',
+                        boxShadow: '0 20px 40px rgba(249, 115, 22, 0.3)'
+                    }}>
+                        📄
+                    </div>
+                    <h1 style={{
+                        fontSize: isMobile ? '1.75rem' : '2.25rem',
+                        fontWeight: '800',
+                        marginBottom: '0.75rem',
                         background: 'var(--primary-gradient)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
-                    }}>{t.notes.createNoteTitle}</h1>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
-                        Notunu oluştur ve arkadaşlarınla paylaş 📚
+                    }}>
+                        Yeni Dosya Oluştur
+                    </h1>
+                    <p style={{
+                        color: 'var(--text-secondary)',
+                        fontSize: '1rem',
+                        maxWidth: '400px',
+                        margin: '0 auto'
+                    }}>
+                        Notlarını yükle ve düzenli tut 📚
                     </p>
                 </div>
-            </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                {/* Basic Information Section */}
-                <div style={{
-                    backgroundColor: 'var(--secondary)',
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    border: '1px solid var(--border)'
-                }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+                    {/* Main Card */}
                     <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        marginBottom: '1.5rem'
+                        backgroundColor: 'var(--secondary)',
+                        borderRadius: '20px',
+                        padding: isMobile ? '1.5rem' : '2rem',
+                        border: '1px solid var(--border)',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.1)'
                     }}>
-                        <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '12px',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '1.5rem'
-                        }}>
-                            📝
-                        </div>
-                        <div>
-                            <h2 style={{ fontSize: '1.5rem', color: 'var(--text)', marginBottom: '0.25rem' }}>
-                                Temel Bilgiler
-                            </h2>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                                Notunun başlığını ve açıklamasını yaz
-                            </p>
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                        {/* Title */}
-                        <div>
-                            <label style={{
+                        {/* Title & Description */}
+                        <div style={{ marginBottom: '2rem' }}>
+                            <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.5rem',
-                                marginBottom: '0.5rem',
-                                color: 'var(--text)',
-                                fontWeight: '600',
-                                fontSize: '0.95rem'
+                                marginBottom: '1.25rem'
                             }}>
-                                <span style={{ color: 'var(--accent-purple)' }}>●</span>
-                                {t.notes.titleLabel} *
-                            </label>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                required
-                                placeholder="ör. Matematik Vize Notları"
-                                style={{
-                                    width: '100%',
-                                    padding: '0.9rem 1rem',
-                                    borderRadius: '12px',
-                                    border: '2px solid var(--border)',
-                                    backgroundColor: 'var(--background)',
-                                    color: 'var(--text)',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    transition: 'border-color 0.2s ease'
-                                }}
-                                onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent-purple)'}
-                                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-                            />
-                        </div>
+                                <span style={{ fontSize: '1.25rem' }}>✍️</span>
+                                <span style={{
+                                    fontWeight: '700',
+                                    fontSize: '1.1rem',
+                                    color: 'var(--text)'
+                                }}>Temel Bilgiler</span>
+                            </div>
 
-                        {/* Description */}
-                        <div>
-                            <label style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                marginBottom: '0.5rem',
-                                color: 'var(--text)',
-                                fontWeight: '600',
-                                fontSize: '0.95rem'
-                            }}>
-                                <span style={{ color: 'var(--accent-purple)' }}>●</span>
-                                {t.notes.descriptionLabel} *
-                            </label>
-                            <textarea
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                required
-                                rows={5}
-                                placeholder="Notun hakkında kısa bir açıklama..."
-                                style={{
-                                    width: '100%',
-                                    padding: '0.9rem 1rem',
-                                    borderRadius: '12px',
-                                    border: '2px solid var(--border)',
-                                    backgroundColor: 'var(--background)',
-                                    color: 'var(--text)',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    resize: 'vertical',
-                                    fontFamily: 'inherit',
-                                    lineHeight: '1.6',
-                                    transition: 'border-color 0.2s ease'
-                                }}
-                                onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent-purple)'}
-                                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Course & Tags Section */}
-                <div style={{
-                    backgroundColor: 'var(--secondary)',
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    border: '1px solid var(--border)'
-                }}>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        marginBottom: '1.5rem'
-                    }}>
-                        <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '12px',
-                            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '1.5rem'
-                        }}>
-                            🎯
-                        </div>
-                        <div>
-                            <h2 style={{ fontSize: '1.5rem', color: 'var(--text)', marginBottom: '0.25rem' }}>
-                                Ders & Etiketler
-                            </h2>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                                Notunu kategorize et
-                            </p>
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                        {/* Course Selection */}
-                        <div>
-                            <label style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                marginBottom: '0.5rem',
-                                color: 'var(--text)',
-                                fontWeight: '600',
-                                fontSize: '0.95rem'
-                            }}>
-                                <span style={{ color: 'var(--accent-amber)' }}>●</span>
-                                {t.notes.courseLabel} *
-                            </label>
-                            <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                <select
-                                    value={courseId}
-                                    onChange={(e) => setCourseId(e.target.value)}
-                                    required
-                                    style={{
-                                        flex: 1,
-                                        padding: '0.9rem 1rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
                                         color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        cursor: 'pointer',
-                                        transition: 'border-color 0.2s ease'
-                                    }}
-                                    onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent-amber)'}
-                                    onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-                                >
-                                    <option value="">{t.notes.selectCoursePlaceholder}</option>
-                                    {courses.map(course => (
-                                        <option key={course.id} value={course.id}>
-                                            {course.code} - {course.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowNewCourseModal(true)}
-                                    style={{
-                                        padding: '0.9rem 1.5rem',
-                                        borderRadius: '12px',
-                                        border: 'none',
-                                        backgroundColor: 'var(--accent-amber)',
-                                        color: 'white',
-                                        fontSize: '0.9rem',
-                                        cursor: 'pointer',
                                         fontWeight: '600',
-                                        whiteSpace: 'nowrap',
-                                        transition: 'transform 0.2s ease',
-                                        boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                                >
-                                    + Yeni
-                                </button>
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Başlık <span style={{ color: '#f97316' }}>*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        required
+                                        placeholder="ör. Matematik Final Notları"
+                                        style={inputStyle}
+                                        onFocus={(e) => {
+                                            e.currentTarget.style.borderColor = '#f97316';
+                                            e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.05)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.currentTarget.style.borderColor = 'transparent';
+                                            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                                        }}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
+                                        color: 'var(--text)',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Açıklama <span style={{ color: '#f97316' }}>*</span>
+                                    </label>
+                                    <textarea
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        required
+                                        rows={3}
+                                        placeholder="Kısa bir açıklama ekle..."
+                                        style={{
+                                            ...inputStyle,
+                                            resize: 'vertical',
+                                            minHeight: '100px',
+                                            fontFamily: 'inherit',
+                                            lineHeight: '1.6'
+                                        }}
+                                        onFocus={(e) => {
+                                            e.currentTarget.style.borderColor = '#f97316';
+                                            e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.05)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.currentTarget.style.borderColor = 'transparent';
+                                            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        {/* Tags */}
-                        <div>
-                            <label style={{
+                        {/* Divider */}
+                        <div style={{
+                            height: '1px',
+                            background: 'linear-gradient(90deg, transparent, var(--border), transparent)',
+                            margin: '1.5rem 0'
+                        }} />
+
+                        {/* Course & Tags */}
+                        <div style={{ marginBottom: '2rem' }}>
+                            <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.5rem',
-                                marginBottom: '0.5rem',
-                                color: 'var(--text)',
-                                fontWeight: '600',
-                                fontSize: '0.95rem'
+                                marginBottom: '1.25rem'
                             }}>
-                                <span style={{ color: 'var(--accent-amber)' }}>●</span>
-                                {t.notes.tagsLabel}
-                            </label>
-                            <input
-                                type="text"
-                                value={tags}
-                                onChange={(e) => setTags(e.target.value)}
-                                placeholder={t.notes.tagsPlaceholder}
+                                <span style={{ fontSize: '1.25rem' }}>🎯</span>
+                                <span style={{
+                                    fontWeight: '700',
+                                    fontSize: '1.1rem',
+                                    color: 'var(--text)'
+                                }}>Ders & Etiketler</span>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
+                                        color: 'var(--text)',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Ders <span style={{ color: '#f97316' }}>*</span>
+                                    </label>
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '0.75rem',
+                                        flexDirection: isMobile ? 'column' : 'row'
+                                    }}>
+                                        <select
+                                            value={courseId}
+                                            onChange={(e) => setCourseId(e.target.value)}
+                                            required
+                                            style={{
+                                                ...inputStyle,
+                                                flex: 1,
+                                                cursor: 'pointer'
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor = '#f97316';
+                                                e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.05)';
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor = 'transparent';
+                                                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                                            }}
+                                        >
+                                            <option value="">{t.notes.selectCoursePlaceholder}</option>
+                                            {courses.map(course => (
+                                                <option key={course.id} value={course.id}>
+                                                    {course.code} - {course.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewCourseModal(true)}
+                                            style={{
+                                                padding: '1rem 1.5rem',
+                                                borderRadius: '14px',
+                                                border: '2px dashed rgba(249, 115, 22, 0.4)',
+                                                backgroundColor: 'rgba(249, 115, 22, 0.08)',
+                                                color: '#f97316',
+                                                fontSize: '0.9rem',
+                                                cursor: 'pointer',
+                                                fontWeight: '600',
+                                                whiteSpace: 'nowrap',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.15)';
+                                                e.currentTarget.style.borderColor = '#f97316';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.08)';
+                                                e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.4)';
+                                            }}
+                                        >
+                                            + Yeni Ders
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
+                                        color: 'var(--text)',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Etiketler
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={tags}
+                                        onChange={(e) => setTags(e.target.value)}
+                                        placeholder="vize, final, özet (virgülle ayır)"
+                                        style={inputStyle}
+                                        onFocus={(e) => {
+                                            e.currentTarget.style.borderColor = '#f97316';
+                                            e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.05)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.currentTarget.style.borderColor = 'transparent';
+                                            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div style={{
+                            height: '1px',
+                            background: 'linear-gradient(90deg, transparent, var(--border), transparent)',
+                            margin: '1.5rem 0'
+                        }} />
+
+                        {/* File Upload */}
+                        <div>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                marginBottom: '1.25rem'
+                            }}>
+                                <span style={{ fontSize: '1.25rem' }}>📎</span>
+                                <span style={{
+                                    fontWeight: '700',
+                                    fontSize: '1.1rem',
+                                    color: 'var(--text)'
+                                }}>Dosyalar</span>
+                                <span style={{
+                                    fontSize: '0.8rem',
+                                    color: 'var(--text-secondary)',
+                                    marginLeft: 'auto'
+                                }}>
+                                    {files.length}/5 dosya
+                                </span>
+                            </div>
+
+                            <label
                                 style={{
-                                    width: '100%',
-                                    padding: '0.9rem 1rem',
-                                    borderRadius: '12px',
-                                    border: '2px solid var(--border)',
-                                    backgroundColor: 'var(--background)',
-                                    color: 'var(--text)',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    transition: 'border-color 0.2s ease'
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '1rem',
+                                    padding: '2.5rem 1.5rem',
+                                    borderRadius: '16px',
+                                    border: dragOver
+                                        ? '3px dashed #f97316'
+                                        : '3px dashed rgba(249, 115, 22, 0.3)',
+                                    backgroundColor: dragOver
+                                        ? 'rgba(249, 115, 22, 0.1)'
+                                        : 'rgba(255,255,255,0.02)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    textAlign: 'center'
                                 }}
-                                onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent-amber)'}
-                                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-                            />
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setDragOver(true);
+                                }}
+                                onDragLeave={() => setDragOver(false)}
+                                onDrop={handleDrop}
+                                onMouseEnter={(e) => {
+                                    if (!dragOver) {
+                                        e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.5)';
+                                        e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.05)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!dragOver) {
+                                        e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.3)';
+                                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)';
+                                    }
+                                }}
+                            >
+                                <div style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    borderRadius: '16px',
+                                    background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.2))',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1.75rem'
+                                }}>
+                                    {dragOver ? '📥' : '📁'}
+                                </div>
+                                <div>
+                                    <div style={{
+                                        fontSize: '1rem',
+                                        fontWeight: '600',
+                                        color: 'var(--text)',
+                                        marginBottom: '0.25rem'
+                                    }}>
+                                        {dragOver ? 'Dosyaları bırak!' : 'Dosya eklemek için tıkla veya sürükle'}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '0.85rem',
+                                        color: 'var(--text-secondary)'
+                                    }}>
+                                        PDF, Word, Excel, PowerPoint
+                                    </div>
+                                </div>
+                                <input
+                                    type="file"
+                                    onChange={handleFileChange}
+                                    multiple
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                                    style={{ display: 'none' }}
+                                />
+                            </label>
+
+                            {/* File List */}
+                            {files.length > 0 && (
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(180px, 1fr))',
+                                    gap: '1rem',
+                                    marginTop: '1.5rem'
+                                }}>
+                                    {files.map((file, index) => (
+                                        <FilePreview
+                                            key={index}
+                                            file={file}
+                                            onRemove={() => removeFile(index)}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
-                </div>
 
-                {/* File Upload Section */}
-                <div style={{
-                    backgroundColor: 'var(--secondary)',
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    border: '1px solid var(--border)'
-                }}>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        marginBottom: '1.5rem'
-                    }}>
+                    {/* Public Toggle Card */}
+                    <div
+                        onClick={() => files.length > 0 && setIsPublic(!isPublic)}
+                        style={{
+                            backgroundColor: isPublic
+                                ? 'rgba(34, 197, 94, 0.1)'
+                                : 'var(--secondary)',
+                            borderRadius: '16px',
+                            padding: '1.5rem',
+                            border: isPublic
+                                ? '2px solid rgba(34, 197, 94, 0.5)'
+                                : '1px solid var(--border)',
+                            cursor: files.length === 0 ? 'not-allowed' : 'pointer',
+                            opacity: files.length === 0 ? 0.5 : 1,
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem'
+                        }}
+                    >
                         <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '12px',
-                            background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                            width: '50px',
+                            height: '50px',
+                            borderRadius: '14px',
+                            background: isPublic
+                                ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+                                : 'rgba(255,255,255,0.05)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: '1.5rem'
+                            fontSize: '1.5rem',
+                            transition: 'all 0.3s ease'
                         }}>
-                            📎
+                            {isPublic ? '🌍' : '🔒'}
                         </div>
-                        <div>
-                            <h2 style={{ fontSize: '1.5rem', color: 'var(--text)', marginBottom: '0.25rem' }}>
-                                Dosyalar
-                            </h2>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                                Notlarını yükle (Maksimum 5 dosya)
-                            </p>
-                        </div>
-                    </div>
-
-                    <label style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.75rem',
-                        padding: '2rem',
-                        borderRadius: '12px',
-                        border: '3px dashed var(--border)',
-                        backgroundColor: 'var(--background)',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        minHeight: '150px'
-                    }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--accent-blue)';
-                            e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--border)';
-                            e.currentTarget.style.backgroundColor = 'var(--background)';
-                        }}>
-                        <div style={{
-                            fontSize: '3rem',
-                            opacity: 0.6
-                        }}>📁</div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{
-                                fontSize: '1.1rem',
-                                fontWeight: '600',
-                                color: 'var(--text)',
-                                marginBottom: '0.25rem'
-                            }}>
-                                {t.notes.addFiles}
-                            </div>
-                            <div style={{
-                                fontSize: '0.85rem',
-                                color: 'var(--text-secondary)'
-                            }}>
-                                {t.notes.supportedFormats}
-                            </div>
-                        </div>
-                        <input
-                            type="file"
-                            onChange={handleFileChange}
-                            multiple
-                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-                            style={{ display: 'none' }}
-                        />
-                    </label>
-
-                    {/* File List */}
-                    {files.length > 0 && (
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                            gap: '1rem',
-                            marginTop: '1.5rem'
-                        }}>
-                            {files.map((file, index) => (
-                                <FilePreview
-                                    key={index}
-                                    file={file}
-                                    onRemove={() => removeFile(index)}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* Privacy & Submit */}
-                <div style={{
-                    backgroundColor: 'var(--secondary)',
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    border: '1px solid var(--border)'
-                }}>
-                    {/* Public/Private Toggle */}
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                        padding: '1rem',
-                        borderRadius: '12px',
-                        backgroundColor: isPublic ? 'rgba(34, 197, 94, 0.1)' : 'var(--background)',
-                        border: `2px solid ${isPublic ? 'var(--accent-teal)' : 'var(--border)'}`,
-                        cursor: files.length === 0 ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.2s ease',
-                        marginBottom: '1.5rem',
-                        opacity: files.length === 0 ? 0.5 : 1
-                    }}>
-                        <input
-                            type="checkbox"
-                            checked={isPublic}
-                            onChange={(e) => setIsPublic(e.target.checked)}
-                            disabled={files.length === 0}
-                            style={{ width: '20px', height: '20px', cursor: files.length === 0 ? 'not-allowed' : 'pointer', accentColor: 'var(--accent-teal)' }}
-                        />
                         <div style={{ flex: 1 }}>
                             <div style={{
                                 fontSize: '1rem',
-                                fontWeight: '600',
+                                fontWeight: '700',
                                 color: 'var(--text)',
                                 marginBottom: '0.25rem'
                             }}>
-                                {isPublic ? '🌍' : '🔒'} {t.notes.publicNote}
+                                {isPublic ? 'Herkesle Paylaş' : 'Gizli Tut'}
                             </div>
                             <div style={{
                                 fontSize: '0.85rem',
                                 color: 'var(--text-secondary)'
                             }}>
                                 {files.length === 0
-                                    ? (t.language === 'tr' ? 'Forumda paylaşmak için önce dosya yüklemelisiniz' : 'Upload files first to share on forum')
-                                    : (t.language === 'tr' ? 'Herkesle paylaş ve forumda yayınla' : 'Share with everyone and post to forum')
+                                    ? 'Forumda paylaşmak için dosya yükle'
+                                    : isPublic
+                                        ? 'Forumda yayınlanacak'
+                                        : 'Sadece sen görebilirsin'
                                 }
                             </div>
                         </div>
-                    </label>
+                        <div style={{
+                            width: '52px',
+                            height: '28px',
+                            borderRadius: '14px',
+                            backgroundColor: isPublic ? '#22c55e' : 'var(--border)',
+                            position: 'relative',
+                            transition: 'all 0.3s ease'
+                        }}>
+                            <div style={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                backgroundColor: 'white',
+                                position: 'absolute',
+                                top: '3px',
+                                left: isPublic ? '27px' : '3px',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                            }} />
+                        </div>
+                    </div>
 
                     {/* Submit Button */}
                     <button
@@ -588,17 +691,20 @@ export default function UploadNote() {
                         disabled={loading}
                         style={{
                             width: '100%',
-                            padding: '1.2rem 1.5rem',
-                            background: loading ? 'var(--text-secondary)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            padding: '1.25rem 2rem',
+                            background: loading
+                                ? 'var(--text-secondary)'
+                                : 'var(--primary-gradient)',
                             color: 'white',
                             border: 'none',
-                            borderRadius: '12px',
+                            borderRadius: '16px',
                             cursor: loading ? 'not-allowed' : 'pointer',
                             fontWeight: '700',
                             fontSize: '1.1rem',
-                            opacity: loading ? 0.7 : 1,
                             transition: 'all 0.3s ease',
-                            boxShadow: loading ? 'none' : '0 8px 20px rgba(102, 126, 234, 0.4)',
+                            boxShadow: loading
+                                ? 'none'
+                                : '0 10px 30px rgba(249, 115, 22, 0.4)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -606,243 +712,315 @@ export default function UploadNote() {
                         }}
                         onMouseEnter={(e) => {
                             if (!loading) {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 12px 28px rgba(102, 126, 234, 0.5)';
+                                e.currentTarget.style.transform = 'translateY(-3px)';
+                                e.currentTarget.style.boxShadow = '0 15px 40px rgba(249, 115, 22, 0.5)';
                             }
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 8px 20px rgba(102, 126, 234, 0.4)';
+                            e.currentTarget.style.boxShadow = '0 10px 30px rgba(249, 115, 22, 0.4)';
                         }}
                     >
-                        {loading ? '⏳' : '✨'} {loading ? t.notes.saving : t.notes.saveNote}
+                        {loading ? (
+                            <>
+                                <div style={{
+                                    width: '22px',
+                                    height: '22px',
+                                    border: '3px solid rgba(255,255,255,0.3)',
+                                    borderTopColor: 'white',
+                                    borderRadius: '50%',
+                                    animation: 'spin 1s linear infinite'
+                                }} />
+                                Kaydediliyor...
+                            </>
+                        ) : (
+                            <>
+                                ✨ Dosyayı Kaydet
+                            </>
+                        )}
                     </button>
-                </div>
-            </form>
 
-            {/* New Course Modal - keeping the same modal code */}
-            {showNewCourseModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    backdropFilter: 'blur(4px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    padding: '1rem'
-                }}
-                    onClick={() => setShowNewCourseModal(false)}>
+                    <style jsx>{`
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `}</style>
+                </form>
+
+                {/* New Course Modal */}
+                {showNewCourseModal && (
                     <div style={{
-                        backgroundColor: 'var(--secondary)',
-                        borderRadius: '16px',
-                        padding: '2rem',
-                        maxWidth: '500px',
-                        width: '100%',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                        border: '1px solid var(--border)'
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        padding: '1rem'
                     }}
-                        onClick={(e) => e.stopPropagation()}>
-                        <h2 style={{ marginBottom: '1.5rem', color: 'var(--text)' }}>
-                            {t.notes.createNewCourse}
-                        </h2>
+                        onClick={() => setShowNewCourseModal(false)}>
+                        <div style={{
+                            backgroundColor: 'var(--secondary)',
+                            borderRadius: '20px',
+                            padding: '2rem',
+                            maxWidth: '450px',
+                            width: '100%',
+                            boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+                            border: '1px solid var(--border)'
+                        }}
+                            onClick={(e) => e.stopPropagation()}>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '500' }}>
-                                    {t.notes.courseCode} *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={newCourse.code}
-                                    onChange={(e) => setNewCourse({ ...newCourse, code: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.8rem',
-                                        borderRadius: '8px',
-                                        border: '1px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '1rem',
+                                marginBottom: '1.5rem'
+                            }}>
+                                <div style={{
+                                    width: '50px',
+                                    height: '50px',
+                                    borderRadius: '14px',
+                                    background: 'var(--primary-gradient)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1.5rem'
+                                }}>📚</div>
+                                <div>
+                                    <h2 style={{
+                                        fontSize: '1.25rem',
                                         color: 'var(--text)',
-                                        fontSize: '1rem'
-                                    }}
-                                />
+                                        marginBottom: '0.25rem'
+                                    }}>
+                                        Yeni Ders Ekle
+                                    </h2>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                        Ders bilgilerini gir
+                                    </p>
+                                </div>
                             </div>
 
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '500' }}>
-                                    {t.notes.courseName} *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={newCourse.name}
-                                    onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.8rem',
-                                        borderRadius: '8px',
-                                        border: '1px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <div style={{ flex: 1 }}>
+                                        <label style={{
+                                            display: 'block',
+                                            marginBottom: '0.5rem',
+                                            color: 'var(--text)',
+                                            fontWeight: '600',
+                                            fontSize: '0.9rem'
+                                        }}>
+                                            Ders Kodu *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={newCourse.code}
+                                            onChange={(e) => setNewCourse({ ...newCourse, code: e.target.value })}
+                                            placeholder="MAT101"
+                                            style={inputStyle}
+                                        />
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <label style={{
+                                            display: 'block',
+                                            marginBottom: '0.5rem',
+                                            color: 'var(--text)',
+                                            fontWeight: '600',
+                                            fontSize: '0.9rem'
+                                        }}>
+                                            Kredi
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={newCourse.credits}
+                                            onChange={(e) => setNewCourse({ ...newCourse, credits: e.target.value })}
+                                            placeholder="3"
+                                            style={inputStyle}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
                                         color: 'var(--text)',
-                                        fontSize: '1rem'
-                                    }}
-                                />
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Ders Adı *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={newCourse.name}
+                                        onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
+                                        placeholder="Matematik I"
+                                        style={inputStyle}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
+                                        color: 'var(--text)',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Öğretim Üyesi
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={newCourse.instructor}
+                                        onChange={(e) => setNewCourse({ ...newCourse, instructor: e.target.value })}
+                                        placeholder="Prof. Dr. ..."
+                                        style={inputStyle}
+                                    />
+                                </div>
+
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '1rem',
+                                    marginTop: '1rem'
+                                }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewCourseModal(false)}
+                                        style={{
+                                            flex: 1,
+                                            padding: '1rem',
+                                            backgroundColor: 'transparent',
+                                            color: 'var(--text)',
+                                            border: '2px solid var(--border)',
+                                            borderRadius: '12px',
+                                            cursor: 'pointer',
+                                            fontWeight: '600',
+                                            transition: 'all 0.2s ease'
+                                        }}>
+                                        İptal
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleCreateCourse}
+                                        disabled={creatingCourse}
+                                        style={{
+                                            flex: 1,
+                                            padding: '1rem',
+                                            background: 'var(--primary-gradient)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '12px',
+                                            cursor: creatingCourse ? 'not-allowed' : 'pointer',
+                                            fontWeight: '700',
+                                            opacity: creatingCourse ? 0.7 : 1
+                                        }}>
+                                        {creatingCourse ? 'Oluşturuluyor...' : 'Oluştur'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Public Warning Modal */}
+                {showPublicWarning && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        padding: '1rem'
+                    }}
+                        onClick={() => setShowPublicWarning(false)}>
+                        <div style={{
+                            backgroundColor: 'var(--secondary)',
+                            borderRadius: '20px',
+                            padding: '2rem',
+                            maxWidth: '400px',
+                            width: '100%',
+                            boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+                            border: '1px solid var(--border)',
+                            textAlign: 'center'
+                        }}
+                            onClick={(e) => e.stopPropagation()}>
+
+                            <div style={{
+                                width: '70px',
+                                height: '70px',
+                                margin: '0 auto 1.5rem',
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(249, 115, 22, 0.2))',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '2rem'
+                            }}>
+                                ⚠️
                             </div>
 
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '500' }}>
-                                    {t.notes.instructor}
-                                </label>
-                                <input
-                                    type="text"
-                                    value={newCourse.instructor}
-                                    onChange={(e) => setNewCourse({ ...newCourse, instructor: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.8rem',
-                                        borderRadius: '8px',
-                                        border: '1px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem'
-                                    }}
-                                />
-                            </div>
+                            <h2 style={{
+                                marginBottom: '0.75rem',
+                                color: 'var(--text)',
+                                fontSize: '1.25rem'
+                            }}>
+                                {t.notes.publicWarning}
+                            </h2>
+                            <p style={{
+                                color: 'var(--text-secondary)',
+                                marginBottom: '2rem',
+                                lineHeight: '1.6',
+                                fontSize: '0.95rem'
+                            }}>
+                                {t.notes.publicWarningMessage}
+                            </p>
 
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '500' }}>
-                                    {t.notes.credits}
-                                </label>
-                                <input
-                                    type="number"
-                                    value={newCourse.credits}
-                                    onChange={(e) => setNewCourse({ ...newCourse, credits: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.8rem',
-                                        borderRadius: '8px',
-                                        border: '1px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem'
-                                    }}
-                                />
-                            </div>
-
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
                                 <button
-                                    type="button"
-                                    onClick={() => setShowNewCourseModal(false)}
+                                    onClick={() => setShowPublicWarning(false)}
                                     style={{
                                         flex: 1,
-                                        padding: '0.8rem',
+                                        padding: '1rem',
                                         backgroundColor: 'transparent',
                                         color: 'var(--text)',
-                                        border: '1px solid var(--border)',
-                                        borderRadius: '8px',
+                                        border: '2px solid var(--border)',
+                                        borderRadius: '12px',
                                         cursor: 'pointer',
-                                        fontWeight: '500'
+                                        fontWeight: '600'
                                     }}>
                                     {t.common.cancel}
                                 </button>
                                 <button
-                                    type="button"
-                                    onClick={handleCreateCourse}
-                                    disabled={creatingCourse}
+                                    onClick={submitNote}
                                     style={{
                                         flex: 1,
-                                        padding: '0.8rem',
-                                        backgroundColor: 'var(--accent-amber)',
+                                        padding: '1rem',
+                                        background: 'linear-gradient(135deg, #22c55e, #16a34a)',
                                         color: 'white',
                                         border: 'none',
-                                        borderRadius: '8px',
-                                        cursor: creatingCourse ? 'not-allowed' : 'pointer',
-                                        fontWeight: 'bold',
-                                        opacity: creatingCourse ? 0.7 : 1
+                                        borderRadius: '12px',
+                                        cursor: 'pointer',
+                                        fontWeight: '700'
                                     }}>
-                                    {creatingCourse ? t.notes.saving : t.notes.createCourse}
+                                    {t.notes.sharePublic}
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-
-            {/* Public Warning Modal - keeping the same modal code */}
-            {showPublicWarning && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    backdropFilter: 'blur(4px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    padding: '1rem'
-                }}
-                    onClick={() => setShowPublicWarning(false)}>
-                    <div style={{
-                        backgroundColor: 'var(--secondary)',
-                        borderRadius: '16px',
-                        padding: '2rem',
-                        maxWidth: '500px',
-                        width: '100%',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                        border: '1px solid var(--border)'
-                    }}
-                        onClick={(e) => e.stopPropagation()}>
-                        <div style={{
-                            fontSize: '3rem',
-                            textAlign: 'center',
-                            marginBottom: '1rem'
-                        }}>⚠️</div>
-                        <h2 style={{ marginBottom: '1rem', color: 'var(--text)', textAlign: 'center' }}>
-                            {t.notes.publicWarning}
-                        </h2>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', textAlign: 'center', lineHeight: '1.6' }}>
-                            {t.notes.publicWarningMessage}
-                        </p>
-
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <button
-                                onClick={() => setShowPublicWarning(false)}
-                                style={{
-                                    flex: 1,
-                                    padding: '0.8rem',
-                                    backgroundColor: 'transparent',
-                                    color: 'var(--text)',
-                                    border: '1px solid var(--border)',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    fontWeight: '500'
-                                }}>
-                                {t.common.cancel}
-                            </button>
-                            <button
-                                onClick={submitNote}
-                                style={{
-                                    flex: 1,
-                                    padding: '0.8rem',
-                                    backgroundColor: 'var(--accent-teal)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    fontWeight: 'bold'
-                                }}>
-                                {t.notes.sharePublic}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

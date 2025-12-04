@@ -20,7 +20,7 @@ export async function PUT(req, { params }) {
         }
 
         const { id } = await params;
-        const { name, code, instructor, credits } = await req.json();
+        const { name, code, instructor, credits, section } = await req.json();
 
         // Check if course belongs to user
         const existingCourse = await prisma.course.findFirst({
@@ -44,7 +44,9 @@ export async function PUT(req, { params }) {
                 name,
                 code,
                 instructor: instructor || null,
-                credits: credits ? parseInt(credits) : null
+                credits: credits ? parseInt(credits) : null,
+                section: section || null,
+
             },
             include: {
                 _count: {

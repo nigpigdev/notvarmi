@@ -12,6 +12,15 @@ export default function ConversationPage({ params }) {
     const { userId } = use(params);
     const [otherUser, setOtherUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -21,31 +30,28 @@ export default function ConversationPage({ params }) {
 
     useEffect(() => {
         if (status === 'authenticated') {
+            if (!userId || userId === 'undefined') {
+                console.warn('Redirecting invalid userId:', userId);
+                router.push('/messages');
+                return;
+            }
             fetchUserData();
         }
     }, [status, userId]);
 
-    const [error, setError] = useState(null);
-
     const fetchUserData = async () => {
         try {
-            console.log('Fetching user data for:', userId);
             const res = await fetch(`/api/messages/${userId}`);
-            console.log('API Response status:', res.status);
-
             if (res.ok) {
                 const data = await res.json();
-                console.log('API Data:', data);
                 setOtherUser(data.otherUser);
             } else {
                 const text = await res.text();
-                console.error('API Raw Response:', text);
                 try {
                     const errorData = JSON.parse(text);
-                    console.error('API Error:', errorData);
                     setError(errorData.error || 'Bir hata oluştu');
                 } catch (e) {
-                    setError('Sunucu hatası (Yanıt okunamadı)');
+                    setError('Sunucu hatası');
                 }
             }
         } catch (error) {
@@ -76,14 +82,14 @@ export default function ConversationPage({ params }) {
                     border: '1px solid var(--border)'
                 }}>
                     <div style={{
-                        width: '24px',
-                        height: '24px',
-                        border: '3px solid var(--accent-purple)',
+                        width: '28px',
+                        height: '28px',
+                        border: '3px solid #f97316',
                         borderTopColor: 'transparent',
                         borderRadius: '50%',
                         animation: 'spin 1s linear infinite'
                     }}></div>
-                    <span style={{ color: 'var(--accent-purple)', fontWeight: '600' }}>Yükleniyor...</span>
+                    <span style={{ color: '#f97316', fontWeight: '600', fontSize: '1.1rem' }}>Yükleniyor...</span>
                 </div>
                 <style jsx>{`
                     @keyframes spin {
@@ -104,23 +110,65 @@ export default function ConversationPage({ params }) {
                 alignItems: 'center',
                 justifyContent: 'center'
             }}>
-                <div style={{ textAlign: 'center' }}>
-                    <h1 style={{ color: 'var(--text)', marginBottom: '1rem' }}>
-                        {error ? `Hata: ${error}` : 'Kullanıcı bulunamadı'}
+                <div style={{
+                    textAlign: 'center',
+                    background: 'var(--secondary)',
+                    padding: '3rem 2rem',
+                    borderRadius: '24px',
+                    border: '1px solid var(--border)',
+                    maxWidth: '400px'
+                }}>
+                    <div style={{
+                        width: '80px',
+                        height: '80px',
+                        margin: '0 auto 1.5rem',
+                        borderRadius: '20px',
+                        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(249, 115, 22, 0.15) 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '2.5rem'
+                    }}>
+                        😕
+                    </div>
+                    <h1 style={{
+                        color: 'var(--text)',
+                        fontSize: '1.5rem',
+                        fontWeight: '700',
+                        marginBottom: '0.75rem'
+                    }}>
+                        {error || 'Kullanıcı bulunamadı'}
                     </h1>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-                        {userId ? `User ID: ${userId}` : ''}
+                    <p style={{
+                        color: 'var(--text-secondary)',
+                        marginBottom: '1.5rem',
+                        lineHeight: '1.5'
+                    }}>
+                        Bu kullanıcıya erişilemiyor veya mevcut değil.
                     </p>
                     <Link href="/messages" style={{
-                        padding: '0.75rem 1.5rem',
-                        background: 'var(--accent-purple)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.85rem 1.5rem',
+                        background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                         color: 'white',
                         textDecoration: 'none',
-                        borderRadius: '50px',
-                        fontWeight: '600',
-                        display: 'inline-block'
-                    }}>
-                        Mesajlara Dön
+                        borderRadius: '14px',
+                        fontWeight: '700',
+                        fontSize: '0.95rem',
+                        boxShadow: '0 6px 20px rgba(249, 115, 22, 0.35)',
+                        transition: 'all 0.2s'
+                    }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 10px 25px rgba(249, 115, 22, 0.45)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(249, 115, 22, 0.35)';
+                        }}>
+                        ← Mesajlara Dön
                     </Link>
                 </div>
             </div>
@@ -131,40 +179,37 @@ export default function ConversationPage({ params }) {
         <div style={{
             minHeight: '100vh',
             background: 'var(--background)',
-            padding: '2rem 1rem'
+            padding: isMobile ? '1rem 0.75rem' : '2rem 1rem'
         }}>
-            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                {/* Back Button */}
-                <Link href="/messages" style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    marginBottom: '1.5rem',
-                    color: 'var(--text-secondary)',
-                    textDecoration: 'none',
-                    fontSize: '0.95rem',
-                    fontWeight: '500',
-                    transition: 'all 0.2s ease',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '10px',
-                    background: 'var(--secondary)',
-                    border: '1px solid var(--border)'
-                }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.color = 'var(--accent-purple)';
-                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                        e.currentTarget.style.transform = 'translateX(-4px)';
+            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                {/* Back Button - Desktop Only (Mobile has it in ChatInterface) */}
+                {!isMobile && (
+                    <Link href="/messages" style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginBottom: '1rem',
+                        color: 'var(--text-secondary)',
+                        textDecoration: 'none',
+                        fontSize: '0.9rem',
+                        fontWeight: '500',
+                        transition: 'all 0.2s ease',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '12px',
+                        background: 'var(--secondary)',
+                        border: '1px solid var(--border)'
                     }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'var(--text-secondary)';
-                        e.currentTarget.style.borderColor = 'var(--border)';
-                        e.currentTarget.style.transform = 'translateX(0)';
-                    }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M19 12H5M12 19l-7-7 7-7" />
-                    </svg>
-                    Tüm Mesajlar
-                </Link>
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#f97316';
+                            e.currentTarget.style.borderColor = '#f97316';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.color = 'var(--text-secondary)';
+                            e.currentTarget.style.borderColor = 'var(--border)';
+                        }}>
+                        ← Tüm Mesajlar
+                    </Link>
+                )}
 
                 {/* Chat Interface */}
                 <ChatInterface userId={userId} otherUser={otherUser} />

@@ -45,6 +45,7 @@ export async function GET(req) {
                         include: {
                             sender: {
                                 select: {
+                                    id: true,
                                     firstName: true,
                                     lastName: true,
                                     username: true,

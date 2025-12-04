@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Card from '@/components/Card';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAlert } from '@/contexts/AlertContext';
 
@@ -18,7 +17,8 @@ export default function Courses() {
         name: '',
         code: '',
         instructor: '',
-        credits: ''
+        credits: '',
+        section: ''
     });
     const [adding, setAdding] = useState(false);
     const [updating, setUpdating] = useState(false);
@@ -33,9 +33,7 @@ export default function Courses() {
     }, []);
 
     useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 767);
-        };
+        const checkMobile = () => setIsMobile(window.innerWidth <= 767);
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
@@ -45,7 +43,8 @@ export default function Courses() {
         const filtered = courses.filter(course =>
             course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (course.instructor && course.instructor.toLowerCase().includes(searchTerm.toLowerCase()))
+            (course.instructor && course.instructor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (course.section && course.section.toLowerCase().includes(searchTerm.toLowerCase()))
         );
         setFilteredCourses(filtered);
     }, [searchTerm, courses]);
@@ -68,7 +67,7 @@ export default function Courses() {
     const handleAddCourse = async (e) => {
         e.preventDefault();
         if (!newCourse.name || !newCourse.code) {
-            await showAlert(t.courses.nameCodeRequired || 'Ders adı ve kodu zorunludur', 'warning');
+            await showAlert(t.courses?.nameCodeRequired || 'Ders adı ve kodu zorunludur', 'warning');
             return;
         }
 
@@ -84,13 +83,13 @@ export default function Courses() {
                 const created = await res.json();
                 setCourses([created, ...courses]);
                 setShowAddModal(false);
-                setNewCourse({ name: '', code: '', instructor: '', credits: '' });
+                setNewCourse({ name: '', code: '', instructor: '', credits: '', section: '' });
             } else {
-                await showAlert(t.courses.addError || 'Ders eklenirken hata oluştu', 'error');
+                await showAlert(t.courses?.addError || 'Ders eklenirken hata oluştu', 'error');
             }
         } catch (error) {
             console.error('Error adding course:', error);
-            await showAlert(t.courses.addError || 'Ders eklenirken hata oluştu', 'error');
+            await showAlert(t.courses?.addError || 'Ders eklenirken hata oluştu', 'error');
         } finally {
             setAdding(false);
         }
@@ -104,7 +103,7 @@ export default function Courses() {
     const handleUpdateCourse = async (e) => {
         e.preventDefault();
         if (!editingCourse.name || !editingCourse.code) {
-            await showAlert(t.courses.nameCodeRequired || 'Ders adı ve kodu zorunludur', 'warning');
+            await showAlert(t.courses?.nameCodeRequired || 'Ders adı ve kodu zorunludur', 'warning');
             return;
         }
 
@@ -122,11 +121,11 @@ export default function Courses() {
                 setShowEditModal(false);
                 setEditingCourse(null);
             } else {
-                await showAlert(t.courses.updateError || 'Ders güncellenirken hata oluştu', 'error');
+                await showAlert(t.courses?.updateError || 'Ders güncellenirken hata oluştu', 'error');
             }
         } catch (error) {
             console.error('Error updating course:', error);
-            await showAlert(t.courses.updateError || 'Ders güncellenirken hata oluştu', 'error');
+            await showAlert(t.courses?.updateError || 'Ders güncellenirken hata oluştu', 'error');
         } finally {
             setUpdating(false);
         }
@@ -134,581 +133,572 @@ export default function Courses() {
 
     const handleDeleteCourse = async () => {
         const confirmed = await showConfirm('Bu dersi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         setDeleting(true);
         try {
-            const res = await fetch(`/api/courses/${editingCourse.id}`, {
-                method: 'DELETE'
-            });
-
+            const res = await fetch(`/api/courses/${editingCourse.id}`, { method: 'DELETE' });
             if (res.ok) {
                 setCourses(courses.filter(c => c.id !== editingCourse.id));
                 setShowEditModal(false);
                 setEditingCourse(null);
             } else {
-                await showAlert(t.courses.deleteError || 'Ders silinirken hata oluştu', 'error');
+                await showAlert(t.courses?.deleteError || 'Ders silinirken hata oluştu', 'error');
             }
         } catch (error) {
             console.error('Error deleting course:', error);
-            await showAlert(t.courses.deleteError || 'Ders silinirken hata oluştu', 'error');
+            await showAlert(t.courses?.deleteError || 'Ders silinirken hata oluştu', 'error');
         } finally {
             setDeleting(false);
         }
     };
 
-    const courseColors = [
-        { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', accent: 'var(--accent-blue)' },
-        { bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.3)', accent: 'var(--accent-purple)' },
-        { bg: 'rgba(20, 184, 166, 0.1)', border: 'rgba(20, 184, 166, 0.3)', accent: 'var(--accent-teal)' },
-        { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', accent: 'var(--accent-amber)' },
-        { bg: 'rgba(99, 102, 241, 0.1)', border: 'rgba(99, 102, 241, 0.3)', accent: 'var(--accent-indigo)' },
-    ];
+    const handleViewNotes = (courseId, e) => {
+        e.stopPropagation();
+        router.push(`/notes?courseId=${courseId}`);
+    };
+
+    const inputStyle = {
+        width: '100%',
+        padding: '1rem 1.25rem',
+        borderRadius: '14px',
+        border: '2px solid transparent',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        color: 'var(--text)',
+        fontSize: '1rem',
+        outline: 'none',
+        transition: 'all 0.3s ease'
+    };
 
     return (
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '1rem' : '2rem 1rem' }}>
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h1 style={{
-                    fontSize: isMobile ? '2rem' : '2.5rem',
-                    marginBottom: '1rem',
-                    background: 'var(--primary-gradient)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                }}>{t.courses.title}</h1>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-                    {t.courses.subtitle}
-                </p>
-            </div>
-
-            {/* Search Bar and Add Button */}
+        <div style={{
+            minHeight: '100vh',
+            background: 'var(--background)',
+            padding: isMobile ? '1rem' : '2rem'
+        }}>
+            {/* Background Gradient */}
             <div style={{
-                display: 'flex',
-                gap: '1rem',
-                marginBottom: '2rem',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                flexDirection: isMobile ? 'column' : 'row'
-            }}>
-                {/* Search Bar */}
-                <div style={{ flex: 1, minWidth: '250px', position: 'relative' }}>
-                    <div style={{
-                        position: 'absolute',
-                        left: '1rem',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        color: 'var(--text-secondary)',
-                        pointerEvents: 'none'
-                    }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                    </div>
-                    <input
-                        type="text"
-                        placeholder={t.common.search || 'Ders ara...'}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '1rem 1rem 1rem 3rem',
-                            borderRadius: '12px',
-                            border: '1px solid var(--border)',
-                            backgroundColor: 'var(--secondary)',
-                            color: 'var(--text)',
-                            fontSize: '1rem',
-                            outline: 'none',
-                            transition: 'border-color 0.2s ease',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                        }}
-                    />
-                </div>
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '350px',
+                background: 'linear-gradient(180deg, rgba(249, 115, 22, 0.06) 0%, transparent 100%)',
+                pointerEvents: 'none',
+                zIndex: 0
+            }} />
 
-                {/* Add Course Button */}
-                <button
-                    onClick={() => setShowAddModal(true)}
-                    style={{
-                        width: isMobile ? '100%' : 'auto',
-                        justifyContent: 'center',
-                        padding: '1rem 1.5rem',
-                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '12px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '1rem',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        boxShadow: '0 4px 14px rgba(59, 130, 246, 0.4)',
-                        display: 'inline-flex',
+            <div style={{
+                maxWidth: '1200px',
+                margin: '0 auto',
+                position: 'relative',
+                zIndex: 1
+            }}>
+                {/* Header */}
+                <div style={{
+                    textAlign: 'center',
+                    marginBottom: '2rem',
+                    padding: '1.5rem 1rem'
+                }}>
+                    <div style={{
+                        width: '70px',
+                        height: '70px',
+                        margin: '0 auto 1.25rem',
+                        borderRadius: '20px',
+                        background: 'var(--primary-gradient)',
+                        display: 'flex',
                         alignItems: 'center',
-                        gap: '0.5rem',
-                        whiteSpace: 'nowrap',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.5)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(59, 130, 246, 0.4)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
+                        justifyContent: 'center',
+                        fontSize: '2rem',
+                        boxShadow: '0 15px 35px rgba(249, 115, 22, 0.25)'
                     }}>
-                    <span style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center' }}>✨</span>
-                    {t.courses.addCourse}
-                </button>
-            </div>
-
-            {/* Statistics */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '1rem',
-                marginBottom: '2rem'
-            }}>
-                <div style={{
-                    padding: '1.5rem',
-                    background: courseColors[0].bg,
-                    border: `1px solid ${courseColors[0].border}`,
-                    borderRadius: '12px',
-                    textAlign: 'center'
-                }}>
-                    <div style={{ fontSize: '2rem', fontWeight: 'bold', color: courseColors[0].accent }}>
-                        {courses.length}
+                        📚
                     </div>
-                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                        Toplam Ders
-                    </div>
+                    <h1 style={{
+                        fontSize: isMobile ? '1.75rem' : '2.25rem',
+                        fontWeight: '800',
+                        marginBottom: '0.5rem',
+                        background: 'var(--primary-gradient)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                    }}>{t.courses?.title || 'Derslerim'}</h1>
+                    <p style={{
+                        color: 'var(--text-secondary)',
+                        fontSize: '1rem',
+                        maxWidth: '400px',
+                        margin: '0 auto'
+                    }}>
+                        {t.courses?.subtitle || 'Derslerini yönet ve notlarına hızlıca eriş'}
+                    </p>
                 </div>
-                <div style={{
-                    padding: '1.5rem',
-                    background: courseColors[1].bg,
-                    border: `1px solid ${courseColors[1].border}`,
-                    borderRadius: '12px',
-                    textAlign: 'center'
-                }}>
-                    <div style={{ fontSize: '2rem', fontWeight: 'bold', color: courseColors[1].accent }}>
-                        {courses.reduce((acc, c) => acc + (c._count?.notes || 0), 0)}
-                    </div>
-                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                        Toplam Not
-                    </div>
-                </div>
-            </div>
 
-            {/* Courses Grid */}
-            {loading ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+                {/* Stats Cards */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)',
+                    gap: '1rem',
+                    marginBottom: '2rem'
+                }}>
                     <div style={{
-                        width: '50px',
-                        height: '50px',
-                        border: '4px solid var(--border)',
-                        borderTop: '4px solid var(--accent-blue)',
-                        borderRadius: '50%',
-                        margin: '0 auto 1rem',
-                        animation: 'spin 1s linear infinite'
-                    }} />
-                    <p>{t.courses.loading}</p>
-                    <style jsx>{`
-                        @keyframes spin {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                        }
-                    `}</style>
+                        padding: '1.25rem',
+                        background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))',
+                        borderRadius: '16px',
+                        border: '1px solid rgba(249, 115, 22, 0.2)',
+                        textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f97316' }}>
+                            {courses.length}
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                            Toplam Ders
+                        </div>
+                    </div>
+                    <div style={{
+                        padding: '1.25rem',
+                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1))',
+                        borderRadius: '16px',
+                        border: '1px solid rgba(139, 92, 246, 0.2)',
+                        textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: '2rem', fontWeight: '700', color: '#8b5cf6' }}>
+                            {courses.reduce((acc, c) => acc + (c._count?.notes || 0), 0)}
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                            Toplam Not
+                        </div>
+                    </div>
+                    {!isMobile && (
+                        <div style={{
+                            padding: '1.25rem',
+                            background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(13, 148, 136, 0.1))',
+                            borderRadius: '16px',
+                            border: '1px solid rgba(20, 184, 166, 0.2)',
+                            textAlign: 'center'
+                        }}>
+                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#14b8a6' }}>
+                                {courses.filter(c => c.section).length}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                                Şubeli Ders
+                            </div>
+                        </div>
+                    )}
                 </div>
-            ) : filteredCourses.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
-                    {filteredCourses.map((course, idx) => {
-                        const colorScheme = courseColors[idx % courseColors.length];
-                        return (
-                            <div key={course.id}
-                                onClick={() => handleEditClick(course)}
+
+                {/* Search & Add Bar */}
+                <div style={{
+                    backgroundColor: 'var(--secondary)',
+                    borderRadius: '18px',
+                    padding: isMobile ? '1rem' : '1.25rem',
+                    marginBottom: '2rem',
+                    border: '1px solid var(--border)',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                        alignItems: 'center',
+                        flexDirection: isMobile ? 'column' : 'row'
+                    }}>
+                        <div style={{ flex: 1, width: isMobile ? '100%' : 'auto' }}>
+                            <input
+                                type="text"
+                                placeholder="Ders, hoca veya şube ara..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={inputStyle}
+                            />
+                        </div>
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            style={{
+                                padding: '1rem 1.75rem',
+                                background: 'var(--primary-gradient)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '14px',
+                                cursor: 'pointer',
+                                fontWeight: '700',
+                                fontSize: '0.95rem',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 8px 25px rgba(249, 115, 22, 0.35)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                whiteSpace: 'nowrap',
+                                width: isMobile ? '100%' : 'auto',
+                                justifyContent: 'center'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 12px 35px rgba(249, 115, 22, 0.45)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(249, 115, 22, 0.35)';
+                            }}
+                        >
+                            ✨ Yeni Ders Ekle
+                        </button>
+                    </div>
+                </div>
+
+                {/* Courses Grid */}
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+                        <div style={{
+                            width: '50px',
+                            height: '50px',
+                            border: '4px solid var(--border)',
+                            borderTop: '4px solid #f97316',
+                            borderRadius: '50%',
+                            margin: '0 auto 1rem',
+                            animation: 'spin 1s linear infinite'
+                        }} />
+                        <p style={{ color: 'var(--text-secondary)' }}>{t.courses?.loading || 'Yükleniyor...'}</p>
+                        <style jsx>{`
+                            @keyframes spin {
+                                0% { transform: rotate(0deg); }
+                                100% { transform: rotate(360deg); }
+                            }
+                        `}</style>
+                    </div>
+                ) : filteredCourses.length > 0 ? (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(340px, 1fr))',
+                        gap: '1.5rem'
+                    }}>
+                        {filteredCourses.map((course) => (
+                            <div
+                                key={course.id}
                                 style={{
-                                    transition: 'all 0.2s ease',
-                                    cursor: 'pointer'
+                                    backgroundColor: 'var(--secondary)',
+                                    borderRadius: '18px',
+                                    padding: '1.5rem',
+                                    border: '1px solid var(--border)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
                                 }}
+                                onClick={() => handleEditClick(course)}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-4px)';
-                                    e.currentTarget.style.boxShadow = `0 8px 24px ${colorScheme.border}`;
+                                    e.currentTarget.style.transform = 'translateY(-6px)';
+                                    e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)';
+                                    e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.3)';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
+                                    e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)';
+                                    e.currentTarget.style.borderColor = 'var(--border)';
+                                }}
+                            >
+                                {/* Course Code & Badges */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    flexWrap: 'wrap',
+                                    marginBottom: '0.75rem'
                                 }}>
-                                <Card title={course.code}>
-                                    <div style={{
-                                        fontSize: '1.1rem',
-                                        fontWeight: '600',
-                                        color: 'var(--text)',
-                                        marginBottom: '1rem'
+                                    <span style={{
+                                        padding: '0.4rem 0.9rem',
+                                        borderRadius: '10px',
+                                        background: 'var(--primary-gradient)',
+                                        color: 'white',
+                                        fontSize: '0.85rem',
+                                        fontWeight: '700'
                                     }}>
-                                        {course.name}
-                                    </div>
-
-                                    {course.instructor && (
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            color: 'var(--text-secondary)',
-                                            fontSize: '0.9rem',
-                                            marginBottom: '0.5rem'
-                                        }}>
-                                            <span>👤</span>
-                                            <span>{course.instructor}</span>
-                                        </div>
-                                    )}
-
-                                    {course.credits && (
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            color: 'var(--text-secondary)',
-                                            fontSize: '0.9rem',
-                                            marginBottom: '1rem'
-                                        }}>
-                                            <span>📊</span>
-                                            <span>{course.credits} {t.courses.credits}</span>
-                                        </div>
-                                    )}
-
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        paddingTop: '1rem',
-                                        borderTop: '1px solid var(--border)'
-                                    }}>
-                                        <div style={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            padding: '0.4rem 0.8rem',
-                                            background: colorScheme.bg,
-                                            border: `1px solid ${colorScheme.border}`,
+                                        {course.code}
+                                    </span>
+                                    {course.section && (
+                                        <span style={{
+                                            padding: '0.35rem 0.7rem',
                                             borderRadius: '8px',
-                                            fontSize: '0.85rem',
+                                            background: 'rgba(20, 184, 166, 0.15)',
+                                            color: '#14b8a6',
+                                            fontSize: '0.8rem',
                                             fontWeight: '600',
-                                            color: colorScheme.accent
+                                            border: '1px solid rgba(20, 184, 166, 0.25)'
                                         }}>
-                                            📚 {course._count?.notes || 0} Not
-                                        </div>
-                                        <div style={{
-                                            padding: '0.4rem 0.8rem',
-                                            background: 'rgba(139, 92, 246, 0.1)',
-                                            border: '1px solid rgba(139, 92, 246, 0.3)',
-                                            borderRadius: '8px',
-                                            fontSize: '0.85rem',
-                                            color: 'var(--accent-purple)',
-                                            fontWeight: '600'
-                                        }}>
-                                            ✏️ Düzenle
-                                        </div>
-                                    </div>
-                                </Card>
-                            </div>
-                        );
-                    })}
-                </div>
-            ) : (
-                <div style={{
-                    textAlign: 'center',
-                    padding: '4rem 2rem',
-                    color: 'var(--text-secondary)',
-                    backgroundColor: 'var(--secondary)',
-                    borderRadius: '16px',
-                    border: '1px solid var(--border)'
-                }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📚</div>
-                    <h3 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>{t.courses.noCourses}</h3>
-                    <p>{t.courses.addFirst}</p>
-                </div>
-            )}
-
-            {/* Add Course Modal */}
-            {showAddModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    backdropFilter: 'blur(8px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    padding: '1rem',
-                    animation: 'fadeIn 0.2s ease-out'
-                }}
-                    onClick={() => setShowAddModal(false)}>
-                    <style jsx>{`
-                        @keyframes fadeIn {
-                            from { opacity: 0; }
-                            to { opacity: 1; }
-                        }
-                        @keyframes slideUp {
-                            from { transform: translateY(20px); opacity: 0; }
-                            to { transform: translateY(0); opacity: 1; }
-                        }
-                    `}</style>
-                    <div style={{
-                        backgroundColor: 'var(--secondary)',
-                        borderRadius: '20px',
-                        padding: '0',
-                        maxWidth: '500px',
-                        width: isMobile ? '95%' : '100%',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                        border: '1px solid var(--border)',
-                        overflow: 'hidden',
-                        animation: 'slideUp 0.3s ease-out'
-                    }}
-                        onClick={(e) => e.stopPropagation()}>
-                        {/* Gradient Header */}
-                        <div style={{
-                            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)',
-                            padding: '2rem',
-                            textAlign: 'center',
-                            position: 'relative',
-                            overflow: 'hidden'
-                        }}>
-                            <div style={{
-                                position: 'absolute',
-                                top: '-50%',
-                                right: '-20%',
-                                width: '200px',
-                                height: '200px',
-                                background: 'rgba(255,255,255,0.1)',
-                                borderRadius: '50%',
-                                filter: 'blur(40px)'
-                            }}></div>
-                            <div style={{
-                                width: '70px',
-                                height: '70px',
-                                borderRadius: '16px',
-                                background: 'rgba(255,255,255,0.2)',
-                                backdropFilter: 'blur(10px)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '2rem',
-                                margin: '0 auto 1rem',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-                                border: '2px solid rgba(255,255,255,0.3)'
-                            }}>
-                                📚
-                            </div>
-                            <h2 style={{
-                                marginBottom: '0.5rem',
-                                color: 'white',
-                                fontSize: '1.5rem',
-                                fontWeight: 'bold',
-                                position: 'relative'
-                            }}>
-                                Yeni Ders Oluştur
-                            </h2>
-                            <p style={{
-                                color: 'rgba(255,255,255,0.9)',
-                                fontSize: '0.9rem',
-                                margin: 0,
-                                position: 'relative'
-                            }}>
-                                Ders bilgilerini girerek hemen başlayın
-                            </p>
-                        </div>
-
-                        {/* Form Content */}
-                        <div style={{ padding: '2rem' }}>
-                            <form onSubmit={handleAddCourse} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                                <div>
-                                    <label style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '0.5rem',
-                                        color: 'var(--text)',
-                                        fontWeight: '600',
-                                        fontSize: '0.9rem'
-                                    }}>
-                                        🔢 {t.notes.courseCode} *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={newCourse.code}
-                                        onChange={(e) => setNewCourse({ ...newCourse, code: e.target.value })}
-                                        required
-                                        placeholder="Örn: BIL101"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.9rem',
-                                            borderRadius: '12px',
-                                            border: '2px solid var(--border)',
-                                            backgroundColor: 'var(--background)',
-                                            color: 'var(--text)',
-                                            fontSize: '1rem',
-                                            outline: 'none',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onFocus={(e) => {
-                                            e.currentTarget.style.borderColor = '#3b82f6';
-                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                                        }}
-                                        onBlur={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--border)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
-                                    />
+                                            📌 {course.section}
+                                        </span>
+                                    )}
                                 </div>
 
-                                <div>
-                                    <label style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '0.5rem',
-                                        color: 'var(--text)',
-                                        fontWeight: '600',
-                                        fontSize: '0.9rem'
+                                {/* Course Name */}
+                                <h3 style={{
+                                    fontSize: '1.15rem',
+                                    fontWeight: '700',
+                                    color: 'var(--text)',
+                                    marginBottom: '0.75rem',
+                                    lineHeight: '1.4'
+                                }}>{course.name}</h3>
+
+                                {/* Instructor & Credits */}
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '0.75rem',
+                                    marginBottom: '1rem',
+                                    fontSize: '0.9rem',
+                                    color: 'var(--text-secondary)'
+                                }}>
+                                    {course.instructor && (
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                            👤 {course.instructor}
+                                        </span>
+                                    )}
+                                    {course.credits && (
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                            ⭐ {course.credits} Kredi
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Notes Preview */}
+                                {course.notes && course.notes.length > 0 && (
+                                    <div style={{
+                                        borderTop: '1px solid var(--border)',
+                                        paddingTop: '1rem',
+                                        marginTop: '0.5rem'
                                     }}>
-                                        📖 {t.notes.courseName} *
+                                        <p style={{
+                                            fontSize: '0.8rem',
+                                            color: 'var(--text-secondary)',
+                                            marginBottom: '0.5rem',
+                                            fontWeight: '600'
+                                        }}>
+                                            📁 Son Notlar:
+                                        </p>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                            {course.notes.map(note => (
+                                                <div key={note.id} style={{
+                                                    fontSize: '0.85rem',
+                                                    color: 'var(--text)',
+                                                    padding: '0.4rem 0.6rem',
+                                                    background: 'rgba(255,255,255,0.03)',
+                                                    borderRadius: '6px',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap'
+                                                }}>
+                                                    • {note.title}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Footer Actions */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginTop: '1rem',
+                                    paddingTop: '1rem',
+                                    borderTop: '1px solid var(--border)'
+                                }}>
+                                    <span style={{
+                                        padding: '0.4rem 0.8rem',
+                                        background: 'rgba(249, 115, 22, 0.1)',
+                                        borderRadius: '8px',
+                                        fontSize: '0.85rem',
+                                        color: '#f97316',
+                                        fontWeight: '600'
+                                    }}>
+                                        📚 {course._count?.notes || 0} Not
+                                    </span>
+                                    <button
+                                        onClick={(e) => handleViewNotes(course.id, e)}
+                                        style={{
+                                            padding: '0.5rem 1rem',
+                                            background: 'rgba(139, 92, 246, 0.1)',
+                                            border: '1px solid rgba(139, 92, 246, 0.25)',
+                                            borderRadius: '8px',
+                                            fontSize: '0.85rem',
+                                            color: '#8b5cf6',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.4rem'
+                                        }}
+                                    >
+                                        📂 Notları Gör
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '4rem 2rem',
+                        backgroundColor: 'var(--secondary)',
+                        borderRadius: '20px',
+                        border: '1px solid var(--border)'
+                    }}>
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            margin: '0 auto 1.5rem',
+                            borderRadius: '20px',
+                            background: 'rgba(249, 115, 22, 0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '2.5rem'
+                        }}>📚</div>
+                        <h3 style={{
+                            color: 'var(--text)',
+                            marginBottom: '0.5rem',
+                            fontSize: '1.25rem'
+                        }}>{t.courses?.noCourses || 'Henüz ders yok'}</h3>
+                        <p style={{ color: 'var(--text-secondary)' }}>
+                            {t.courses?.addFirst || 'İlk dersini ekleyerek başla!'}
+                        </p>
+                    </div>
+                )}
+
+                {/* Add Course Modal */}
+                {showAddModal && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        padding: '1rem'
+                    }}
+                        onClick={() => setShowAddModal(false)}>
+                        <div style={{
+                            backgroundColor: 'var(--secondary)',
+                            borderRadius: '24px',
+                            padding: '0',
+                            maxWidth: '500px',
+                            width: isMobile ? '95%' : '100%',
+                            boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+                            border: '1px solid var(--border)',
+                            overflow: 'hidden',
+                            maxHeight: '90vh',
+                            overflowY: 'auto'
+                        }}
+                            onClick={(e) => e.stopPropagation()}>
+
+                            {/* Modal Header */}
+                            <div style={{
+                                background: 'var(--primary-gradient)',
+                                padding: '1.75rem',
+                                textAlign: 'center'
+                            }}>
+                                <div style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    borderRadius: '16px',
+                                    background: 'rgba(255,255,255,0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1.75rem',
+                                    margin: '0 auto 1rem',
+                                    backdropFilter: 'blur(10px)'
+                                }}>✨</div>
+                                <h2 style={{ color: 'white', fontSize: '1.35rem', fontWeight: '700' }}>
+                                    Yeni Ders Oluştur
+                                </h2>
+                            </div>
+
+                            {/* Form */}
+                            <form onSubmit={handleAddCourse} style={{ padding: '1.5rem' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                            Ders Kodu <span style={{ color: '#f97316' }}>*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={newCourse.code}
+                                            onChange={(e) => setNewCourse({ ...newCourse, code: e.target.value })}
+                                            required
+                                            placeholder="BIL101"
+                                            style={inputStyle}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                            Kredi
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={newCourse.credits}
+                                            onChange={(e) => setNewCourse({ ...newCourse, credits: e.target.value })}
+                                            placeholder="4"
+                                            style={inputStyle}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div style={{ marginTop: '1rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                        Ders Adı <span style={{ color: '#f97316' }}>*</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={newCourse.name}
                                         onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
                                         required
-                                        placeholder="Örn: Bilgisayar Programlama"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.9rem',
-                                            borderRadius: '12px',
-                                            border: '2px solid var(--border)',
-                                            backgroundColor: 'var(--background)',
-                                            color: 'var(--text)',
-                                            fontSize: '1rem',
-                                            outline: 'none',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onFocus={(e) => {
-                                            e.currentTarget.style.borderColor = '#3b82f6';
-                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                                        }}
-                                        onBlur={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--border)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
+                                        placeholder="Bilgisayar Programlama"
+                                        style={inputStyle}
                                     />
                                 </div>
 
-                                <div>
-                                    <label style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '0.5rem',
-                                        color: 'var(--text)',
-                                        fontWeight: '600',
-                                        fontSize: '0.9rem'
-                                    }}>
-                                        👨‍🏫 {t.notes.instructor}
+                                <div style={{ marginTop: '1rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                        Öğretim Üyesi
                                     </label>
                                     <input
                                         type="text"
                                         value={newCourse.instructor}
                                         onChange={(e) => setNewCourse({ ...newCourse, instructor: e.target.value })}
-                                        placeholder="Örn: Prof. Dr. Ahmet Yılmaz"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.9rem',
-                                            borderRadius: '12px',
-                                            border: '2px solid var(--border)',
-                                            backgroundColor: 'var(--background)',
-                                            color: 'var(--text)',
-                                            fontSize: '1rem',
-                                            outline: 'none',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onFocus={(e) => {
-                                            e.currentTarget.style.borderColor = '#3b82f6';
-                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                                        }}
-                                        onBlur={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--border)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
+                                        placeholder="Prof. Dr. Ahmet Yılmaz"
+                                        style={inputStyle}
                                     />
                                 </div>
 
-                                <div>
-                                    <label style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '0.5rem',
-                                        color: 'var(--text)',
-                                        fontWeight: '600',
-                                        fontSize: '0.9rem'
-                                    }}>
-                                        ⭐ {t.notes.credits}
+                                <div style={{ marginTop: '1rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                        📌 Şube
                                     </label>
                                     <input
-                                        type="number"
-                                        value={newCourse.credits}
-                                        onChange={(e) => setNewCourse({ ...newCourse, credits: e.target.value })}
-                                        placeholder="Örn: 4"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.9rem',
-                                            borderRadius: '12px',
-                                            border: '2px solid var(--border)',
-                                            backgroundColor: 'var(--background)',
-                                            color: 'var(--text)',
-                                            fontSize: '1rem',
-                                            outline: 'none',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onFocus={(e) => {
-                                            e.currentTarget.style.borderColor = '#3b82f6';
-                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                                        }}
-                                        onBlur={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--border)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
+                                        type="text"
+                                        value={newCourse.section}
+                                        onChange={(e) => setNewCourse({ ...newCourse, section: e.target.value })}
+                                        placeholder="1A, 2B..."
+                                        style={inputStyle}
                                     />
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
                                     <button
                                         type="button"
                                         onClick={() => setShowAddModal(false)}
                                         style={{
                                             flex: 1,
-                                            padding: '0.9rem',
+                                            padding: '1rem',
                                             backgroundColor: 'transparent',
                                             color: 'var(--text)',
                                             border: '2px solid var(--border)',
                                             borderRadius: '12px',
                                             cursor: 'pointer',
-                                            fontWeight: '600',
-                                            fontSize: '0.95rem',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--text-secondary)';
-                                            e.currentTarget.style.transform = 'translateY(-1px)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--border)';
-                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            fontWeight: '600'
                                         }}>
                                         İptal
                                     </button>
@@ -717,339 +707,207 @@ export default function Courses() {
                                         disabled={adding}
                                         style={{
                                             flex: 1,
-                                            padding: '0.9rem',
-                                            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                            padding: '1rem',
+                                            background: 'var(--primary-gradient)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '12px',
                                             cursor: adding ? 'not-allowed' : 'pointer',
-                                            fontWeight: 'bold',
-                                            fontSize: '0.95rem',
+                                            fontWeight: '700',
                                             opacity: adding ? 0.7 : 1,
-                                            transition: 'all 0.2s ease',
-                                            boxShadow: '0 4px 14px rgba(59, 130, 246, 0.4)'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (!adding) {
-                                                e.currentTarget.style.transform = 'translateY(-1px)';
-                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.5)';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = '0 4px 14px rgba(59, 130, 246, 0.4)';
+                                            boxShadow: '0 8px 20px rgba(249, 115, 22, 0.3)'
                                         }}>
-                                        {adding ? '✨ Oluşturuluyor...' : '✨ Ders Oluştur'}
+                                        {adding ? 'Oluşturuluyor...' : '✓ Oluştur'}
                                     </button>
                                 </div>
                             </form>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Edit Course Modal */}
-            {showEditModal && editingCourse && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    backdropFilter: 'blur(4px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    padding: '1rem'
-                }}
-                    onClick={() => {
-                        setShowEditModal(false);
-                        setEditingCourse(null);
-                    }}>
+                {/* Edit Course Modal */}
+                {showEditModal && editingCourse && (
                     <div style={{
-                        backgroundColor: 'var(--secondary)',
-                        borderRadius: '20px',
-                        padding: isMobile ? '1.5rem' : '2.5rem',
-                        maxWidth: '500px',
-                        width: isMobile ? '95%' : '100%',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                        border: '1px solid var(--border)'
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        padding: '1rem'
                     }}
-                        onClick={(e) => e.stopPropagation()}>
-                        {/* Header với icon */}
-                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                        onClick={() => { setShowEditModal(false); setEditingCourse(null); }}>
+                        <div style={{
+                            backgroundColor: 'var(--secondary)',
+                            borderRadius: '24px',
+                            padding: isMobile ? '1.5rem' : '2rem',
+                            maxWidth: '500px',
+                            width: isMobile ? '95%' : '100%',
+                            boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+                            border: '1px solid var(--border)',
+                            maxHeight: '90vh',
+                            overflowY: 'auto'
+                        }}
+                            onClick={(e) => e.stopPropagation()}>
+
+                            {/* Modal Header */}
                             <div style={{
-                                width: '70px',
-                                height: '70px',
-                                borderRadius: '16px',
-                                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '2rem',
-                                margin: '0 auto 1rem',
-                                boxShadow: '0 10px 30px rgba(139, 92, 246, 0.3)'
+                                gap: '1rem',
+                                marginBottom: '1.5rem'
                             }}>
-                                ✏️
-                            </div>
-                            <h2 style={{ marginBottom: '0.5rem', color: 'var(--text)', fontSize: '1.5rem' }}>
-                                Dersi Düzenle
-                            </h2>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                                {editingCourse.code} - {editingCourse.name}
-                            </p>
-                        </div>
-
-                        <form onSubmit={handleUpdateCourse} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                            <div>
-                                <label style={{
+                                <div style={{
+                                    width: '55px',
+                                    height: '55px',
+                                    borderRadius: '16px',
+                                    background: 'var(--primary-gradient)',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    🔢 Ders Kodu *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editingCourse.code}
-                                    onChange={(e) => setEditingCourse({ ...editingCourse, code: e.target.value })}
-                                    required
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                />
+                                    justifyContent: 'center',
+                                    fontSize: '1.5rem',
+                                    boxShadow: '0 8px 25px rgba(249, 115, 22, 0.3)'
+                                }}>✏️</div>
+                                <div>
+                                    <h2 style={{ fontSize: '1.25rem', color: 'var(--text)', fontWeight: '700' }}>
+                                        Dersi Düzenle
+                                    </h2>
+                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                                        {editingCourse.code}
+                                    </p>
+                                </div>
                             </div>
 
-                            <div>
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    📚 Ders Adı *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editingCourse.name}
-                                    onChange={(e) => setEditingCourse({ ...editingCourse, name: e.target.value })}
-                                    required
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-
-                            <div>
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    👤 Eğitmen
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editingCourse.instructor || ''}
-                                    onChange={(e) => setEditingCourse({ ...editingCourse, instructor: e.target.value })}
-                                    placeholder="Eğitmen adı (opsiyonel)"
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-
-                            <div>
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    📊 Kredi
-                                </label>
-                                <input
-                                    type="number"
-                                    value={editingCourse.credits || ''}
-                                    onChange={(e) => setEditingCourse({ ...editingCourse, credits: e.target.value })}
-                                    placeholder="Kredi sayısı (opsiyonel)"
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
-                                {/* Save & Cancel */}
-                                <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowEditModal(false);
-                                            setEditingCourse(null);
-                                        }}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.9rem',
-                                            backgroundColor: 'transparent',
-                                            color: 'var(--text)',
-                                            border: '2px solid var(--border)',
-                                            borderRadius: '12px',
-                                            cursor: 'pointer',
-                                            fontWeight: '600',
-                                            fontSize: '0.95rem',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--text-secondary)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}>
-                                        İptal
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={updating}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.9rem',
-                                            background: updating ? 'var(--text-secondary)' : 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '12px',
-                                            cursor: updating ? 'not-allowed' : 'pointer',
-                                            fontWeight: '700',
-                                            fontSize: '0.95rem',
-                                            transition: 'all 0.3s ease',
-                                            boxShadow: updating ? 'none' : '0 6px 18px rgba(139, 92, 246, 0.4)'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (!updating) {
-                                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                                e.currentTarget.style.boxShadow = '0 8px 24px rgba(139, 92, 246, 0.5)';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = '0 6px 18px rgba(139, 92, 246, 0.4)';
-                                        }}>
-                                        {updating ? '⏳ Kaydediliyor...' : '💾 Kaydet'}
-                                    </button>
+                            <form onSubmit={handleUpdateCourse}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                            Ders Kodu <span style={{ color: '#f97316' }}>*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={editingCourse.code}
+                                            onChange={(e) => setEditingCourse({ ...editingCourse, code: e.target.value })}
+                                            required
+                                            style={inputStyle}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                            Kredi
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={editingCourse.credits || ''}
+                                            onChange={(e) => setEditingCourse({ ...editingCourse, credits: e.target.value })}
+                                            style={inputStyle}
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* Delete Button */}
-                                <button
-                                    type="button"
-                                    onClick={handleDeleteCourse}
-                                    disabled={deleting}
-                                    style={{
-                                        padding: '0.9rem',
-                                        background: deleting ? 'var(--text-secondary)' : 'transparent',
-                                        color: deleting ? 'white' : '#ef4444',
-                                        border: deleting ? 'none' : '2px solid #ef4444',
-                                        borderRadius: '12px',
-                                        cursor: deleting ? 'not-allowed' : 'pointer',
-                                        fontWeight: '600',
-                                        fontSize: '0.95rem',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        if (!deleting) {
-                                            e.currentTarget.style.background = '#ef4444';
-                                            e.currentTarget.style.color = 'white';
-                                        }
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        if (!deleting) {
-                                            e.currentTarget.style.background = 'transparent';
-                                            e.currentTarget.style.color = '#ef4444';
-                                        }
-                                    }}>
-                                    {deleting ? '⏳ Siliniyor...' : '🗑️ Dersi Sil'}
-                                </button>
-                            </div>
-                        </form>
+                                <div style={{ marginTop: '1rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                        Ders Adı <span style={{ color: '#f97316' }}>*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingCourse.name}
+                                        onChange={(e) => setEditingCourse({ ...editingCourse, name: e.target.value })}
+                                        required
+                                        style={inputStyle}
+                                    />
+                                </div>
+
+                                <div style={{ marginTop: '1rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                        Öğretim Üyesi
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingCourse.instructor || ''}
+                                        onChange={(e) => setEditingCourse({ ...editingCourse, instructor: e.target.value })}
+                                        style={inputStyle}
+                                    />
+                                </div>
+
+                                <div style={{ marginTop: '1rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontWeight: '600', fontSize: '0.9rem' }}>
+                                        📌 Şube
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingCourse.section || ''}
+                                        onChange={(e) => setEditingCourse({ ...editingCourse, section: e.target.value })}
+                                        placeholder="1A, 2B..."
+                                        style={inputStyle}
+                                    />
+                                </div>
+
+                                {/* Actions */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => { setShowEditModal(false); setEditingCourse(null); }}
+                                            style={{
+                                                flex: 1,
+                                                padding: '1rem',
+                                                backgroundColor: 'transparent',
+                                                color: 'var(--text)',
+                                                border: '2px solid var(--border)',
+                                                borderRadius: '12px',
+                                                cursor: 'pointer',
+                                                fontWeight: '600'
+                                            }}>
+                                            İptal
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={updating}
+                                            style={{
+                                                flex: 1,
+                                                padding: '1rem',
+                                                background: 'var(--primary-gradient)',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '12px',
+                                                cursor: updating ? 'not-allowed' : 'pointer',
+                                                fontWeight: '700',
+                                                opacity: updating ? 0.7 : 1,
+                                                boxShadow: '0 8px 20px rgba(249, 115, 22, 0.3)'
+                                            }}>
+                                            {updating ? 'Kaydediliyor...' : '✓ Kaydet'}
+                                        </button>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteCourse}
+                                        disabled={deleting}
+                                        style={{
+                                            width: '100%',
+                                            padding: '1rem',
+                                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                            color: '#ef4444',
+                                            border: '2px solid rgba(239, 68, 68, 0.2)',
+                                            borderRadius: '12px',
+                                            cursor: deleting ? 'not-allowed' : 'pointer',
+                                            fontWeight: '600',
+                                            opacity: deleting ? 0.7 : 1
+                                        }}>
+                                        🗑️ {deleting ? 'Siliniyor...' : 'Dersi Sil'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

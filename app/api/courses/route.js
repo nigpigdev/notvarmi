@@ -25,6 +25,15 @@ export async function GET(req) {
             include: {
                 _count: {
                     select: { notes: true }
+                },
+                notes: {
+                    select: {
+                        id: true,
+                        title: true,
+                        createdAt: true
+                    },
+                    orderBy: { createdAt: 'desc' },
+                    take: 3
                 }
             }
         });
@@ -52,7 +61,7 @@ export async function POST(req) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        const { name, code, instructor, credits } = await req.json();
+        const { name, code, instructor, credits, section } = await req.json();
 
         if (!name || !code) {
             return NextResponse.json({ error: 'Name and code are required' }, { status: 400 });
@@ -64,6 +73,8 @@ export async function POST(req) {
                 code,
                 instructor: instructor || null,
                 credits: credits ? parseInt(credits) : null,
+                section: section || null,
+
                 userId: user.id
             }
         });
@@ -74,3 +85,4 @@ export async function POST(req) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+

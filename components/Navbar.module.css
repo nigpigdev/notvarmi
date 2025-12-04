@@ -3,14 +3,20 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     position: sticky;
     top: 0;
     z-index: 1000;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+}
+
+.navbar:hover {
+    background: rgba(0, 0, 0, 0.85);
+    border-bottom-color: rgba(249, 115, 22, 0.3);
 }
 
 .navbar::after {
@@ -22,10 +28,20 @@
     height: 2px;
     background: var(--primary-gradient);
     z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.navbar:hover::after {
+    opacity: 1;
 }
 
 [data-theme='dark'] .navbar {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme='light'] .navbar {
+    background: rgba(255, 255, 255, 0.85);
 }
 
 .logo {
@@ -35,18 +51,20 @@
 
 .logo a {
     text-decoration: none;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: inline-block;
+    filter: drop-shadow(0 2px 8px rgba(249, 115, 22, 0.3));
 }
 
 .logo a:hover {
-    transform: scale(1.05) rotate(-2deg);
+    transform: scale(1.08) rotate(-2deg);
+    filter: drop-shadow(0 4px 15px rgba(249, 115, 22, 0.5));
 }
 
 .navLinks {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    gap: 1.5rem;
     margin: 0;
     padding: 0;
     align-items: center;
@@ -60,10 +78,11 @@
     text-decoration: none;
     color: var(--text);
     font-weight: 600;
-    font-size: 1rem;
-    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    padding: 0.6rem 0.2rem;
     position: relative;
-    transition: color 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
 }
 
 .navLinks a::after {
@@ -74,13 +93,15 @@
     bottom: 0;
     left: 50%;
     background: var(--primary-gradient);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateX(-50%);
     border-radius: 2px;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
 }
 
 .navLinks a:hover {
-    color: var(--primary);
+    color: #f97316;
+    transform: translateY(-2px);
 }
 
 .navLinks a:hover::after {
@@ -89,7 +110,7 @@
 
 /* Active state styling if needed */
 .active {
-    color: var(--primary) !important;
+    color: #f97316 !important;
 }
 
 .active::after {
@@ -100,12 +121,13 @@
 .loginBtn {
     background: transparent !important;
     color: var(--text) !important;
-    padding: 0.6rem 1.5rem !important;
-    border-radius: 10px !important;
+    padding: 0.65rem 1.5rem !important;
+    border-radius: 12px !important;
     font-weight: 600 !important;
     border: 2px solid var(--border) !important;
-    transition: all 0.3s ease !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative !important;
+    letter-spacing: 0.3px !important;
 }
 
 .loginBtn::after {
@@ -113,20 +135,39 @@
 }
 
 .loginBtn:hover {
-    border-color: var(--primary) !important;
-    background: rgba(102, 126, 234, 0.05) !important;
+    border-color: #f97316 !important;
+    color: #f97316 !important;
+    background: rgba(249, 115, 22, 0.1) !important;
     transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2) !important;
 }
 
 .registerBtn {
     background: var(--primary-gradient) !important;
     color: white !important;
-    padding: 0.6rem 1.5rem !important;
-    border-radius: 10px !important;
-    font-weight: 600 !important;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
-    transition: all 0.3s ease !important;
+    padding: 0.65rem 1.5rem !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.35) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative !important;
+    letter-spacing: 0.3px !important;
+    overflow: hidden !important;
+}
+
+.registerBtn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.registerBtn:hover::before {
+    left: 100%;
 }
 
 .registerBtn::after {
@@ -134,20 +175,29 @@
 }
 
 .registerBtn:hover {
-    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4) !important;
-    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(249, 115, 22, 0.5) !important;
+    transform: translateY(-3px) scale(1.02);
 }
 
 /* Mobile Login/Register Buttons */
 .mobileLoginBtn {
     background: var(--secondary) !important;
     border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+.mobileLoginBtn:hover {
+    border-color: #f97316 !important;
+    background: rgba(249, 115, 22, 0.1) !important;
 }
 
 .mobileRegisterBtn {
     background: var(--primary-gradient) !important;
     color: white !important;
     margin-top: 0.5rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3) !important;
 }
 
 /* Hamburger Menu Button */
@@ -160,15 +210,20 @@
     cursor: pointer;
     padding: 0.5rem;
     z-index: 1001;
+    transition: transform 0.3s ease;
+}
+
+.hamburger:hover {
+    transform: scale(1.1);
 }
 
 .hamburger span {
     display: block;
     width: 25px;
     height: 3px;
-    background-color: var(--text);
-    border-radius: 2px;
-    transition: all 0.3s ease;
+    background: linear-gradient(90deg, #f97316, #ec4899);
+    border-radius: 3px;
+    transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 }
 
 .hamburger.active span:nth-child(1) {
@@ -177,6 +232,7 @@
 
 .hamburger.active span:nth-child(2) {
     opacity: 0;
+    transform: scaleX(0);
 }
 
 .hamburger.active span:nth-child(3) {
@@ -191,15 +247,22 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
     z-index: 999;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease;
 }
 
 .mobileMenuOverlay.active {
     display: block;
     opacity: 1;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* Mobile Menu Drawer */
@@ -212,10 +275,10 @@
     max-width: 320px;
     height: 100%;
     background: var(--background);
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: -4px 0 30px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     overflow-y: auto;
-    transition: right 0.3s ease;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     padding-top: 70px;
 }
 
@@ -225,44 +288,69 @@
 
 .mobileMenuItems {
     list-style: none;
-    padding: 1rem;
+    padding: 1.5rem;
     margin: 0;
 }
 
 .mobileMenuItems li {
     margin-bottom: 0.5rem;
+    animation: slideIn 0.3s ease forwards;
+    opacity: 0;
+}
+
+.mobileMenuItems li:nth-child(1) { animation-delay: 0.1s; }
+.mobileMenuItems li:nth-child(2) { animation-delay: 0.15s; }
+.mobileMenuItems li:nth-child(3) { animation-delay: 0.2s; }
+.mobileMenuItems li:nth-child(4) { animation-delay: 0.25s; }
+.mobileMenuItems li:nth-child(5) { animation-delay: 0.3s; }
+.mobileMenuItems li:nth-child(6) { animation-delay: 0.35s; }
+.mobileMenuItems li:nth-child(7) { animation-delay: 0.4s; }
+.mobileMenuItems li:nth-child(8) { animation-delay: 0.45s; }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .mobileMenuItems a,
 .mobileMenuItems button {
     display: block;
     width: 100%;
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     text-decoration: none;
     color: var(--text);
     font-weight: 600;
     font-size: 1rem;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
+    border-radius: 12px;
+    transition: all 0.25s ease;
     text-align: left;
     background: none;
     border: none;
     cursor: pointer;
+    letter-spacing: 0.3px;
 }
 
 .mobileMenuItems a:hover,
 .mobileMenuItems button:hover {
-    background-color: var(--secondary);
+    background: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+    transform: translateX(5px);
 }
 
 /* Mobile responsiveness */
 @media (max-width: 767px) {
     .navbar {
-        padding: 1rem;
+        padding: 0.75rem 1rem;
     }
 
     .logo a {
-        font-size: 1.5rem !important;
+        font-size: 1.6rem !important;
     }
 
     .navLinks {

@@ -3,37 +3,45 @@
 import { useState, useEffect } from 'react';
 import Card from '@/components/Card';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAlert } from '@/contexts/AlertContext';
 import FileBadge from '@/components/FileBadge';
 
 export default function Notes() {
     const [notes, setNotes] = useState([]);
+    const [savedPosts, setSavedPosts] = useState([]);
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('notes');
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { t } = useLanguage();
     const { showAlert, showConfirm } = useAlert();
 
-    // Edit state
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingNote, setEditingNote] = useState(null);
     const [updating, setUpdating] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
+    // Read courseId from URL on mount
+    useEffect(() => {
+        const courseIdFromUrl = searchParams.get('courseId');
+        if (courseIdFromUrl) {
+            setSelectedCourse(courseIdFromUrl);
+        }
+    }, [searchParams]);
+
     useEffect(() => {
         fetchCourses();
-        fetchNotes();
+        fetchSavedPosts();
     }, []);
 
     useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 767);
-        };
+        const checkMobile = () => setIsMobile(window.innerWidth <= 767);
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
@@ -70,7 +78,29 @@ export default function Notes() {
         }
     };
 
+    const fetchSavedPosts = async () => {
+        try {
+            const res = await fetch('/api/forum/saved');
+            if (res.ok) {
+                const data = await res.json();
+                setSavedPosts(data.savedPosts || []);
+            }
+        } catch (error) {
+            console.error('Error fetching saved posts:', error);
+        }
+    };
 
+    const handleUnsavePost = async (postId) => {
+        const confirmed = await showConfirm('Bu tartışmayı kayıtlılardan kaldırmak istediğinizden emin misiniz?');
+        if (!confirmed) return;
+
+        try {
+            await fetch(`/api/forum/save?postId=${postId}`, { method: 'DELETE' });
+            setSavedPosts(prev => prev.filter(p => p.post.id !== postId));
+        } catch (error) {
+            console.error('Error unsaving post:', error);
+        }
+    };
 
     const handleEditClick = (note) => {
         setEditingNote(note);
@@ -110,16 +140,11 @@ export default function Notes() {
 
     const handleDeleteNote = async () => {
         const confirmed = await showConfirm(t.notes.deleteConfirm || 'Bu notu silmek istediğinizden emin misiniz?');
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         setDeleting(true);
         try {
-            const res = await fetch(`/api/notes/${editingNote.id}`, {
-                method: 'DELETE'
-            });
-
+            const res = await fetch(`/api/notes/${editingNote.id}`, { method: 'DELETE' });
             if (res.ok) {
                 setNotes(notes.filter(n => n.id !== editingNote.id));
                 setShowEditModal(false);
@@ -135,632 +160,925 @@ export default function Notes() {
         }
     };
 
+    const filteredNotes = notes.filter(note =>
+        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        note.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (note.tags && note.tags.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        note.course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        note.course.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const inputStyle = {
+        padding: '1rem 1.25rem',
+        borderRadius: '14px',
+        border: '2px solid transparent',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        color: 'var(--text)',
+        fontSize: '1rem',
+        outline: 'none',
+        transition: 'all 0.3s ease',
+        backdropFilter: 'blur(10px)'
+    };
+
     return (
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '1rem' : '2rem 1rem' }}>
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h1 style={{
-                    fontSize: isMobile ? '2rem' : '2.5rem',
-                    marginBottom: '1rem',
-                    background: 'var(--primary-gradient)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                }}>{t.notes.title}</h1>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-                    {t.notes.subtitle}
-                </p>
-            </div>
-
-            {/* Course Filter, Search Bar and Upload Button */}
+        <div style={{
+            minHeight: '100vh',
+            background: 'var(--background)',
+            padding: isMobile ? '1rem' : '2rem'
+        }}>
+            {/* Background Gradient */}
             <div style={{
-                display: 'flex',
-                gap: '1rem',
-                marginBottom: '2rem',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                flexDirection: isMobile ? 'column' : 'row'
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '350px',
+                background: 'linear-gradient(180deg, rgba(249, 115, 22, 0.06) 0%, transparent 100%)',
+                pointerEvents: 'none',
+                zIndex: 0
+            }} />
+
+            <div style={{
+                maxWidth: '1200px',
+                margin: '0 auto',
+                position: 'relative',
+                zIndex: 1
             }}>
-                {/* Course Filter */}
-                <select
-                    value={selectedCourse}
-                    onChange={(e) => setSelectedCourse(e.target.value)}
-                    style={{
-                        padding: '1rem 1.2rem',
-                        borderRadius: '12px',
-                        border: '1px solid var(--border)',
-                        backgroundColor: 'var(--secondary)',
-                        color: 'var(--text)',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        cursor: 'pointer',
-                        minWidth: '200px',
-                        width: isMobile ? '100%' : 'auto',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                    }}
-                >
-                    <option value="">{t.notes.allCourses}</option>
-                    {courses.map(course => (
-                        <option key={course.id} value={course.id}>
-                            {course.code} - {course.name}
-                        </option>
-                    ))}
-                </select>
-
-                {/* Search Bar */}
-                <div style={{ flex: 1, minWidth: '250px', position: 'relative' }}>
-                    <div style={{
-                        position: 'absolute',
-                        left: '1rem',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        color: 'var(--text-secondary)',
-                        pointerEvents: 'none'
-                    }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                    </div>
-                    <input
-                        type="text"
-                        placeholder={t.notes.searchPlaceholder || 'Not ara...'}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '1rem 1rem 1rem 3rem',
-                            borderRadius: '12px',
-                            border: '1px solid var(--border)',
-                            backgroundColor: 'var(--secondary)',
-                            color: 'var(--text)',
-                            fontSize: '1rem',
-                            outline: 'none',
-                            transition: 'border-color 0.2s ease',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                        }}
-                    />
-                </div>
-
-                {/* Upload Button */}
-                <Link href="/notes/upload" style={{
-                    width: isMobile ? '100%' : 'auto',
-                    justifyContent: 'center',
-                    padding: '1rem 1.5rem',
-                    background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '1rem',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 4px 14px rgba(139, 92, 246, 0.4)',
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    whiteSpace: 'nowrap',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(139, 92, 246, 0.5)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(139, 92, 246, 0.4)';
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)';
-                    }}>
-                    <span style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center' }}>📝</span>
-                    {t.notes.uploadNote}
-                </Link>
-            </div>
-
-            {/* Notes Grid */}
-            {loading ? (
+                {/* Header */}
                 <div style={{
                     textAlign: 'center',
-                    padding: '3rem',
-                    color: 'var(--text-secondary)'
+                    marginBottom: '2rem',
+                    padding: '1.5rem 1rem'
                 }}>
                     <div style={{
-                        width: '50px',
-                        height: '50px',
-                        border: '4px solid var(--border)',
-                        borderTop: '4px solid var(--primary)',
-                        borderRadius: '50%',
-                        margin: '0 auto 1rem',
-                        animation: 'spin 1s linear infinite'
-                    }} />
-                    <p>{t.notes.loading}</p>
-                    <style jsx>{`
-                        @keyframes spin {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                        }
-                    `}</style>
+                        width: '70px',
+                        height: '70px',
+                        margin: '0 auto 1.25rem',
+                        borderRadius: '20px',
+                        background: 'var(--primary-gradient)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '2rem',
+                        boxShadow: '0 15px 35px rgba(249, 115, 22, 0.25)'
+                    }}>
+                        📂
+                    </div>
+                    <h1 style={{
+                        fontSize: isMobile ? '1.75rem' : '2.25rem',
+                        fontWeight: '800',
+                        marginBottom: '0.5rem',
+                        background: 'var(--primary-gradient)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                    }}>{t.notes.title}</h1>
+                    <p style={{
+                        color: 'var(--text-secondary)',
+                        fontSize: '1rem',
+                        maxWidth: '400px',
+                        margin: '0 auto'
+                    }}>
+                        {t.notes.subtitle}
+                    </p>
                 </div>
-            ) : notes.filter(note =>
-                note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                note.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (note.tags && note.tags.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                note.course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                note.course.name.toLowerCase().includes(searchTerm.toLowerCase())
-            ).length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    {notes.filter(note =>
-                        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        note.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        (note.tags && note.tags.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                        note.course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        note.course.name.toLowerCase().includes(searchTerm.toLowerCase())
-                    ).map(note => (
-                        <div key={note.id} style={{
-                            transition: 'transform 0.2s ease',
-                            cursor: 'pointer'
-                        }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                            onClick={() => handleEditClick(note)}>
-                            <Card title={note.title}>
-                                {/* Description Preview */}
-                                <p style={{
-                                    color: 'var(--text-secondary)',
-                                    fontSize: '0.9rem',
-                                    marginBottom: '1rem',
-                                    lineHeight: '1.5',
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 3,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden'
-                                }}>
-                                    {note.description}
-                                </p>
 
-                                {/* Course Badge */}
+                {/* Tab Buttons */}
+                <div style={{
+                    display: 'flex',
+                    gap: '0.75rem',
+                    marginBottom: '1.5rem',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap'
+                }}>
+                    <button
+                        onClick={() => setActiveTab('notes')}
+                        style={{
+                            padding: '0.875rem 1.75rem',
+                            borderRadius: '14px',
+                            border: activeTab === 'notes' ? 'none' : '2px solid var(--border)',
+                            background: activeTab === 'notes' ? 'var(--primary-gradient)' : 'rgba(255,255,255,0.03)',
+                            color: activeTab === 'notes' ? 'white' : 'var(--text)',
+                            cursor: 'pointer',
+                            fontWeight: '700',
+                            fontSize: '0.95rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.6rem',
+                            transition: 'all 0.3s ease',
+                            boxShadow: activeTab === 'notes' ? '0 8px 25px rgba(249, 115, 22, 0.35)' : 'none'
+                        }}
+                    >
+                        📁 Dosyalarım
+                        {notes.length > 0 && (
+                            <span style={{
+                                background: activeTab === 'notes' ? 'rgba(255,255,255,0.25)' : 'rgba(249, 115, 22, 0.15)',
+                                color: activeTab === 'notes' ? 'white' : '#f97316',
+                                padding: '0.25rem 0.6rem',
+                                borderRadius: '8px',
+                                fontSize: '0.8rem',
+                                fontWeight: '700'
+                            }}>{notes.length}</span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('saved')}
+                        style={{
+                            padding: '0.875rem 1.75rem',
+                            borderRadius: '14px',
+                            border: activeTab === 'saved' ? 'none' : '2px solid var(--border)',
+                            background: activeTab === 'saved' ? 'var(--primary-gradient)' : 'rgba(255,255,255,0.03)',
+                            color: activeTab === 'saved' ? 'white' : 'var(--text)',
+                            cursor: 'pointer',
+                            fontWeight: '700',
+                            fontSize: '0.95rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.6rem',
+                            transition: 'all 0.3s ease',
+                            boxShadow: activeTab === 'saved' ? '0 8px 25px rgba(249, 115, 22, 0.35)' : 'none'
+                        }}
+                    >
+                        🔖 Kaydedilenler
+                        {savedPosts.length > 0 && (
+                            <span style={{
+                                background: activeTab === 'saved' ? 'rgba(255,255,255,0.25)' : 'rgba(249, 115, 22, 0.15)',
+                                color: activeTab === 'saved' ? 'white' : '#f97316',
+                                padding: '0.25rem 0.6rem',
+                                borderRadius: '8px',
+                                fontSize: '0.8rem',
+                                fontWeight: '700'
+                            }}>{savedPosts.length}</span>
+                        )}
+                    </button>
+                </div>
+
+                {/* Search & Filter Bar */}
+                <div style={{
+                    backgroundColor: 'var(--secondary)',
+                    borderRadius: '18px',
+                    padding: isMobile ? '1rem' : '1.25rem',
+                    marginBottom: '2rem',
+                    border: '1px solid var(--border)',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                        alignItems: 'center',
+                        flexDirection: isMobile ? 'column' : 'row'
+                    }}>
+                        {/* Course Filter */}
+                        <select
+                            value={selectedCourse}
+                            onChange={(e) => setSelectedCourse(e.target.value)}
+                            style={{
+                                ...inputStyle,
+                                minWidth: '180px',
+                                width: isMobile ? '100%' : 'auto',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <option value="">{t.notes.allCourses}</option>
+                            {courses.map(course => (
+                                <option key={course.id} value={course.id}>
+                                    {course.code} - {course.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Search Bar */}
+                        <div style={{
+                            flex: 1,
+                            width: isMobile ? '100%' : 'auto'
+                        }}>
+                            <input
+                                type="text"
+                                placeholder={t.notes.searchPlaceholder || 'Not ara...'}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{
+                                    ...inputStyle,
+                                    width: '100%'
+                                }}
+                            />
+                        </div>
+
+                        {/* Upload Button */}
+                        <Link href="/notes/upload" style={{
+                            padding: '1rem 1.75rem',
+                            background: 'var(--primary-gradient)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '14px',
+                            cursor: 'pointer',
+                            fontWeight: '700',
+                            fontSize: '0.95rem',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 8px 25px rgba(249, 115, 22, 0.35)',
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            whiteSpace: 'nowrap',
+                            width: isMobile ? '100%' : 'auto',
+                            justifyContent: 'center'
+                        }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 12px 35px rgba(249, 115, 22, 0.45)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(249, 115, 22, 0.35)';
+                            }}>
+                            ✨ {t.notes.uploadNote}
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Notes Grid */}
+                {activeTab === 'notes' && (
+                    <>
+                        {loading ? (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '4rem 2rem'
+                            }}>
                                 <div style={{
-                                    display: 'inline-block',
-                                    padding: '0.3rem 0.8rem',
-                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                    borderRadius: '6px',
-                                    fontSize: '0.8rem',
-                                    fontWeight: '600',
-                                    color: 'var(--accent-blue)',
-                                    marginBottom: '0.8rem',
-                                    border: '1px solid rgba(59, 130, 246, 0.2)'
-                                }}>
-                                    {note.course.code}
+                                    width: '50px',
+                                    height: '50px',
+                                    border: '4px solid var(--border)',
+                                    borderTop: '4px solid #f97316',
+                                    borderRadius: '50%',
+                                    margin: '0 auto 1rem',
+                                    animation: 'spin 1s linear infinite'
+                                }} />
+                                <p style={{ color: 'var(--text-secondary)' }}>{t.notes.loading}</p>
+                                <style jsx>{`
+                                    @keyframes spin {
+                                        0% { transform: rotate(0deg); }
+                                        100% { transform: rotate(360deg); }
+                                    }
+                                `}</style>
+                            </div>
+                        ) : filteredNotes.length > 0 ? (
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',
+                                gap: '1.5rem'
+                            }}>
+                                {filteredNotes.map(note => (
+                                    <div
+                                        key={note.id}
+                                        style={{
+                                            backgroundColor: 'var(--secondary)',
+                                            borderRadius: '18px',
+                                            padding: '1.5rem',
+                                            border: '1px solid var(--border)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease',
+                                            boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
+                                        }}
+                                        onClick={() => handleEditClick(note)}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-6px)';
+                                            e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)';
+                                            e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.3)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)';
+                                            e.currentTarget.style.borderColor = 'var(--border)';
+                                        }}
+                                    >
+                                        {/* Title */}
+                                        <h3 style={{
+                                            fontSize: '1.1rem',
+                                            fontWeight: '700',
+                                            color: 'var(--text)',
+                                            marginBottom: '0.75rem',
+                                            lineHeight: '1.4'
+                                        }}>{note.title}</h3>
+
+                                        {/* Description */}
+                                        <p style={{
+                                            color: 'var(--text-secondary)',
+                                            fontSize: '0.9rem',
+                                            marginBottom: '1rem',
+                                            lineHeight: '1.6',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden'
+                                        }}>{note.description}</p>
+
+                                        {/* Course Badge */}
+                                        <div style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '0.4rem',
+                                            padding: '0.4rem 0.9rem',
+                                            borderRadius: '10px',
+                                            background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))',
+                                            color: '#f97316',
+                                            fontSize: '0.8rem',
+                                            fontWeight: '600',
+                                            marginBottom: '0.75rem',
+                                            border: '1px solid rgba(249, 115, 22, 0.2)'
+                                        }}>
+                                            📚 {note.course.code}
+                                        </div>
+
+                                        {/* Tags */}
+                                        {note.tags && (
+                                            <div style={{
+                                                display: 'flex',
+                                                gap: '0.4rem',
+                                                marginBottom: '1rem',
+                                                flexWrap: 'wrap'
+                                            }}>
+                                                {note.tags.split(',').slice(0, 3).map((tag, index) => (
+                                                    <span key={index} style={{
+                                                        fontSize: '0.75rem',
+                                                        padding: '0.25rem 0.6rem',
+                                                        borderRadius: '6px',
+                                                        backgroundColor: 'rgba(255,255,255,0.05)',
+                                                        color: 'var(--text-secondary)',
+                                                        border: '1px solid var(--border)'
+                                                    }}>
+                                                        #{tag.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Files */}
+                                        {note.fileUrls && (() => {
+                                            try {
+                                                const urls = JSON.parse(note.fileUrls);
+                                                if (urls.length > 0) {
+                                                    return (
+                                                        <div style={{
+                                                            borderTop: '1px solid var(--border)',
+                                                            paddingTop: '1rem',
+                                                            marginTop: '0.5rem'
+                                                        }}>
+                                                            <div style={{
+                                                                display: 'flex',
+                                                                flexWrap: 'wrap',
+                                                                gap: '0.5rem'
+                                                            }}>
+                                                                {urls.slice(0, 2).map((url, index) => (
+                                                                    <FileBadge
+                                                                        key={index}
+                                                                        url={`/api/download?url=${encodeURIComponent(url)}`}
+                                                                        fileName={url.split('/').pop()}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                            {urls.length > 2 && (
+                                                                <span style={{
+                                                                    fontSize: '0.8rem',
+                                                                    color: 'var(--text-secondary)',
+                                                                    display: 'block',
+                                                                    marginTop: '0.5rem'
+                                                                }}>
+                                                                    +{urls.length - 2} dosya daha
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                }
+                                            } catch (e) { return null; }
+                                        })()}
+
+                                        {/* Footer */}
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            marginTop: '1rem',
+                                            paddingTop: '1rem',
+                                            borderTop: '1px solid var(--border)'
+                                        }}>
+                                            <span style={{
+                                                fontSize: '0.8rem',
+                                                color: 'var(--text-secondary)'
+                                            }}>
+                                                📅 {new Date(note.createdAt).toLocaleDateString()}
+                                            </span>
+                                            <span style={{
+                                                padding: '0.4rem 0.8rem',
+                                                background: 'rgba(249, 115, 22, 0.1)',
+                                                borderRadius: '8px',
+                                                fontSize: '0.8rem',
+                                                color: '#f97316',
+                                                fontWeight: '600'
+                                            }}>
+                                                ✏️ Düzenle
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '4rem 2rem',
+                                backgroundColor: 'var(--secondary)',
+                                borderRadius: '20px',
+                                border: '1px solid var(--border)'
+                            }}>
+                                <div style={{
+                                    width: '80px',
+                                    height: '80px',
+                                    margin: '0 auto 1.5rem',
+                                    borderRadius: '20px',
+                                    background: 'rgba(249, 115, 22, 0.1)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '2.5rem'
+                                }}>📚</div>
+                                <h3 style={{
+                                    color: 'var(--text)',
+                                    marginBottom: '0.5rem',
+                                    fontSize: '1.25rem'
+                                }}>{t.notes.noNotes}</h3>
+                                <p style={{ color: 'var(--text-secondary)' }}>{t.notes.noNotesDesc}</p>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {/* Saved Posts Grid */}
+                {activeTab === 'saved' && (
+                    <>
+                        {savedPosts.length > 0 ? (
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',
+                                gap: '1.5rem'
+                            }}>
+                                {savedPosts.map(saved => (
+                                    <div
+                                        key={saved.id}
+                                        style={{
+                                            backgroundColor: 'var(--secondary)',
+                                            borderRadius: '18px',
+                                            padding: '1.5rem',
+                                            border: '1px solid var(--border)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease',
+                                            boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
+                                        }}
+                                        onClick={() => router.push(`/forum/${saved.post.id}`)}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-6px)';
+                                            e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)';
+                                            e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.3)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)';
+                                            e.currentTarget.style.borderColor = 'var(--border)';
+                                        }}
+                                    >
+                                        {/* Forum Badge */}
+                                        <div style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '0.4rem',
+                                            padding: '0.4rem 0.9rem',
+                                            borderRadius: '10px',
+                                            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.15))',
+                                            color: '#8b5cf6',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '600',
+                                            marginBottom: '0.75rem',
+                                            border: '1px solid rgba(139, 92, 246, 0.25)'
+                                        }}>
+                                            💬 Forum Tartışması
+                                        </div>
+
+                                        {/* Title */}
+                                        <h3 style={{
+                                            fontSize: '1.1rem',
+                                            fontWeight: '700',
+                                            color: 'var(--text)',
+                                            marginBottom: '0.75rem',
+                                            lineHeight: '1.4'
+                                        }}>{saved.post.title.replace('(Not Paylaşıldı) ', '')}</h3>
+
+                                        {/* Content */}
+                                        <p style={{
+                                            color: 'var(--text-secondary)',
+                                            fontSize: '0.9rem',
+                                            marginBottom: '1rem',
+                                            lineHeight: '1.6',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden'
+                                        }}>{saved.post.content}</p>
+
+                                        {/* Tags */}
+                                        {saved.post.tags && (
+                                            <div style={{
+                                                display: 'flex',
+                                                gap: '0.4rem',
+                                                marginBottom: '1rem',
+                                                flexWrap: 'wrap'
+                                            }}>
+                                                {saved.post.tags.split(',').slice(0, 3).map((tag, index) => (
+                                                    <span key={index} style={{
+                                                        fontSize: '0.75rem',
+                                                        padding: '0.25rem 0.6rem',
+                                                        borderRadius: '6px',
+                                                        backgroundColor: 'rgba(255,255,255,0.05)',
+                                                        color: 'var(--text-secondary)',
+                                                        border: '1px solid var(--border)'
+                                                    }}>
+                                                        #{tag.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Files */}
+                                        {saved.post.fileUrls && (() => {
+                                            try {
+                                                const urls = JSON.parse(saved.post.fileUrls);
+                                                if (urls.length > 0) {
+                                                    return (
+                                                        <div style={{
+                                                            borderTop: '1px solid var(--border)',
+                                                            paddingTop: '1rem',
+                                                            marginTop: '0.5rem'
+                                                        }}>
+                                                            <div style={{
+                                                                display: 'flex',
+                                                                flexWrap: 'wrap',
+                                                                gap: '0.5rem'
+                                                            }}>
+                                                                {urls.slice(0, 2).map((url, index) => (
+                                                                    <FileBadge
+                                                                        key={index}
+                                                                        url={`/api/download?url=${encodeURIComponent(url)}`}
+                                                                        fileName={url.split('/').pop()}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }
+                                            } catch (e) { return null; }
+                                        })()}
+
+                                        {/* Author & Actions */}
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            marginTop: '1rem',
+                                            paddingTop: '1rem',
+                                            borderTop: '1px solid var(--border)'
+                                        }}>
+                                            <div style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.5rem'
+                                            }}>
+                                                <div style={{
+                                                    width: '28px',
+                                                    height: '28px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: 'rgba(249, 115, 22, 0.15)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '700',
+                                                    color: '#f97316',
+                                                    overflow: 'hidden'
+                                                }}>
+                                                    {saved.post.author.avatar ? (
+                                                        <img src={saved.post.author.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    ) : (
+                                                        saved.post.author.name?.[0]?.toUpperCase() || '?'
+                                                    )}
+                                                </div>
+                                                <span style={{
+                                                    fontSize: '0.85rem',
+                                                    color: 'var(--text-secondary)'
+                                                }}>
+                                                    {saved.post.author.name}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleUnsavePost(saved.post.id);
+                                                }}
+                                                style={{
+                                                    padding: '0.4rem 0.8rem',
+                                                    background: 'rgba(239, 68, 68, 0.1)',
+                                                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                                                    borderRadius: '8px',
+                                                    fontSize: '0.8rem',
+                                                    color: '#ef4444',
+                                                    fontWeight: '600',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s ease'
+                                                }}
+                                            >
+                                                🗑️ Kaldır
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '4rem 2rem',
+                                backgroundColor: 'var(--secondary)',
+                                borderRadius: '20px',
+                                border: '1px solid var(--border)'
+                            }}>
+                                <div style={{
+                                    width: '80px',
+                                    height: '80px',
+                                    margin: '0 auto 1.5rem',
+                                    borderRadius: '20px',
+                                    background: 'rgba(139, 92, 246, 0.1)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '2.5rem'
+                                }}>🔖</div>
+                                <h3 style={{
+                                    color: 'var(--text)',
+                                    marginBottom: '0.5rem',
+                                    fontSize: '1.25rem'
+                                }}>Henüz kayıtlı tartışma yok</h3>
+                                <p style={{ color: 'var(--text-secondary)' }}>
+                                    Forum'dan tartışmaları kaydetmek için "Kaydet" butonuna tıklayın.
+                                </p>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {/* Edit Modal */}
+                {showEditModal && editingNote && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        padding: '1rem'
+                    }}
+                        onClick={() => {
+                            setShowEditModal(false);
+                            setEditingNote(null);
+                        }}>
+                        <div style={{
+                            backgroundColor: 'var(--secondary)',
+                            borderRadius: '24px',
+                            padding: isMobile ? '1.5rem' : '2rem',
+                            maxWidth: '550px',
+                            width: isMobile ? '95%' : '100%',
+                            boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+                            border: '1px solid var(--border)',
+                            maxHeight: '90vh',
+                            overflowY: 'auto'
+                        }}
+                            onClick={(e) => e.stopPropagation()}>
+
+                            {/* Modal Header */}
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '1rem',
+                                marginBottom: '1.75rem'
+                            }}>
+                                <div style={{
+                                    width: '55px',
+                                    height: '55px',
+                                    borderRadius: '16px',
+                                    background: 'var(--primary-gradient)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1.75rem',
+                                    boxShadow: '0 8px 25px rgba(249, 115, 22, 0.3)'
+                                }}>✏️</div>
+                                <div>
+                                    <h2 style={{
+                                        fontSize: '1.35rem',
+                                        color: 'var(--text)',
+                                        marginBottom: '0.25rem',
+                                        fontWeight: '700'
+                                    }}>
+                                        Dosyayı Düzenle
+                                    </h2>
+                                    <p style={{
+                                        fontSize: '0.9rem',
+                                        color: 'var(--text-secondary)'
+                                    }}>
+                                        Bilgileri güncelleyin
+                                    </p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleUpdateNote} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                {/* Title */}
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
+                                        color: 'var(--text)',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Başlık <span style={{ color: '#f97316' }}>*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingNote.title}
+                                        onChange={(e) => setEditingNote({ ...editingNote, title: e.target.value })}
+                                        required
+                                        style={inputStyle}
+                                        onFocus={(e) => {
+                                            e.currentTarget.style.borderColor = '#f97316';
+                                            e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.05)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.currentTarget.style.borderColor = 'transparent';
+                                            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Description */}
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
+                                        color: 'var(--text)',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Açıklama <span style={{ color: '#f97316' }}>*</span>
+                                    </label>
+                                    <textarea
+                                        value={editingNote.description}
+                                        onChange={(e) => setEditingNote({ ...editingNote, description: e.target.value })}
+                                        required
+                                        rows={3}
+                                        style={{
+                                            ...inputStyle,
+                                            resize: 'vertical',
+                                            minHeight: '90px',
+                                            fontFamily: 'inherit'
+                                        }}
+                                        onFocus={(e) => {
+                                            e.currentTarget.style.borderColor = '#f97316';
+                                            e.currentTarget.style.backgroundColor = 'rgba(249, 115, 22, 0.05)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.currentTarget.style.borderColor = 'transparent';
+                                            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Course */}
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
+                                        color: 'var(--text)',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        Ders <span style={{ color: '#f97316' }}>*</span>
+                                    </label>
+                                    <select
+                                        value={editingNote.courseId}
+                                        onChange={(e) => setEditingNote({ ...editingNote, courseId: e.target.value })}
+                                        required
+                                        style={{
+                                            ...inputStyle,
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        <option value="">{t.notes.selectCourse}</option>
+                                        {courses.map(course => (
+                                            <option key={course.id} value={course.id}>
+                                                {course.code} - {course.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 {/* Tags */}
-                                {note.tags && (
-                                    <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                                        {note.tags.split(',').slice(0, 3).map((tag, index) => {
-                                            const colors = [
-                                                { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: 'var(--accent-blue)' },
-                                                { bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.3)', text: 'var(--accent-purple)' },
-                                                { bg: 'rgba(20, 184, 166, 0.1)', border: 'rgba(20, 184, 166, 0.3)', text: 'var(--accent-teal)' },
-                                                { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: 'var(--accent-amber)' },
-                                                { bg: 'rgba(99, 102, 241, 0.1)', border: 'rgba(99, 102, 241, 0.3)', text: 'var(--accent-indigo)' },
-                                            ];
-                                            const colorScheme = colors[index % colors.length];
-                                            return (
-                                                <span key={index} style={{
-                                                    fontSize: '0.75rem',
-                                                    padding: '0.2rem 0.6rem',
-                                                    borderRadius: '4px',
-                                                    backgroundColor: colorScheme.bg,
-                                                    color: colorScheme.text,
-                                                    border: `1px solid ${colorScheme.border}`,
-                                                    fontWeight: '500'
-                                                }}>
-                                                    #{tag.trim()}
-                                                </span>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-
-                                {/* Files */}
-                                {note.fileUrls && (() => {
-                                    try {
-                                        const urls = JSON.parse(note.fileUrls);
-                                        if (urls.length > 0) {
-                                            return (
-                                                <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.8rem' }}>
-                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                                        {urls.slice(0, 3).map((url, index) => (
-                                                            <FileBadge
-                                                                key={index}
-                                                                url={`/api/download?url=${encodeURIComponent(url)}`}
-                                                                fileName={url.split('/').pop()}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                    {urls.length > 3 && (
-                                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginTop: '0.5rem' }}>
-                                                            +{urls.length - 3} {t.language === 'tr' ? 'dosya daha' : 'more files'}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            );
-                                        }
-                                    } catch (e) { return null; }
-                                })()}
-
-                                {/* Date */}
-                                <div style={{
-                                    marginTop: '1rem',
-                                    fontSize: '0.8rem',
-                                    color: 'var(--text-secondary)'
-                                }}>
-                                    {new Date(note.createdAt).toLocaleDateString()}
-                                </div>
-
-                                {/* Edit Button */}
-                                <div style={{
-                                    marginTop: '1rem',
-                                    paddingTop: '1rem',
-                                    borderTop: '1px solid var(--border)',
-                                    display: 'flex',
-                                    justifyContent: 'flex-end'
-                                }}>
-                                    <div style={{
-                                        padding: '0.4rem 0.8rem',
-                                        background: 'rgba(139, 92, 246, 0.1)',
-                                        border: '1px solid rgba(139, 92, 246, 0.3)',
-                                        borderRadius: '8px',
-                                        fontSize: '0.85rem',
-                                        color: 'var(--accent-purple)',
+                                <div>
+                                    <label style={{
+                                        display: 'block',
+                                        marginBottom: '0.5rem',
+                                        color: 'var(--text)',
                                         fontWeight: '600',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
+                                        fontSize: '0.9rem'
                                     }}>
-                                        ✏️ {t.common.edit || 'Düzenle'}
-                                    </div>
+                                        Etiketler
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingNote.tags || ''}
+                                        onChange={(e) => setEditingNote({ ...editingNote, tags: e.target.value })}
+                                        placeholder="vize, final, özet"
+                                        style={inputStyle}
+                                    />
                                 </div>
-                            </Card>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <div style={{
-                    textAlign: 'center',
-                    padding: '4rem 2rem',
-                    color: 'var(--text-secondary)',
-                    backgroundColor: 'var(--secondary)',
-                    borderRadius: '16px',
-                    border: '1px solid var(--border)'
-                }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📚</div>
-                    <h3 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>{t.notes.noNotes}</h3>
-                    <p>{t.notes.noNotesDesc}</p>
-                </div>
-            )}
 
-            {/* Edit Note Modal */}
-            {showEditModal && editingNote && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    backdropFilter: 'blur(4px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    padding: '1rem'
-                }}
-                    onClick={() => {
-                        setShowEditModal(false);
-                        setEditingNote(null);
-                    }}>
-                    <div style={{
-                        backgroundColor: 'var(--secondary)',
-                        borderRadius: '20px',
-                        padding: isMobile ? '1.5rem' : '2.5rem',
-                        maxWidth: '600px',
-                        width: isMobile ? '95%' : '100%',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                        border: '1px solid var(--border)',
-                        maxHeight: '90vh',
-                        overflowY: 'auto'
-                    }}
-                        onClick={(e) => e.stopPropagation()}>
-
-                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                            <div style={{
-                                width: '70px',
-                                height: '70px',
-                                borderRadius: '16px',
-                                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '2rem',
-                                margin: '0 auto 1rem',
-                                boxShadow: '0 10px 30px rgba(139, 92, 246, 0.3)'
-                            }}>
-                                ✏️
-                            </div>
-                            <h2 style={{ marginBottom: '0.5rem', color: 'var(--text)', fontSize: '1.5rem' }}>
-                                {t.notes.editNote || 'Notu Düzenle'}
-                            </h2>
-                        </div>
-
-                        <form onSubmit={handleUpdateNote} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                            {/* Title */}
-                            <div>
-                                <label style={{
+                                {/* Actions */}
+                                <div style={{
                                     display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
+                                    flexDirection: 'column',
+                                    gap: '0.75rem',
+                                    marginTop: '0.5rem'
                                 }}>
-                                    📝 {t.notes.noteTitle || 'Not Başlığı'} *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editingNote.title}
-                                    onChange={(e) => setEditingNote({ ...editingNote, title: e.target.value })}
-                                    required
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowEditModal(false);
+                                                setEditingNote(null);
+                                            }}
+                                            style={{
+                                                flex: 1,
+                                                padding: '1rem',
+                                                backgroundColor: 'transparent',
+                                                color: 'var(--text)',
+                                                border: '2px solid var(--border)',
+                                                borderRadius: '12px',
+                                                cursor: 'pointer',
+                                                fontWeight: '600',
+                                                transition: 'all 0.2s ease'
+                                            }}>
+                                            İptal
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={updating}
+                                            style={{
+                                                flex: 1,
+                                                padding: '1rem',
+                                                background: 'var(--primary-gradient)',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '12px',
+                                                cursor: updating ? 'not-allowed' : 'pointer',
+                                                fontWeight: '700',
+                                                opacity: updating ? 0.7 : 1,
+                                                boxShadow: '0 8px 20px rgba(249, 115, 22, 0.3)'
+                                            }}>
+                                            {updating ? 'Kaydediliyor...' : '✓ Kaydet'}
+                                        </button>
+                                    </div>
 
-                            {/* Description */}
-                            <div>
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    📄 {t.notes.description || 'Açıklama'} *
-                                </label>
-                                <textarea
-                                    value={editingNote.description}
-                                    onChange={(e) => setEditingNote({ ...editingNote, description: e.target.value })}
-                                    required
-                                    rows={4}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        resize: 'vertical',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-
-                            {/* Course */}
-                            <div>
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    📚 {t.notes.course || 'Ders'} *
-                                </label>
-                                <select
-                                    value={editingNote.courseId}
-                                    onChange={(e) => setEditingNote({ ...editingNote, courseId: e.target.value })}
-                                    required
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'all 0.2s ease',
-                                        cursor: 'pointer'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                >
-                                    <option value="">{t.notes.selectCourse}</option>
-                                    {courses.map(course => (
-                                        <option key={course.id} value={course.id}>
-                                            {course.code} - {course.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Tags */}
-                            <div>
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text)',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    🏷️ {t.notes.tags || 'Etiketler'}
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editingNote.tags || ''}
-                                    onChange={(e) => setEditingNote({ ...editingNote, tags: e.target.value })}
-                                    placeholder="örn: vize, final, özet"
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid var(--border)',
-                                        backgroundColor: 'var(--background)',
-                                        color: 'var(--text)',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-                                    }}
-                                    onBlur={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-
-                            {/* Actions */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
-                                <div style={{ display: 'flex', gap: '1rem' }}>
                                     <button
                                         type="button"
-                                        onClick={() => {
-                                            setShowEditModal(false);
-                                            setEditingNote(null);
-                                        }}
+                                        onClick={handleDeleteNote}
+                                        disabled={deleting}
                                         style={{
-                                            flex: 1,
-                                            padding: '0.9rem',
-                                            backgroundColor: 'transparent',
-                                            color: 'var(--text)',
-                                            border: '2px solid var(--border)',
+                                            width: '100%',
+                                            padding: '1rem',
+                                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                            color: '#ef4444',
+                                            border: '2px solid rgba(239, 68, 68, 0.2)',
                                             borderRadius: '12px',
-                                            cursor: 'pointer',
+                                            cursor: deleting ? 'not-allowed' : 'pointer',
                                             fontWeight: '600',
-                                            fontSize: '0.95rem',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--text-secondary)';
-                                            e.currentTarget.style.transform = 'translateY(-1px)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--border)';
-                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            opacity: deleting ? 0.7 : 1
                                         }}>
-                                        {t.common.cancel || 'İptal'}
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={updating}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.9rem',
-                                            backgroundColor: 'var(--accent-blue)',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '12px',
-                                            cursor: updating ? 'not-allowed' : 'pointer',
-                                            fontWeight: 'bold',
-                                            fontSize: '0.95rem',
-                                            opacity: updating ? 0.7 : 1,
-                                            transition: 'all 0.2s ease',
-                                            boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (!updating) {
-                                                e.currentTarget.style.transform = 'translateY(-1px)';
-                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.4)';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = '0 4px 14px rgba(59, 130, 246, 0.3)';
-                                        }}>
-                                        {updating ? (t.common.saving || 'Kaydediliyor...') : (t.common.save || 'Kaydet')}
+                                        🗑️ {deleting ? 'Siliniyor...' : 'Dosyayı Sil'}
                                     </button>
                                 </div>
-
-                                <button
-                                    type="button"
-                                    onClick={handleDeleteNote}
-                                    disabled={deleting}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.9rem',
-                                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                        color: '#ef4444',
-                                        border: '2px solid rgba(239, 68, 68, 0.2)',
-                                        borderRadius: '12px',
-                                        cursor: deleting ? 'not-allowed' : 'pointer',
-                                        fontWeight: '600',
-                                        fontSize: '0.95rem',
-                                        opacity: deleting ? 0.7 : 1,
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        if (!deleting) {
-                                            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
-                                            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-                                            e.currentTarget.style.transform = 'translateY(-1px)';
-                                        }
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-                                        e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                    }}>
-                                    🗑️ {deleting ? (t.common.deleting || 'Siliniyor...') : (t.notes.deleteNote || 'Notu Sil')}
-                                </button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

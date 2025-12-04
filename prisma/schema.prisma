@@ -48,6 +48,7 @@ model User {
   quickNotes       QuickNote[]
   replies          Reply[]
   reports          Report[]
+  savedPosts       SavedPost[]
   searchHistory    SearchHistory[]
   tasks            Task[]
   votes            Vote[]
@@ -86,24 +87,25 @@ model Announcement {
 }
 
 model Post {
-  id        String     @id @default(cuid())
+  id        String      @id @default(cuid())
   title     String
   content   String
   tags      String
   fileUrls  String?
   authorId  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  isVisible Boolean    @default(true)
-  isDeleted Boolean    @default(false)
-  viewCount Int        @default(0)
-  author    User       @relation(fields: [authorId], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  isVisible Boolean     @default(true)
+  isDeleted Boolean     @default(false)
+  viewCount Int         @default(0)
+  author    User        @relation(fields: [authorId], references: [id])
   postViews PostView[]
   replies   Reply[]
   reports   Report[]
+  savedBy   SavedPost[]
   votes     Vote[]
-  noteId    String?    @unique
-  note      Note?      @relation(fields: [noteId], references: [id])
+  noteId    String?     @unique
+  note      Note?       @relation(fields: [noteId], references: [id])
 }
 
 model Reply {
@@ -160,6 +162,7 @@ model Course {
   code       String
   instructor String?
   credits    Int?
+  section    String?
   userId     String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -277,4 +280,17 @@ model UserSession {
   @@index([userId])
   @@index([token])
   @@index([expiresAt])
+}
+
+model SavedPost {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
 }

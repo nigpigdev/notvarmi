@@ -24,7 +24,7 @@ export async function GET(request, { params }) {
         });
 
         if (!currentUser) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+            return NextResponse.json({ error: 'Current user not found' }, { status: 404 });
         }
 
         console.log('Current user ID:', currentUser.id);
@@ -40,12 +40,21 @@ export async function GET(request, { params }) {
                 lastName: true,
                 avatar: true,
                 university: true,
-                department: true
+                department: true,
+                lastSeen: true,
+                showOnlineStatus: true
             }
         });
 
+        // Calculate if user is online (active within last 5 minutes)
+        const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
+        const isOnline = otherUser?.lastSeen
+            ? (new Date() - new Date(otherUser.lastSeen)) < ONLINE_THRESHOLD_MS
+            : false;
+
         if (!otherUser) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+            console.log(`Target user with ID ${userId} not found`);
+            return NextResponse.json({ error: `Target user not found (ID: ${userId})` }, { status: 404 });
         }
 
         // Get all messages between these two users
@@ -119,7 +128,14 @@ export async function GET(request, { params }) {
             });
         }
 
-        return NextResponse.json({ messages, otherUser });
+        // Build otherUser response with online status
+        const otherUserResponse = {
+            ...otherUser,
+            isOnline: otherUser.showOnlineStatus ? isOnline : false,
+            lastSeen: otherUser.showOnlineStatus ? otherUser.lastSeen : null
+        };
+
+        return NextResponse.json({ messages, otherUser: otherUserResponse });
     } catch (error) {
         console.error('=== ERROR in messages API ===');
         console.error('Error message:', error.message);
