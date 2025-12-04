@@ -1,16 +1,24 @@
 // Toggle Switch Component
-function ToggleSwitch({ checked, onChange }) {
+function ToggleSwitch({ checked, onChange, disabled }) {
     return (
-        <label style={{ position: 'relative', display: 'inline-block', width: '50px', height: '28px' }}>
+        <label style={{
+            position: 'relative',
+            display: 'inline-block',
+            width: '50px',
+            height: '28px',
+            opacity: disabled ? 0.5 : 1,
+            cursor: disabled ? 'not-allowed' : 'pointer'
+        }}>
             <input
                 type="checkbox"
                 checked={checked}
-                onChange={(e) => onChange(e.target.checked)}
+                onChange={(e) => !disabled && onChange(e.target.checked)}
+                disabled={disabled}
                 style={{ opacity: 0, width: 0, height: 0 }}
             />
             <span style={{
                 position: 'absolute',
-                cursor: 'pointer',
+                cursor: disabled ? 'not-allowed' : 'pointer',
                 top: 0, left: 0, right: 0, bottom: 0,
                 backgroundColor: checked ? 'var(--accent-purple)' : '#ccc',
                 borderRadius: '28px',

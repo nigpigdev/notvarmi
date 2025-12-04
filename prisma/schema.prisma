@@ -29,6 +29,7 @@ model User {
   theme            String          @default("system")
   language         String          @default("tr")
   role             String          @default("USER")
+  adminMode        Boolean         @default(true)
   banned           Boolean         @default(false)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt

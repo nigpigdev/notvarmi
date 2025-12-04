@@ -14,14 +14,12 @@ export default function Navbar() {
     const { data: session, status } = useSession();
     const { language, toggleLanguage, t } = useLanguage();
     const [unreadMessages, setUnreadMessages] = useState(0);
-    const [userRole, setUserRole] = useState(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
         if (status === 'authenticated') {
             fetchUnreadMessages();
-            fetchUserRole();
             const interval = setInterval(fetchUnreadMessages, 10000); // Check every 10 seconds
             return () => clearInterval(interval);
         }
@@ -47,18 +45,6 @@ export default function Navbar() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
-    const fetchUserRole = async () => {
-        try {
-            const res = await fetch('/api/auth/me');
-            if (res.ok) {
-                const data = await res.json();
-                setUserRole(data.role);
-            }
-        } catch (error) {
-            console.error('Error fetching user role:', error);
-        }
-    };
 
     const fetchUnreadMessages = async () => {
         try {
@@ -153,7 +139,7 @@ export default function Navbar() {
             )}
             {status === 'authenticated' ? (
                 <>
-                    {userRole && (userRole === 'ADMIN' || userRole === 'POWERUSER') ? (
+                    {session?.user?.role && (session.user.role === 'ADMIN' || session.user.role === 'POWERUSER') ? (
                         <>
                             <li>
                                 <Link href="/admin" onClick={isMobile ? closeMobileMenu : undefined}>

@@ -11,7 +11,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { useAlert } from '@/contexts/AlertContext';
 
 export default function SettingsPage() {
-    const { data: session, status } = useSession();
+    const { data: session, status, update: updateSession } = useSession();
     const router = useRouter();
     const { showAlert, showConfirm } = useAlert();
     const fileInputRef = useRef(null);
@@ -64,6 +64,10 @@ export default function SettingsPage() {
     const [loadingSessions, setLoadingSessions] = useState(false);
     const [terminatingAll, setTerminatingAll] = useState(false);
 
+    // Admin mode state
+    const [adminMode, setAdminMode] = useState(true);
+    const [togglingAdminMode, setTogglingAdminMode] = useState(false);
+
     useEffect(() => {
         if (status === 'unauthenticated') {
             router.push('/login');
@@ -76,6 +80,10 @@ export default function SettingsPage() {
             fetchAppearanceSettings();
             if (activeTab === 'security') {
                 fetchSessions();
+            }
+            // Set admin mode from session
+            if (session.user.originalRole === 'ADMIN' || session.user.originalRole === 'POWERUSER') {
+                setAdminMode(session.user.adminMode !== false);
             }
         }
     }, [session, status, router, activeTab]);
@@ -255,6 +263,47 @@ export default function SettingsPage() {
         } catch (error) {
             console.error('Error updating privacy:', error);
             setPrivacySettings(privacySettings); // Revert on error
+        }
+    };
+
+    const handleAdminModeToggle = async (value) => {
+        setTogglingAdminMode(true);
+        const previousValue = adminMode;
+        setAdminMode(value);
+
+        try {
+            const res = await fetch('/api/settings/admin-mode', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminMode: value })
+            });
+
+            if (res.ok) {
+                // Update the session with new adminMode value
+                await updateSession({
+                    user: {
+                        ...session.user,
+                        adminMode: value
+                    }
+                });
+
+                await showAlert(
+                    value
+                        ? 'Admin modu aktif edildi. Sayfa yenileniyor...'
+                        : 'Admin modu kapatıldı. Sayfa yenileniyor...',
+                    'success'
+                );
+                window.location.reload();
+            } else {
+                setAdminMode(previousValue);
+                await showAlert('Admin modu güncellenemedi', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating admin mode:', error);
+            setAdminMode(previousValue);
+            await showAlert('Bir hata oluştu', 'error');
+        } finally {
+            setTogglingAdminMode(false);
         }
     };
 
@@ -1086,6 +1135,58 @@ export default function SettingsPage() {
                                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic' }}>
                                     ✅ Gizlilik ayarları aktif ve otomatik kaydediliyor
                                 </p>
+
+                                {/* Admin Mode Toggle - Only visible for ADMIN/POWERUSER users */}
+                                {(session?.user?.originalRole === 'ADMIN' || session?.user?.originalRole === 'POWERUSER') && (
+                                    <div style={{
+                                        marginTop: '2rem',
+                                        padding: '1.5rem',
+                                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1))',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(139, 92, 246, 0.3)'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                                            <span style={{ fontSize: '1.5rem' }}>🛡️</span>
+                                            <h3 style={{ margin: 0, color: 'var(--text)', fontSize: '1.2rem' }}>Admin Modu</h3>
+                                        </div>
+
+                                        <div style={{
+                                            padding: '1.2rem',
+                                            background: 'var(--background)',
+                                            borderRadius: '10px',
+                                            border: '1px solid var(--border)'
+                                        }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div>
+                                                    <h4 style={{ margin: 0, marginBottom: '0.3rem', color: 'var(--text)' }}>Admin Yetkilerini Kullan</h4>
+                                                    <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                                                        {adminMode
+                                                            ? 'Admin paneline ve yetkilerine erişebilirsiniz'
+                                                            : 'Normal kullanıcı olarak geziniyorsunuz'
+                                                        }
+                                                    </p>
+                                                </div>
+                                                <ToggleSwitch
+                                                    checked={adminMode}
+                                                    onChange={handleAdminModeToggle}
+                                                    disabled={togglingAdminMode}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <p style={{
+                                            margin: '1rem 0 0 0',
+                                            fontSize: '0.85rem',
+                                            color: 'var(--text-secondary)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
+                                        }}>
+                                            <span>💡</span>
+                                            Kapatıldığında siteyi normal kullanıcı gibi deneyimleyebilirsiniz. İstediğiniz zaman tekrar açabilirsiniz.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
