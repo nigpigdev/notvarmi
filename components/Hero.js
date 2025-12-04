@@ -59,7 +59,7 @@ export default function Hero() {
                             textDecoration: 'none',
                             fontWeight: 'bold',
                             fontSize: '1.1rem',
-                            boxShadow: '0 10px 25px rgba(225, 48, 108, 0.3)',
+                            boxShadow: '0 10px 25px rgba(249, 115, 22, 0.3)',
                             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                             display: 'inline-block',
                             textAlign: 'center',
@@ -67,11 +67,11 @@ export default function Hero() {
                         }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 15px 30px rgba(225, 48, 108, 0.4)';
+                                e.currentTarget.style.boxShadow = '0 15px 30px rgba(249, 115, 22, 0.4)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 10px 25px rgba(225, 48, 108, 0.3)';
+                                e.currentTarget.style.boxShadow = '0 10px 25px rgba(249, 115, 22, 0.3)';
                             }}>
                             Foruma Git
                         </Link>
@@ -85,7 +85,7 @@ export default function Hero() {
                                 textDecoration: 'none',
                                 fontWeight: 'bold',
                                 fontSize: '1.1rem',
-                                boxShadow: '0 10px 25px rgba(225, 48, 108, 0.3)',
+                                boxShadow: '0 10px 25px rgba(249, 115, 22, 0.3)',
                                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                                 display: 'inline-block',
                                 textAlign: 'center',
@@ -93,11 +93,11 @@ export default function Hero() {
                             }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = '0 15px 30px rgba(225, 48, 108, 0.4)';
+                                    e.currentTarget.style.boxShadow = '0 15px 30px rgba(249, 115, 22, 0.4)';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(225, 48, 108, 0.3)';
+                                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(249, 115, 22, 0.3)';
                                 }}>
                                 Hemen Başla
                             </Link>
@@ -197,15 +197,7 @@ export default function Hero() {
                 }
 
                 .hero-background {
-                    position: absolute;
-                    top: -20%;
-                    right: -10%;
-                    width: 600px;
-                    height: 600px;
-                    background: radial-gradient(circle, rgba(225, 48, 108, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
-                    border-radius: 50%;
-                    z-index: -1;
-                    transition: transform 0.1s ease-out;
+                    display: none;
                 }
 
                 .hero-content {
@@ -224,7 +216,7 @@ export default function Hero() {
                 }
 
                 .hero-title-gradient {
-                    background: var(--primary-gradient);
+                    background: linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     display: inline-block;
@@ -259,12 +251,12 @@ export default function Hero() {
                 .hero-button-primary {
                     background: var(--primary-gradient);
                     color: white !important;
-                    box-shadow: 0 10px 25px rgba(225, 48, 108, 0.3);
+                    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
                 }
 
                 .hero-button-primary:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 15px 30px rgba(225, 48, 108, 0.4);
+                    box-shadow: 0 15px 30px rgba(249, 115, 22, 0.4);
                     color: white !important;
                 }
 
@@ -311,7 +303,7 @@ export default function Hero() {
                     left: -50%;
                     width: 200%;
                     height: 200%;
-                    background: radial-gradient(circle, rgba(225, 48, 108, 0.1) 0%, transparent 60%);
+                    background: radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, transparent 60%);
                     transform: rotate(45deg);
                 }
 

@@ -108,7 +108,7 @@ export default function FeaturesSection() {
             title: "Sorular & Cevaplar",
             description: "Takıldığın yerleri sor, diğer öğrencilerden yardım al.",
             icon: "💬",
-            gradient: "linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%)",
+            gradient: "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)",
             link: "/forum",
             linkText: "Foruma Git",
             content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
@@ -125,7 +125,7 @@ export default function FeaturesSection() {
             title: "Popüler Notlar",
             description: "En çok indirilen ve beğenilen ders notları.",
             icon: "📝",
-            gradient: "linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%)",
+            gradient: "linear-gradient(135deg, #f97316 0%, #ec4899 100%)",
             link: "/forum?showNotes=true",
             linkText: "Notlara Göz At",
             content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
@@ -142,7 +142,7 @@ export default function FeaturesSection() {
             title: "Yaklaşan Sınavlar",
             description: "Sınav takvimini takip et, hazırlıksız yakalanma.",
             icon: "📅",
-            gradient: "linear-gradient(135deg, #43E97B 0%, #38F9D7 100%)",
+            gradient: "linear-gradient(135deg, #fbbf24 0%, #fcd34d 100%)",
             link: "/courses",
             linkText: null,
             content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
@@ -220,7 +220,7 @@ export default function FeaturesSection() {
                                                         gap: '0.3rem',
                                                         padding: '0.2rem 0.5rem',
                                                         borderRadius: '6px',
-                                                        background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+                                                        background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                                                         color: 'white',
                                                         fontSize: '0.65rem',
                                                         fontWeight: '600',
