@@ -21,6 +21,14 @@ export default function AdminPage() {
     const [selectedRole, setSelectedRole] = useState('');
     const [userRole, setUserRole] = useState(null);
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, type: null, id: null, title: '' });
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth <= 767);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const openDeleteModal = (type, id, title) => {
         setDeleteModal({ isOpen: true, type, id, title });
@@ -320,21 +328,160 @@ export default function AdminPage() {
         }
     }, [activeTab, searchTerm, selectedRole]);
 
+    // Styles
+    const containerStyle = {
+        minHeight: '100vh',
+        background: 'var(--background)',
+        padding: isMobile ? '1rem' : '2rem'
+    };
+
+    const contentStyle = {
+        maxWidth: '1400px',
+        margin: '0 auto'
+    };
+
+    const cardStyle = {
+        background: 'var(--secondary)',
+        borderRadius: '20px',
+        padding: isMobile ? '1.25rem' : '1.5rem',
+        border: '1px solid var(--border)',
+        transition: 'all 0.3s ease'
+    };
+
+    const tabButtonStyle = (isActive) => ({
+        padding: isMobile ? '0.6rem 1rem' : '0.8rem 1.5rem',
+        background: isActive ? 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)' : 'transparent',
+        color: isActive ? 'white' : 'var(--text)',
+        border: 'none',
+        borderRadius: '12px',
+        cursor: 'pointer',
+        fontWeight: isActive ? '600' : '500',
+        fontSize: isMobile ? '0.85rem' : '1rem',
+        transition: 'all 0.2s',
+        boxShadow: isActive ? '0 4px 15px rgba(249, 115, 22, 0.3)' : 'none',
+        whiteSpace: 'nowrap'
+    });
+
+    const inputStyle = {
+        padding: '0.9rem 1.2rem',
+        borderRadius: '12px',
+        border: '2px solid var(--border)',
+        background: 'var(--background)',
+        color: 'var(--text)',
+        fontSize: '1rem',
+        outline: 'none',
+        transition: 'all 0.2s'
+    };
+
+    const tableHeaderStyle = {
+        padding: '1rem',
+        textAlign: 'left',
+        color: 'var(--text)',
+        fontWeight: '600',
+        fontSize: '0.9rem',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px'
+    };
+
+    const tableCellStyle = {
+        padding: '1rem',
+        borderBottom: '1px solid var(--border)'
+    };
+
+    const badgeStyle = (color) => ({
+        padding: '0.3rem 0.8rem',
+        borderRadius: '20px',
+        fontSize: '0.8rem',
+        fontWeight: '600',
+        background: color,
+        color: 'white',
+        whiteSpace: 'nowrap'
+    });
+
+    const actionButtonStyle = (color) => ({
+        padding: '0.5rem 0.8rem',
+        background: color,
+        color: 'white',
+        border: 'none',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+        fontWeight: '600',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'all 0.2s',
+        minWidth: '40px'
+    });
+
     if (loading || status === 'loading' || !userRole) {
-        return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text)' }}>Yükleniyor...</div>;
+        return (
+            <div style={{
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'var(--background)'
+            }}>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{
+                        width: '60px',
+                        height: '60px',
+                        border: '3px solid var(--border)',
+                        borderTopColor: '#f97316',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        margin: '0 auto 1rem'
+                    }} />
+                    <div style={{ color: 'var(--text)', fontSize: '1.1rem' }}>Yükleniyor...</div>
+                </div>
+                <style jsx>{`
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
     }
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--background)', padding: '2rem' }}>
-            <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={containerStyle}>
+            {/* Background Gradient */}
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '350px',
+                background: 'linear-gradient(180deg, rgba(249, 115, 22, 0.08) 0%, transparent 100%)',
+                pointerEvents: 'none',
+                zIndex: 0
+            }} />
+
+            <div style={{ ...contentStyle, position: 'relative', zIndex: 1 }}>
                 {/* Header */}
-                <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{
+                    marginBottom: '2rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '1rem'
+                }}>
                     <div>
-                        <h1 style={{ color: 'var(--text)', fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+                        <h1 style={{
+                            fontSize: isMobile ? '1.75rem' : '2.5rem',
+                            fontWeight: '800',
+                            marginBottom: '0.5rem',
+                            background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}>
                             🛡️ Admin Paneli
                         </h1>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-                            Hoş geldin, {session?.user?.firstName || 'Admin'} ({userRole})
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
+                            Hoş geldin, <strong style={{ color: '#f97316' }}>{session?.user?.firstName || 'Admin'}</strong> ({userRole})
                         </p>
                     </div>
                     {activeTab !== 'dashboard' && (
@@ -342,15 +489,15 @@ export default function AdminPage() {
                             onClick={() => setActiveTab('dashboard')}
                             style={{
                                 padding: '0.8rem 1.5rem',
-                                background: 'var(--primary-gradient)',
+                                background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
                                 color: 'white',
                                 border: 'none',
-                                borderRadius: '8px',
+                                borderRadius: '12px',
                                 cursor: 'pointer',
                                 fontWeight: '600',
                                 fontSize: '1rem',
                                 transition: 'all 0.2s',
-                                boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)'
+                                boxShadow: '0 4px 15px rgba(249, 115, 22, 0.3)'
                             }}
                         >
                             ← Panele Dön
@@ -360,30 +507,19 @@ export default function AdminPage() {
 
                 {/* Tab Navigation */}
                 <div style={{
-                    background: 'var(--secondary)',
-                    borderRadius: '12px',
-                    padding: '1rem',
+                    ...cardStyle,
                     marginBottom: '2rem',
                     display: 'flex',
                     gap: '0.5rem',
-                    border: '1px solid var(--border)',
-                    flexWrap: 'wrap'
+                    flexWrap: 'wrap',
+                    overflowX: 'auto',
+                    padding: '1rem'
                 }}>
                     {['dashboard', 'users', 'posts', 'replies', 'notes', 'reports'].map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            style={{
-                                padding: '0.8rem 1.5rem',
-                                background: activeTab === tab ? 'var(--accent-purple)' : 'transparent',
-                                color: activeTab === tab ? 'white' : 'var(--text)',
-                                border: 'none',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                fontWeight: activeTab === tab ? '600' : '500',
-                                fontSize: '1rem',
-                                transition: 'all 0.2s'
-                            }}
+                            style={tabButtonStyle(activeTab === tab)}
                         >
                             {tab === 'dashboard' && '📊 Dashboard'}
                             {tab === 'users' && '👥 Kullanıcılar'}
@@ -394,21 +530,12 @@ export default function AdminPage() {
                         </button>
                     ))}
                     <Link href="/admin/announcements" style={{
-                        padding: '0.8rem 1.5rem',
-                        background: 'transparent',
-                        color: 'var(--text)',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontWeight: '500',
-                        fontSize: '1rem',
-                        textDecoration: 'none',
-                        transition: 'all 0.2s',
-                        display: 'inline-block'
+                        ...tabButtonStyle(false),
+                        textDecoration: 'none'
                     }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'var(--accent-purple)';
-                            e.currentTarget.style.color = 'white';
+                            e.currentTarget.style.background = 'rgba(249, 115, 22, 0.1)';
+                            e.currentTarget.style.color = '#f97316';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.background = 'transparent';
@@ -421,74 +548,94 @@ export default function AdminPage() {
                 {/* Dashboard Tab */}
                 {activeTab === 'dashboard' && stats && (
                     <div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                            gap: '1rem',
+                            marginBottom: '2rem'
+                        }}>
                             {[
-                                { label: 'Toplam Kullanıcı', value: stats.stats.totalUsers, icon: '👥', color: '#8b5cf6' },
-                                { label: 'Toplam Gönderi', value: stats.stats.totalPosts, icon: '📝', color: '#3b82f6' },
-                                { label: 'Toplam Yanıt', value: stats.stats.totalReplies, icon: '💬', color: '#10b981' },
-                                { label: 'Toplam Not', value: stats.stats.totalNotes, icon: '📄', color: '#f59e0b' },
-                                { label: 'Toplam Mesaj', value: stats.stats.totalMessages, icon: '✉️', color: '#ec4899' },
-                                { label: 'Banlı Kullanıcı', value: stats.stats.bannedUsers, icon: '🚫', color: '#ef4444' }
+                                { label: 'Toplam Kullanıcı', value: stats.stats.totalUsers, icon: '👥', gradient: 'linear-gradient(135deg, #f97316, #fbbf24)' },
+                                { label: 'Toplam Gönderi', value: stats.stats.totalPosts, icon: '📝', gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)' },
+                                { label: 'Toplam Yanıt', value: stats.stats.totalReplies, icon: '💬', gradient: 'linear-gradient(135deg, #10b981, #34d399)' },
+                                { label: 'Toplam Not', value: stats.stats.totalNotes, icon: '📄', gradient: 'linear-gradient(135deg, #f97316, #ec4899)' },
+                                { label: 'Toplam Mesaj', value: stats.stats.totalMessages, icon: '✉️', gradient: 'linear-gradient(135deg, #ec4899, #8b5cf6)' },
+                                { label: 'Banlı Kullanıcı', value: stats.stats.bannedUsers, icon: '🚫', gradient: 'linear-gradient(135deg, #ef4444, #f97316)' }
                             ].map((stat, idx) => (
                                 <div
                                     key={idx}
                                     style={{
-                                        background: 'var(--secondary)',
-                                        borderRadius: '16px',
-                                        padding: '1.5rem',
-                                        border: '1px solid var(--border)',
-                                        transition: 'transform 0.2s'
+                                        ...cardStyle,
+                                        position: 'relative',
+                                        overflow: 'hidden'
                                     }}
                                     onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
                                     onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                 >
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        right: 0,
+                                        width: '80px',
+                                        height: '80px',
+                                        background: stat.gradient,
+                                        opacity: 0.1,
+                                        borderRadius: '0 20px 0 80px'
+                                    }} />
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{stat.label}</p>
-                                            <p style={{ color: 'var(--text)', fontSize: '2rem', fontWeight: '700', margin: 0 }}>{stat.value}</p>
+                                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>{stat.label}</p>
+                                            <p style={{
+                                                background: stat.gradient,
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent',
+                                                fontSize: isMobile ? '1.75rem' : '2.25rem',
+                                                fontWeight: '700',
+                                                margin: 0
+                                            }}>{stat.value}</p>
                                         </div>
-                                        <div style={{ fontSize: '3rem' }}>{stat.icon}</div>
+                                        <div style={{ fontSize: isMobile ? '2rem' : '2.5rem', opacity: 0.8 }}>{stat.icon}</div>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
                         {/* Recent Users */}
-                        <div style={{
-                            background: 'var(--secondary)',
-                            borderRadius: '16px',
-                            padding: '1.5rem',
-                            border: '1px solid var(--border)'
-                        }}>
-                            <h2 style={{ color: 'var(--text)', marginBottom: '1rem', fontSize: '1.5rem' }}>Son Kaydolan Kullanıcılar</h2>
+                        <div style={cardStyle}>
+                            <h2 style={{
+                                color: 'var(--text)',
+                                marginBottom: '1.5rem',
+                                fontSize: '1.3rem',
+                                fontWeight: '700',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem'
+                            }}>
+                                <span style={{ fontSize: '1.5rem' }}>👤</span> Son Kaydolan Kullanıcılar
+                            </h2>
                             <div style={{ overflowX: 'auto' }}>
                                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     <thead>
                                         <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                                            <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>Kullanıcı Adı</th>
-                                            <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>Email</th>
-                                            <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>Rol</th>
-                                            <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>Kayıt Tarihi</th>
+                                            <th style={tableHeaderStyle}>Kullanıcı Adı</th>
+                                            <th style={tableHeaderStyle}>Email</th>
+                                            <th style={tableHeaderStyle}>Rol</th>
+                                            <th style={tableHeaderStyle}>Kayıt Tarihi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {stats.recentUsers.map(user => (
                                             <tr key={user.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                                <td style={{ padding: '1rem', color: 'var(--text)' }}>@{user.username}</td>
-                                                <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{user.email}</td>
-                                                <td style={{ padding: '1rem' }}>
-                                                    <span style={{
-                                                        padding: '0.25rem 0.75rem',
-                                                        borderRadius: '20px',
-                                                        fontSize: '0.85rem',
-                                                        fontWeight: '600',
-                                                        background: user.role === 'POWERUSER' ? '#dc2626' : user.role === 'ADMIN' ? '#f59e0b' : '#3b82f6',
-                                                        color: 'white'
-                                                    }}>
+                                                <td style={{ ...tableCellStyle, color: '#f97316', fontWeight: '600' }}>@{user.username}</td>
+                                                <td style={{ ...tableCellStyle, color: 'var(--text-secondary)' }}>{user.email}</td>
+                                                <td style={tableCellStyle}>
+                                                    <span style={badgeStyle(
+                                                        user.role === 'POWERUSER' ? '#ef4444' : user.role === 'ADMIN' ? '#f97316' : '#3b82f6'
+                                                    )}>
                                                         {user.role}
                                                     </span>
                                                 </td>
-                                                <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>
+                                                <td style={{ ...tableCellStyle, color: 'var(--text-secondary)' }}>
                                                     {new Date(user.createdAt).toLocaleDateString('tr-TR')}
                                                 </td>
                                             </tr>
@@ -502,12 +649,7 @@ export default function AdminPage() {
 
                 {/* Users Tab */}
                 {activeTab === 'users' && (
-                    <div style={{
-                        background: 'var(--secondary)',
-                        borderRadius: '16px',
-                        padding: '1.5rem',
-                        border: '1px solid var(--border)'
-                    }}>
+                    <div style={cardStyle}>
                         <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                             <input
                                 type="text"
@@ -515,27 +657,20 @@ export default function AdminPage() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 style={{
+                                    ...inputStyle,
                                     flex: 1,
-                                    minWidth: '250px',
-                                    padding: '0.8rem',
-                                    borderRadius: '8px',
-                                    border: '1px solid var(--border)',
-                                    background: 'var(--background)',
-                                    color: 'var(--text)',
-                                    fontSize: '1rem'
+                                    minWidth: '250px'
                                 }}
+                                onFocus={(e) => e.currentTarget.style.borderColor = '#f97316'}
+                                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
                             />
                             <select
                                 value={selectedRole}
                                 onChange={(e) => setSelectedRole(e.target.value)}
                                 style={{
-                                    padding: '0.8rem',
-                                    borderRadius: '8px',
-                                    border: '1px solid var(--border)',
-                                    background: 'var(--background)',
-                                    color: 'var(--text)',
-                                    fontSize: '1rem',
-                                    cursor: 'pointer'
+                                    ...inputStyle,
+                                    cursor: 'pointer',
+                                    minWidth: '150px'
                                 }}
                             >
                                 <option value="">Tüm Roller</option>
@@ -548,61 +683,55 @@ export default function AdminPage() {
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
                                     <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                                        <th style={{ padding: '0.75rem', textAlign: 'left', color: 'var(--text)' }}>Kullanıcı</th>
-                                        <th style={{ padding: '0.75rem', textAlign: 'left', color: 'var(--text)' }}>Email</th>
-                                        <th style={{ padding: '0.75rem', textAlign: 'left', color: 'var(--text)' }}>Üniversite</th>
-                                        <th style={{ padding: '0.75rem', textAlign: 'left', color: 'var(--text)' }}>Rol</th>
-                                        <th style={{ padding: '0.75rem', textAlign: 'left', color: 'var(--text)' }}>Durum</th>
-                                        <th style={{ padding: '0.75rem', textAlign: 'left', color: 'var(--text)' }}>İçerik</th>
-                                        <th style={{ padding: '0.75rem', textAlign: 'right', color: 'var(--text)' }}>İşlemler</th>
+                                        <th style={tableHeaderStyle}>Kullanıcı</th>
+                                        <th style={tableHeaderStyle}>Email</th>
+                                        <th style={tableHeaderStyle}>Üniversite</th>
+                                        <th style={tableHeaderStyle}>Rol</th>
+                                        <th style={tableHeaderStyle}>Durum</th>
+                                        <th style={tableHeaderStyle}>İçerik</th>
+                                        <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>İşlemler</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {users.map(user => (
                                         <tr key={user.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                            <td style={{ padding: '0.75rem' }}>
+                                            <td style={tableCellStyle}>
                                                 <div>
                                                     <div style={{ color: 'var(--text)', fontWeight: '600' }}>
                                                         {user.firstName} {user.lastName}
                                                     </div>
-                                                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                                    <div style={{ color: '#f97316', fontSize: '0.85rem' }}>
                                                         @{user.username}
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{user.email}</td>
-                                            <td style={{ padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                            <td style={{ ...tableCellStyle, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{user.email}</td>
+                                            <td style={{ ...tableCellStyle, color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                                                 <div>{user.university || 'N/A'}</div>
                                                 <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>{user.department || ''}</div>
                                             </td>
-                                            <td style={{ padding: '0.75rem' }}>
-                                                <span style={{
-                                                    padding: '0.25rem 0.75rem',
-                                                    borderRadius: '20px',
-                                                    fontSize: '0.85rem',
-                                                    fontWeight: '600',
-                                                    background: user.role === 'POWERUSER' ? '#dc2626' : user.role === 'ADMIN' ? '#f59e0b' : '#3b82f6',
-                                                    color: 'white',
-                                                    whiteSpace: 'nowrap'
-                                                }}>
+                                            <td style={tableCellStyle}>
+                                                <span style={badgeStyle(
+                                                    user.role === 'POWERUSER' ? '#ef4444' : user.role === 'ADMIN' ? '#f97316' : '#3b82f6'
+                                                )}>
                                                     {user.role}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '0.75rem' }}>
+                                            <td style={tableCellStyle}>
                                                 {user.banned ? (
                                                     <span style={{ color: '#ef4444', fontWeight: '600', whiteSpace: 'nowrap' }}>🚫 Banlı</span>
                                                 ) : (
                                                     <span style={{ color: '#10b981', fontWeight: '600', whiteSpace: 'nowrap' }}>✅ Aktif</span>
                                                 )}
                                             </td>
-                                            <td style={{ padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                            <td style={{ ...tableCellStyle, color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                                                     <span>📝 {user._count.posts}</span>
                                                     <span>💬 {user._count.replies}</span>
                                                     <span>📄 {user._count.notes}</span>
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '0.75rem', textAlign: 'right' }}>
+                                            <td style={{ ...tableCellStyle, textAlign: 'right' }}>
                                                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                                                     {user.role !== 'POWERUSER' && !(user.role === 'ADMIN' && userRole === 'ADMIN') && (
                                                         <>
@@ -610,20 +739,7 @@ export default function AdminPage() {
                                                                 type="button"
                                                                 onClick={(e) => handleBanUser(e, user.id, user.banned)}
                                                                 title={user.banned ? 'Ban Kaldır' : 'Banla'}
-                                                                style={{
-                                                                    padding: '0.6rem',
-                                                                    background: user.banned ? '#10b981' : '#f59e0b',
-                                                                    color: 'white',
-                                                                    border: 'none',
-                                                                    borderRadius: '6px',
-                                                                    cursor: 'pointer',
-                                                                    fontSize: '1.2rem',
-                                                                    fontWeight: '600',
-                                                                    minWidth: '40px',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center'
-                                                                }}
+                                                                style={actionButtonStyle(user.banned ? '#10b981' : '#f59e0b')}
                                                             >
                                                                 {user.banned ? '✓' : '❌'}
                                                             </button>
@@ -631,20 +747,7 @@ export default function AdminPage() {
                                                                 type="button"
                                                                 onClick={(e) => handleDeleteUser(e, user.id)}
                                                                 title="Kullanıcıyı Sil"
-                                                                style={{
-                                                                    padding: '0.6rem',
-                                                                    background: '#ef4444',
-                                                                    color: 'white',
-                                                                    border: 'none',
-                                                                    borderRadius: '6px',
-                                                                    cursor: 'pointer',
-                                                                    fontSize: '1.2rem',
-                                                                    fontWeight: '600',
-                                                                    minWidth: '40px',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center'
-                                                                }}
+                                                                style={actionButtonStyle('#ef4444')}
                                                             >
                                                                 🗑️
                                                             </button>
@@ -657,301 +760,297 @@ export default function AdminPage() {
                                                     )}
                                                 </div>
                                             </td>
-                                        </tr >
-                                    ))
-                                    }
-                                </tbody >
-                            </table >
-                        </div >
-                    </div >
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 )}
 
                 {/* Posts Tab */}
-                {
-                    activeTab === 'posts' && (
-                        <div style={{
-                            background: 'var(--secondary)',
-                            borderRadius: '16px',
-                            padding: '1.5rem',
-                            border: '1px solid var(--border)'
+                {activeTab === 'posts' && (
+                    <div style={cardStyle}>
+                        <h2 style={{
+                            color: 'var(--text)',
+                            marginBottom: '1.5rem',
+                            fontSize: '1.3rem',
+                            fontWeight: '700',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
                         }}>
-                            <h2 style={{ color: 'var(--text)', marginBottom: '1.5rem', fontSize: '1.5rem' }}>Tüm Gönderiler</h2>
+                            <span style={{ fontSize: '1.5rem' }}>📝</span> Tüm Gönderiler
+                        </h2>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {posts.map(post => (
-                                    <div
-                                        key={post.id}
-                                        style={{
-                                            background: 'var(--background)',
-                                            borderRadius: '12px',
-                                            padding: '1.5rem',
-                                            border: '1px solid var(--border)'
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-                                            <div style={{ flex: 1 }}>
-                                                <Link href={`/forum/${post.id}`} style={{ textDecoration: 'none' }}>
-                                                    <h3 style={{
-                                                        color: 'var(--text)',
-                                                        marginBottom: '0.5rem',
-                                                        fontSize: '1.2rem',
-                                                        cursor: 'pointer',
-                                                        transition: 'color 0.2s'
-                                                    }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
-                                                    >
-                                                        {post.title}
-                                                    </h3>
-                                                </Link>
-                                                <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                                                    <span style={{ fontWeight: '600', color: post.author.banned ? '#ef4444' : 'var(--text)' }}>
-                                                        @{post.author.username}
-                                                    </span>
-                                                    {post.author.banned && <span style={{ color: '#ef4444', marginLeft: '0.5rem' }}>(Banlı)</span>}
-                                                    {' · '}
-                                                    {new Date(post.createdAt).toLocaleString('tr-TR')}
-                                                    {' · '}
-                                                    {post._count.replies} yanıt
-                                                </div>
-                                                <p style={{ color: 'var(--text)', lineHeight: 1.5 }}>
-                                                    {post.content.substring(0, 200)}
-                                                    {post.content.length > 200 && '...'}
-                                                </p>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => handleDeletePost(e, post.id)}
-                                                style={{
-                                                    padding: '0.6rem 1.2rem',
-                                                    background: '#ef4444',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '8px',
-                                                    cursor: 'pointer',
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {posts.map(post => (
+                                <div
+                                    key={post.id}
+                                    style={{
+                                        background: 'var(--background)',
+                                        borderRadius: '16px',
+                                        padding: '1.5rem',
+                                        border: '1px solid var(--border)',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.borderColor = '#f97316'}
+                                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <Link href={`/forum/${post.id}`} style={{ textDecoration: 'none' }}>
+                                                <h3 style={{
+                                                    color: 'var(--text)',
+                                                    marginBottom: '0.5rem',
+                                                    fontSize: '1.1rem',
                                                     fontWeight: '600',
-                                                    marginLeft: '1rem',
-                                                    zIndex: 10,
-                                                    position: 'relative'
+                                                    cursor: 'pointer',
+                                                    transition: 'color 0.2s'
                                                 }}
-                                            >
-                                                🗑️ Sil
-                                            </button>
+                                                    onMouseEnter={(e) => e.currentTarget.style.color = '#f97316'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+                                                >
+                                                    {post.title}
+                                                </h3>
+                                            </Link>
+                                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                                                <span style={{ fontWeight: '600', color: post.author.banned ? '#ef4444' : '#f97316' }}>
+                                                    @{post.author.username}
+                                                </span>
+                                                {post.author.banned && <span style={{ color: '#ef4444', marginLeft: '0.5rem' }}>(Banlı)</span>}
+                                                {' · '}
+                                                {new Date(post.createdAt).toLocaleString('tr-TR')}
+                                                {' · '}
+                                                {post._count.replies} yanıt
+                                            </div>
+                                            <p style={{ color: 'var(--text)', lineHeight: 1.6 }}>
+                                                {post.content.substring(0, 200)}
+                                                {post.content.length > 200 && '...'}
+                                            </p>
                                         </div>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleDeletePost(e, post.id)}
+                                            style={{
+                                                ...actionButtonStyle('#ef4444'),
+                                                padding: '0.6rem 1.2rem',
+                                                marginLeft: '1rem'
+                                            }}
+                                        >
+                                            🗑️ Sil
+                                        </button>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
                         </div>
-                    )
-                }
+                    </div>
+                )}
 
                 {/* Replies Tab */}
-                {
-                    activeTab === 'replies' && (
-                        <div style={{
-                            background: 'var(--secondary)',
-                            borderRadius: '16px',
-                            padding: '1.5rem',
-                            border: '1px solid var(--border)'
+                {activeTab === 'replies' && (
+                    <div style={cardStyle}>
+                        <h2 style={{
+                            color: 'var(--text)',
+                            marginBottom: '1.5rem',
+                            fontSize: '1.3rem',
+                            fontWeight: '700',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
                         }}>
-                            <h2 style={{ color: 'var(--text)', marginBottom: '1.5rem', fontSize: '1.5rem' }}>Forum Yanıtları</h2>
+                            <span style={{ fontSize: '1.5rem' }}>💬</span> Forum Yanıtları
+                        </h2>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {replies.map(reply => (
-                                    <div
-                                        key={reply.id}
-                                        style={{
-                                            background: 'var(--background)',
-                                            borderRadius: '12px',
-                                            padding: '1.5rem',
-                                            border: '1px solid var(--border)'
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                                                    <span style={{ fontWeight: '600', color: reply.author.banned ? '#ef4444' : 'var(--text)' }}>
-                                                        @{reply.author.username}
-                                                    </span>
-                                                    {reply.author.banned && <span style={{ color: '#ef4444', marginLeft: '0.5rem' }}>(Banlı)</span>}
-                                                    {' → '}
-                                                    <Link
-                                                        href={`/forum/${reply.post.id}`}
-                                                        style={{
-                                                            color: 'var(--primary)',
-                                                            textDecoration: 'none',
-                                                            cursor: 'pointer'
-                                                        }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
-                                                    >
-                                                        {reply.post.title}
-                                                    </Link>
-                                                    {' · '}
-                                                    {new Date(reply.createdAt).toLocaleString('tr-TR')}
-                                                </div>
-                                                <p style={{ color: 'var(--text)', lineHeight: 1.5, marginBottom: '0.5rem' }}>
-                                                    {reply.content.substring(0, 200)}
-                                                    {reply.content.length > 200 && '...'}
-                                                </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {replies.map(reply => (
+                                <div
+                                    key={reply.id}
+                                    style={{
+                                        background: 'var(--background)',
+                                        borderRadius: '16px',
+                                        padding: '1.5rem',
+                                        border: '1px solid var(--border)',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.borderColor = '#f97316'}
+                                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                                                <span style={{ fontWeight: '600', color: reply.author.banned ? '#ef4444' : '#f97316' }}>
+                                                    @{reply.author.username}
+                                                </span>
+                                                {reply.author.banned && <span style={{ color: '#ef4444', marginLeft: '0.5rem' }}>(Banlı)</span>}
+                                                {' → '}
+                                                <Link
+                                                    href={`/forum/${reply.post.id}`}
+                                                    style={{
+                                                        color: '#f97316',
+                                                        textDecoration: 'none',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                                                >
+                                                    {reply.post.title}
+                                                </Link>
+                                                {' · '}
+                                                {new Date(reply.createdAt).toLocaleString('tr-TR')}
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => handleDeleteReply(e, reply.id)}
-                                                style={{
-                                                    padding: '0.6rem 1.2rem',
-                                                    background: '#ef4444',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '8px',
-                                                    cursor: 'pointer',
-                                                    fontWeight: '600',
-                                                    marginLeft: '1rem',
-                                                    zIndex: 10,
-                                                    position: 'relative'
-                                                }}
-                                            >
-                                                🗑️ Sil
-                                            </button>
+                                            <p style={{ color: 'var(--text)', lineHeight: 1.6, marginBottom: '0.5rem' }}>
+                                                {reply.content.substring(0, 200)}
+                                                {reply.content.length > 200 && '...'}
+                                            </p>
                                         </div>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleDeleteReply(e, reply.id)}
+                                            style={{
+                                                ...actionButtonStyle('#ef4444'),
+                                                padding: '0.6rem 1.2rem',
+                                                marginLeft: '1rem'
+                                            }}
+                                        >
+                                            🗑️ Sil
+                                        </button>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
                         </div>
-                    )
-                }
+                    </div>
+                )}
 
                 {/* Notes Tab */}
-                {
-                    activeTab === 'notes' && (
-                        <div style={{
-                            background: 'var(--secondary)',
-                            borderRadius: '16px',
-                            padding: '1.5rem',
-                            border: '1px solid var(--border)'
+                {activeTab === 'notes' && (
+                    <div style={cardStyle}>
+                        <h2 style={{
+                            color: 'var(--text)',
+                            marginBottom: '1.5rem',
+                            fontSize: '1.3rem',
+                            fontWeight: '700',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
                         }}>
-                            <h2 style={{ color: 'var(--text)', marginBottom: '1.5rem', fontSize: '1.5rem' }}>Ders Notları</h2>
+                            <span style={{ fontSize: '1.5rem' }}>📄</span> Ders Notları
+                        </h2>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {notes.map(note => (
-                                    <div
-                                        key={note.id}
-                                        style={{
-                                            background: 'var(--background)',
-                                            borderRadius: '12px',
-                                            padding: '1.5rem',
-                                            border: '1px solid var(--border)'
-                                        }}
-                                    >
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                                            <div style={{ flex: 1 }}>
-                                                <Link href="/notes" style={{ textDecoration: 'none' }}>
-                                                    <h3 style={{
-                                                        color: 'var(--text)',
-                                                        marginBottom: '0.5rem',
-                                                        fontSize: '1.2rem',
-                                                        cursor: 'pointer',
-                                                        transition: 'color 0.2s'
-                                                    }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
-                                                    >
-                                                        {note.title}
-                                                    </h3>
-                                                </Link>
-                                                <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                                                    <span style={{ fontWeight: '600', color: note.author.banned ? '#ef4444' : 'var(--text)' }}>
-                                                        @{note.author.username}
-                                                    </span>
-                                                    {note.author.banned && <span style={{ color: '#ef4444', marginLeft: '0.5rem' }}>(Banlı)</span>}
-                                                    {' · '}
-                                                    <span style={{ color: 'var(--primary)' }}>{note.course?.name || 'Ders bulunamadı'}</span>
-                                                    {' · '}
-                                                    {new Date(note.createdAt).toLocaleString('tr-TR')}
-                                                </div>
-                                                <p style={{ color: 'var(--text)', lineHeight: 1.5 }}>
-                                                    {note.content ? note.content.substring(0, 200) : 'İçerik yok'}
-                                                    {note.content && note.content.length > 200 && '...'}
-                                                </p>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => handleDeleteNote(e, note.id)}
-                                                style={{
-                                                    padding: '0.6rem 1.2rem',
-                                                    background: '#ef4444',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '8px',
-                                                    cursor: 'pointer',
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {notes.map(note => (
+                                <div
+                                    key={note.id}
+                                    style={{
+                                        background: 'var(--background)',
+                                        borderRadius: '16px',
+                                        padding: '1.5rem',
+                                        border: '1px solid var(--border)',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.borderColor = '#f97316'}
+                                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <Link href="/notes" style={{ textDecoration: 'none' }}>
+                                                <h3 style={{
+                                                    color: 'var(--text)',
+                                                    marginBottom: '0.5rem',
+                                                    fontSize: '1.1rem',
                                                     fontWeight: '600',
-                                                    marginLeft: '1rem',
-                                                    zIndex: 10,
-                                                    position: 'relative'
+                                                    cursor: 'pointer',
+                                                    transition: 'color 0.2s'
                                                 }}
-                                            >
-                                                🗑️ Sil
-                                            </button>
+                                                    onMouseEnter={(e) => e.currentTarget.style.color = '#f97316'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+                                                >
+                                                    {note.title}
+                                                </h3>
+                                            </Link>
+                                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                                                <span style={{ fontWeight: '600', color: note.author.banned ? '#ef4444' : '#f97316' }}>
+                                                    @{note.author.username}
+                                                </span>
+                                                {note.author.banned && <span style={{ color: '#ef4444', marginLeft: '0.5rem' }}>(Banlı)</span>}
+                                                {' · '}
+                                                <span style={{ color: '#f97316' }}>{note.course?.name || 'Ders bulunamadı'}</span>
+                                                {' · '}
+                                                {new Date(note.createdAt).toLocaleString('tr-TR')}
+                                            </div>
+                                            <p style={{ color: 'var(--text)', lineHeight: 1.6 }}>
+                                                {note.content ? note.content.substring(0, 200) : 'İçerik yok'}
+                                                {note.content && note.content.length > 200 && '...'}
+                                            </p>
                                         </div>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleDeleteNote(e, note.id)}
+                                            style={{
+                                                ...actionButtonStyle('#ef4444'),
+                                                padding: '0.6rem 1.2rem',
+                                                marginLeft: '1rem'
+                                            }}
+                                        >
+                                            🗑️ Sil
+                                        </button>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
                         </div>
-                    )
-                }
+                    </div>
+                )}
 
                 {/* Reports Tab */}
                 {activeTab === 'reports' && (
-                    <div style={{
-                        background: 'var(--secondary)',
-                        borderRadius: '16px',
-                        padding: '1.5rem',
-                        border: '1px solid var(--border)'
-                    }}>
-                        <h2 style={{ color: 'var(--text)', marginBottom: '1.5rem', fontSize: '1.5rem' }}>Raporlar</h2>
+                    <div style={cardStyle}>
+                        <h2 style={{
+                            color: 'var(--text)',
+                            marginBottom: '1.5rem',
+                            fontSize: '1.3rem',
+                            fontWeight: '700',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                        }}>
+                            <span style={{ fontSize: '1.5rem' }}>⚠️</span> Raporlar
+                        </h2>
 
                         <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
                                     <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                                        <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>Raporlayan</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>Neden</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>İçerik</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>Durum</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text)' }}>Tarih</th>
-                                        <th style={{ padding: '1rem', textAlign: 'right', color: 'var(--text)' }}>İşlemler</th>
+                                        <th style={tableHeaderStyle}>Raporlayan</th>
+                                        <th style={tableHeaderStyle}>Neden</th>
+                                        <th style={tableHeaderStyle}>İçerik</th>
+                                        <th style={tableHeaderStyle}>Durum</th>
+                                        <th style={tableHeaderStyle}>Tarih</th>
+                                        <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>İşlemler</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {reports.map(report => (
                                         <tr key={report.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                            <td style={{ padding: '1rem', color: 'var(--text)' }}>
+                                            <td style={{ ...tableCellStyle, color: '#f97316', fontWeight: '600' }}>
                                                 @{report.reporter.username}
                                             </td>
-                                            <td style={{ padding: '1rem' }}>
-                                                <span style={{
-                                                    padding: '0.25rem 0.75rem',
-                                                    borderRadius: '20px',
-                                                    fontSize: '0.85rem',
-                                                    fontWeight: '600',
-                                                    background: '#ef4444',
-                                                    color: 'white'
-                                                }}>
+                                            <td style={tableCellStyle}>
+                                                <span style={badgeStyle('#ef4444')}>
                                                     {report.reason}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '1rem', color: 'var(--text-secondary)', maxWidth: '300px' }}>
+                                            <td style={{ ...tableCellStyle, color: 'var(--text-secondary)', maxWidth: '300px' }}>
                                                 {report.post ? (
                                                     <div>
                                                         <span style={{ fontWeight: 'bold', color: 'var(--text)' }}>Post: </span>
-                                                        <Link href={`/forum/${report.post.id}`} style={{ color: 'var(--primary)' }}>
+                                                        <Link href={`/forum/${report.post.id}`} style={{ color: '#f97316' }}>
                                                             {report.post.title}
                                                         </Link>
                                                     </div>
                                                 ) : report.reply ? (
                                                     <div>
                                                         <span style={{ fontWeight: 'bold', color: 'var(--text)' }}>Reply in: </span>
-                                                        <Link href={`/forum/${report.reply.post.id}`} style={{ color: 'var(--primary)' }}>
+                                                        <Link href={`/forum/${report.reply.post.id}`} style={{ color: '#f97316' }}>
                                                             {report.reply.post.title}
                                                         </Link>
                                                         <div style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>
@@ -960,49 +1059,30 @@ export default function AdminPage() {
                                                     </div>
                                                 ) : 'Silinmiş İçerik'}
                                             </td>
-                                            <td style={{ padding: '1rem' }}>
-                                                <span style={{
-                                                    padding: '0.25rem 0.75rem',
-                                                    borderRadius: '20px',
-                                                    fontSize: '0.85rem',
-                                                    fontWeight: '600',
-                                                    background: report.status === 'PENDING' ? '#f59e0b' : report.status === 'RESOLVED' ? '#10b981' : '#6b7280',
-                                                    color: 'white'
-                                                }}>
+                                            <td style={tableCellStyle}>
+                                                <span style={badgeStyle(
+                                                    report.status === 'PENDING' ? '#f97316' : report.status === 'RESOLVED' ? '#10b981' : '#6b7280'
+                                                )}>
                                                     {report.status}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>
+                                            <td style={{ ...tableCellStyle, color: 'var(--text-secondary)' }}>
                                                 {new Date(report.createdAt).toLocaleDateString()}
                                             </td>
-                                            <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                            <td style={{ ...tableCellStyle, textAlign: 'right' }}>
                                                 {report.status === 'PENDING' && (
                                                     <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                                                         <button
                                                             onClick={() => handleUpdateReportStatus(report.id, 'RESOLVED')}
                                                             title="Çözüldü Olarak İşaretle"
-                                                            style={{
-                                                                padding: '0.5rem',
-                                                                background: '#10b981',
-                                                                color: 'white',
-                                                                border: 'none',
-                                                                borderRadius: '6px',
-                                                                cursor: 'pointer'
-                                                            }}
+                                                            style={actionButtonStyle('#10b981')}
                                                         >
                                                             ✅
                                                         </button>
                                                         <button
                                                             onClick={() => handleUpdateReportStatus(report.id, 'DISMISSED')}
                                                             title="Reddet"
-                                                            style={{
-                                                                padding: '0.5rem',
-                                                                background: '#6b7280',
-                                                                color: 'white',
-                                                                border: 'none',
-                                                                borderRadius: '6px',
-                                                                cursor: 'pointer'
-                                                            }}
+                                                            style={actionButtonStyle('#6b7280')}
                                                         >
                                                             ❌
                                                         </button>
@@ -1016,6 +1096,7 @@ export default function AdminPage() {
                         </div>
                     </div>
                 )}
+
                 {/* Delete Confirmation Modal */}
                 {deleteModal.isOpen && (
                     <div style={{
@@ -1024,50 +1105,82 @@ export default function AdminPage() {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: 'rgba(0, 0, 0, 0.5)',
+                        background: 'rgba(0, 0, 0, 0.6)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        zIndex: 1000
+                        zIndex: 1000,
+                        backdropFilter: 'blur(4px)'
                     }}>
                         <div style={{
                             background: 'var(--secondary)',
                             padding: '2rem',
-                            borderRadius: '16px',
-                            maxWidth: '400px',
+                            borderRadius: '20px',
+                            maxWidth: '420px',
                             width: '90%',
-                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+                            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
                             border: '1px solid var(--border)'
                         }}>
-                            <h3 style={{ color: 'var(--text)', fontSize: '1.2rem', marginBottom: '1rem' }}>Onaylıyor musunuz?</h3>
-                            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: 1.5 }}>
+                            <div style={{
+                                width: '60px',
+                                height: '60px',
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 1.5rem',
+                                fontSize: '2rem'
+                            }}>
+                                ⚠️
+                            </div>
+                            <h3 style={{
+                                color: 'var(--text)',
+                                fontSize: '1.3rem',
+                                marginBottom: '1rem',
+                                textAlign: 'center',
+                                fontWeight: '700'
+                            }}>Onaylıyor musunuz?</h3>
+                            <p style={{
+                                color: 'var(--text-secondary)',
+                                marginBottom: '2rem',
+                                lineHeight: 1.6,
+                                textAlign: 'center'
+                            }}>
                                 {deleteModal.title}
                             </p>
-                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                                 <button
                                     onClick={closeDeleteModal}
                                     style={{
-                                        padding: '0.8rem 1.5rem',
+                                        padding: '0.9rem 1.8rem',
                                         background: 'transparent',
                                         color: 'var(--text)',
-                                        border: '1px solid var(--border)',
-                                        borderRadius: '8px',
+                                        border: '2px solid var(--border)',
+                                        borderRadius: '12px',
                                         cursor: 'pointer',
-                                        fontWeight: '600'
+                                        fontWeight: '600',
+                                        fontSize: '1rem',
+                                        transition: 'all 0.2s'
                                     }}
+                                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--text)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
                                 >
                                     İptal
                                 </button>
                                 <button
                                     onClick={executeDelete}
                                     style={{
-                                        padding: '0.8rem 1.5rem',
+                                        padding: '0.9rem 1.8rem',
                                         background: '#ef4444',
                                         color: 'white',
                                         border: 'none',
-                                        borderRadius: '8px',
+                                        borderRadius: '12px',
                                         cursor: 'pointer',
-                                        fontWeight: '600'
+                                        fontWeight: '600',
+                                        fontSize: '1rem',
+                                        transition: 'all 0.2s',
+                                        boxShadow: '0 4px 15px rgba(239, 68, 68, 0.3)'
                                     }}
                                 >
                                     Sil
@@ -1076,7 +1189,7 @@ export default function AdminPage() {
                         </div>
                     </div>
                 )}
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }

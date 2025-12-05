@@ -633,63 +633,78 @@ function SearchPageContent() {
                             </div>
                         )}
 
-                        {/* Trending Posts */}
-                        {suggestions.trendingPosts && suggestions.trendingPosts.length > 0 && (
-                            <div>
-                                <h2 style={sectionTitleStyle}>📈 Trend Gönderiler</h2>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                    {suggestions.trendingPosts.map((post, idx) => (
-                                        <Link key={idx} href={`/forum/${post.id}`} style={{
-                                            ...cardStyle,
-                                            textDecoration: 'none'
-                                        }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.borderColor = '#f97316';
-                                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(249, 115, 22, 0.1)';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.borderColor = 'var(--border)';
-                                                e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = 'none';
-                                            }}>
-                                            <div style={{ fontSize: '1rem', color: 'var(--text)', fontWeight: '600' }}>
-                                                {post.title}
-                                            </div>
-                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-                                                👁️ {post.views} görüntülenme
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Announcements */}
-                        {announcements.length > 0 && (
+                        {/* Grid Container for Trending Posts & Announcements */}
+                        {(suggestions.trendingPosts?.length > 0 || announcements.length > 0) && (
                             <div style={{
-                                ...cardStyle,
-                                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(249, 115, 22, 0.05))',
-                                borderColor: 'rgba(249, 115, 22, 0.2)'
+                                display: 'grid',
+                                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                                gap: '2rem',
+                                alignItems: 'start'
                             }}>
-                                <h2 style={sectionTitleStyle}>📢 Duyurular</h2>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                                    {announcements.map((announcement, idx) => (
-                                        <div key={announcement.id} style={{
-                                            borderBottom: idx < announcements.length - 1 ? '1px solid var(--border)' : 'none',
-                                            paddingBottom: idx < announcements.length - 1 ? '1.25rem' : 0
+                                {/* Trending Posts */}
+                                <div>
+                                    {suggestions.trendingPosts && suggestions.trendingPosts.length > 0 && (
+                                        <div style={{
+                                            ...cardStyle,
+                                            height: '100%'
                                         }}>
-                                            <h3 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--text)' }}>
-                                                {announcement.title}
-                                            </h3>
-                                            <p style={{ color: 'var(--text)', lineHeight: '1.6', fontSize: '0.95rem' }}>
-                                                {announcement.content}
-                                            </p>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-                                                {new Date(announcement.createdAt).toLocaleDateString('tr-TR')}
+                                            <h2 style={sectionTitleStyle}>📈 Trend Gönderiler</h2>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                                {suggestions.trendingPosts.map((post, idx) => (
+                                                    <Link key={idx} href={`/forum/${post.id}`} style={{
+                                                        textDecoration: 'none',
+                                                        display: 'block',
+                                                        borderBottom: idx < suggestions.trendingPosts.length - 1 ? '1px solid var(--border)' : 'none',
+                                                        paddingBottom: idx < suggestions.trendingPosts.length - 1 ? '1.25rem' : 0,
+                                                        transition: 'transform 0.2s'
+                                                    }}
+                                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(5px)'}
+                                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateX(0)'}
+                                                    >
+                                                        <div style={{ fontSize: '1.05rem', color: 'var(--text)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                                                            {post.title}
+                                                        </div>
+                                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                            <span>👁️ {post.views} görüntülenme</span>
+                                                            <span style={{ color: '#f97316' }}>Devamını Oku →</span>
+                                                        </div>
+                                                    </Link>
+                                                ))}
                                             </div>
                                         </div>
-                                    ))}
+                                    )}
+                                </div>
+
+                                {/* Announcements */}
+                                <div>
+                                    {announcements.length > 0 && (
+                                        <div style={{
+                                            ...cardStyle,
+                                            background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(249, 115, 22, 0.05))',
+                                            borderColor: 'rgba(249, 115, 22, 0.2)',
+                                            height: '100%'
+                                        }}>
+                                            <h2 style={sectionTitleStyle}>📢 Duyurular</h2>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                                {announcements.map((announcement, idx) => (
+                                                    <div key={announcement.id} style={{
+                                                        borderBottom: idx < announcements.length - 1 ? '1px solid var(--border)' : 'none',
+                                                        paddingBottom: idx < announcements.length - 1 ? '1.25rem' : 0
+                                                    }}>
+                                                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--text)' }}>
+                                                            {announcement.title}
+                                                        </h3>
+                                                        <p style={{ color: 'var(--text)', lineHeight: '1.6', fontSize: '0.95rem' }}>
+                                                            {announcement.content}
+                                                        </p>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                                                            {new Date(announcement.createdAt).toLocaleDateString('tr-TR')}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
