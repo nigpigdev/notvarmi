@@ -7,6 +7,20 @@ import { existsSync } from 'fs';
 import path from 'path';
 import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
 import { logSecurityEvent, getSecurityInfo } from '@/lib/security';
+import { validateUpload, sanitizeFilename } from '@/lib/file-validator';
+
+// Allowed MIME types for forum posts
+const ALLOWED_MIME_TYPES = [
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'application/zip',
+    'application/x-rar-compressed'
+];
 
 export async function GET(req) {
     try {
@@ -85,6 +99,7 @@ export async function POST(req) {
         const session = await getServerSession(authOptions);
 
         if (!session) {
+            logSecurityEvent('UNAUTHORIZED_POST_ATTEMPT', getSecurityInfo(req));
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -111,11 +126,27 @@ export async function POST(req) {
                     const bytes = await file.arrayBuffer();
                     const buffer = Buffer.from(bytes);
 
-                    // Generate unique filename
+                    // Validate file
+                    const validation = await validateUpload(file, buffer, {
+                        allowedMimeTypes: ALLOWED_MIME_TYPES,
+                        maxSize: 100 * 1024 * 1024
+                    });
+
+                    if (!validation.valid) {
+                        logSecurityEvent('MALICIOUS_FILE_BLOCKED', {
+                            ...getSecurityInfo(req),
+                            filename: file.name,
+                            mimeType: file.type,
+                            error: validation.error
+                        });
+                        return NextResponse.json({ error: validation.error }, { status: 400 });
+                    }
+
+                    // Generate secure filename
                     const randomId = Math.random().toString(36).substring(2, 8);
-                    const originalName = file.name.replace(/\.[^/.]+$/, '');
-                    const extension = file.name.split('.').pop();
-                    const filename = `${originalName}_${randomId}.${extension}`;
+                    const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, ''));
+                    const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
+                    const filename = `${safeOriginalName}_${randomId}.${extension}`;
                     const filepath = path.join(uploadDir, filename);
 
                     await writeFile(filepath, buffer);

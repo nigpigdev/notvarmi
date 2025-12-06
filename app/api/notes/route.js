@@ -2,19 +2,29 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
-import fs from 'fs';
+import { existsSync } from 'fs';
+import { validateUpload, sanitizeFilename } from '@/lib/file-validator';
+import { logSecurityEvent, getSecurityInfo } from '@/lib/security';
+import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
 
 const globalForPrisma = global;
 const prisma = globalForPrisma.prisma || new PrismaClient();
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-// Ensure upload directory exists
-const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Allowed MIME types for notes
+const ALLOWED_MIME_TYPES = [
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'application/zip',
+    'application/x-rar-compressed'
+];
 
 // GET all notes
 export async function GET(req) {
@@ -37,9 +47,6 @@ export async function GET(req) {
         const search = searchParams.get('search');
 
         const where = {
-            // Show notes if:
-            // 1. User is the author
-            // 2. OR Note is public
             OR: [
                 { authorId: user.id },
                 { isPublic: true }
@@ -84,9 +91,20 @@ export async function GET(req) {
 
 // POST create a new note
 export async function POST(req) {
+    // Apply rate limiting
+    const rateLimit = applyRateLimit(req, rateLimiters.upload);
+    if (rateLimit.limited) {
+        logSecurityEvent('RATE_LIMIT_NOTES', getSecurityInfo(req));
+        return NextResponse.json(
+            rateLimit.response.body,
+            { status: rateLimit.response.status, headers: rateLimit.response.headers }
+        );
+    }
+
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.email) {
+            logSecurityEvent('UNAUTHORIZED_NOTE_UPLOAD', getSecurityInfo(req));
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -110,12 +128,38 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        // Handle file uploads
+        // Ensure upload directory exists
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+        if (!existsSync(uploadDir)) {
+            await mkdir(uploadDir, { recursive: true });
+        }
+
+        // Handle file uploads with validation
         const fileUrls = [];
         for (const file of files) {
-            if (file instanceof File) {
+            if (file instanceof File && file.size > 0) {
                 const buffer = Buffer.from(await file.arrayBuffer());
-                const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+
+                // Validate file
+                const validation = await validateUpload(file, buffer, {
+                    allowedMimeTypes: ALLOWED_MIME_TYPES,
+                    maxSize: 100 * 1024 * 1024
+                });
+
+                if (!validation.valid) {
+                    logSecurityEvent('MALICIOUS_FILE_BLOCKED', {
+                        ...getSecurityInfo(req),
+                        filename: file.name,
+                        mimeType: file.type,
+                        error: validation.error
+                    });
+                    return NextResponse.json({ error: validation.error }, { status: 400 });
+                }
+
+                const randomId = Math.random().toString(36).substring(2, 8);
+                const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, ''));
+                const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
+                const filename = `${safeOriginalName}_${randomId}.${extension}`;
                 const filepath = path.join(uploadDir, filename);
 
                 await writeFile(filepath, buffer);
@@ -162,3 +206,4 @@ export async function POST(req) {
         }, { status: 500 });
     }
 }
+

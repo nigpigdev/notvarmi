@@ -6,9 +6,20 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
 import { logSecurityEvent, getSecurityInfo } from '@/lib/security';
+import { validateUpload, sanitizeFilename } from '@/lib/file-validator';
 
-// Next.js 15: bodyParser config is deprecated, formData() handles file uploads automatically
-// No config needed - formData() works out of the box
+// Allowed MIME types for this upload endpoint
+const ALLOWED_MIME_TYPES = [
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'application/zip',
+    'application/x-rar-compressed'
+];
 
 export async function POST(req) {
     // Apply rate limiting - 5 uploads per minute
@@ -27,6 +38,7 @@ export async function POST(req) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.email) {
+            logSecurityEvent('UNAUTHORIZED_UPLOAD_ATTEMPT', getSecurityInfo(req));
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -37,27 +49,24 @@ export async function POST(req) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
         }
 
-        // Validate file type - Allow images and documents
-        const allowedTypes = [
-            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-            'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'text/plain',
-            'application/zip',
-            'application/x-rar-compressed'
-        ];
-        if (!allowedTypes.includes(file.type)) {
-            return NextResponse.json({
-                error: 'File type not allowed. Supported: Images, PDF, Word, Excel, TXT, ZIP'
-            }, { status: 400 });
-        }
+        // Convert file to buffer for validation
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
 
-        // Validate file size (max 100MB)
-        if (file.size > 100 * 1024 * 1024) {
-            return NextResponse.json({ error: 'File size must be less than 100MB' }, { status: 400 });
+        // Comprehensive file validation (magic bytes, extensions, size)
+        const validation = await validateUpload(file, buffer, {
+            allowedMimeTypes: ALLOWED_MIME_TYPES,
+            maxSize: 100 * 1024 * 1024 // 100MB
+        });
+
+        if (!validation.valid) {
+            logSecurityEvent('MALICIOUS_FILE_BLOCKED', {
+                ...getSecurityInfo(req),
+                filename: file.name,
+                mimeType: file.type,
+                error: validation.error
+            });
+            return NextResponse.json({ error: validation.error }, { status: 400 });
         }
 
         // Create uploads directory if it doesn't exist
@@ -66,16 +75,14 @@ export async function POST(req) {
             await mkdir(uploadDir, { recursive: true });
         }
 
-        // Generate unique filename with shorter ID
-        const randomId = Math.random().toString(36).substring(2, 8); // 6 character random ID
-        const originalName = file.name.replace(/\.[^/.]+$/, ''); // Remove extension
-        const extension = file.name.split('.').pop();
-        const filename = `${originalName}_${randomId}.${extension}`;
+        // Generate secure filename
+        const randomId = Math.random().toString(36).substring(2, 8);
+        const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, ''));
+        const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
+        const filename = `${safeOriginalName}_${randomId}.${extension}`;
         const filepath = path.join(uploadDir, filename);
 
-        // Convert file to buffer and save
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
+        // Save file
         await writeFile(filepath, buffer);
 
         // Return public URL
@@ -87,3 +94,4 @@ export async function POST(req) {
         return NextResponse.json({ error: 'Failed to upload file', details: error.message }, { status: 500 });
     }
 }
+
