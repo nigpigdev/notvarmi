@@ -67,10 +67,9 @@ export function ForumPostProvider({ children }) {
 
             if (res.ok) {
                 setPendingPost(null);
-                router.refresh();
-                // Auto reload page to show new content
+                // Hard refresh - forces browser to reload without cache (like Ctrl+F5)
                 setTimeout(() => {
-                    window.location.reload();
+                    window.location.href = window.location.pathname + '?t=' + Date.now();
                 }, 500);
             } else {
                 console.error('Failed to create post');
