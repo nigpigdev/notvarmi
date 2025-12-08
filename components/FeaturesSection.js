@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react';
 export default function FeaturesSection() {
     const { status } = useSession();
     const [forumPosts, setForumPosts] = useState([]);
-    const [sharedNotes, setSharedNotes] = useState([]);
     const [upcomingExams, setUpcomingExams] = useState([]);
     const [loading, setLoading] = useState(true);
     const [rotationIndex, setRotationIndex] = useState(0);
@@ -15,44 +14,32 @@ export default function FeaturesSection() {
     useEffect(() => {
         if (status === 'authenticated') {
             fetchDynamicContent();
+        } else {
+            setLoading(false);
         }
     }, [status]);
 
-    // Rotate content every 10 seconds
     useEffect(() => {
-        if (status === 'authenticated' && (forumPosts.length > 3 || sharedNotes.length > 3)) {
+        if (status === 'authenticated' && forumPosts.length > 3) {
             const interval = setInterval(() => {
                 setRotationIndex(prev => prev + 1);
-            }, 10000);
+            }, 8000);
             return () => clearInterval(interval);
         }
-    }, [status, forumPosts.length, sharedNotes.length]);
+    }, [status, forumPosts.length]);
 
     const fetchDynamicContent = async () => {
         try {
-            // Fetch forum posts (sort by views)
             const forumRes = await fetch('/api/forum/posts');
             if (forumRes.ok) {
                 const forumData = await forumRes.json();
                 const posts = forumData.posts || [];
                 const filtered = posts
                     .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
-                    .slice(0, 6); // Get top 6 for rotation
+                    .slice(0, 6);
                 setForumPosts(filtered);
             }
 
-            // Fetch shared notes (posts with files attached)
-            const notesRes = await fetch('/api/forum/posts');
-            if (notesRes.ok) {
-                const notesData = await notesRes.json();
-                const posts = notesData.posts || [];
-                const shared = posts
-                    .filter(post => post.fileUrls && JSON.parse(post.fileUrls).length > 0)
-                    .slice(0, 6); // Get 6 for rotation
-                setSharedNotes(shared);
-            }
-
-            // Fetch courses with upcoming exams
             const coursesRes = await fetch('/api/courses');
             const courseExams = [];
             if (coursesRes.ok) {
@@ -62,13 +49,11 @@ export default function FeaturesSection() {
                     .forEach(course => {
                         courseExams.push({
                             code: course.code,
-                            examDate: course.examDate,
-                            source: 'course'
+                            examDate: course.examDate
                         });
                     });
             }
 
-            // Fetch exam tasks from tasks API
             const tasksRes = await fetch('/api/tasks');
             if (tasksRes.ok) {
                 const tasksData = await tasksRes.json();
@@ -77,16 +62,14 @@ export default function FeaturesSection() {
                     .forEach(task => {
                         courseExams.push({
                             code: task.title,
-                            examDate: task.dueDate,
-                            source: 'task'
+                            examDate: task.dueDate
                         });
                     });
             }
 
-            // Sort all exams by date and take top 8
             const sortedExams = courseExams
                 .sort((a, b) => new Date(a.examDate) - new Date(b.examDate))
-                .slice(0, 8);
+                .slice(0, 4);
             setUpcomingExams(sortedExams);
         } catch (error) {
             console.error('Error fetching dynamic content:', error);
@@ -95,337 +78,450 @@ export default function FeaturesSection() {
         }
     };
 
-    // Get rotated content (show 3 items at a time, rotate through all)
     const getRotatedItems = (items, count = 3) => {
         if (items.length === 0) return [];
         const startIndex = rotationIndex % Math.max(1, items.length - count + 1);
         return items.slice(startIndex, startIndex + count);
     };
 
-    const features = [
-        {
-            title: "Sorular & Cevaplar",
-            description: "Takıldığın yerleri sor, diğer öğrencilerden yardım al.",
-            icon: "💬",
-            gradient: "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)",
-            link: "/topluluk",
-            linkText: "Topluluğa Git",
-            content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
-                forumPosts.length > 0
-                    ? getRotatedItems(forumPosts).map(post => ({
-                        text: post.title.substring(0, 60) + (post.title.length > 60 ? '...' : ''),
-                        bold: true,
-                        views: post.viewCount || 0
-                    }))
-                    : [{ text: 'Henüz soru sorulmamış', bold: false }, { text: 'İlk soruyu sen sor!', bold: false }],
-            authMessage: "Giriş yaparak tartışmalara katıl."
-        },
-        {
-            title: "Popüler Notlar",
-            description: "En çok indirilen ve beğenilen ders notları.",
-            icon: "📝",
-            gradient: "linear-gradient(135deg, #f97316 0%, #ec4899 100%)",
-            link: "/topluluk?showNotes=true",
-            linkText: "Notlara Göz At",
-            content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
-                sharedNotes.length > 0
-                    ? getRotatedItems(sharedNotes).map(note => ({
-                        text: note.title.substring(0, 60),
-                        bold: true
-                    }))
-                    : [{ text: 'Henüz not paylaşılmamış', bold: false }, { text: 'İlk notu sen paylaş!', bold: false }],
-            authMessage: "Notları görmek için giriş yap."
-        },
-        {
-            title: "Yaklaşan Sınavlar",
-            description: "Sınav takvimini takip et, hazırlıksız yakalanma.",
-            icon: "📅",
-            gradient: "linear-gradient(135deg, #fbbf24 0%, #fcd34d 100%)",
-            link: "/courses",
-            linkText: null,
-            content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
-                upcomingExams.length > 0
-                    ? upcomingExams.map((course, index) => {
-                        const examDate = new Date(course.examDate);
-                        const dayName = examDate.toLocaleDateString('tr-TR', { weekday: 'long' });
-                        const formattedDate = examDate.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const formatExamDate = (dateStr) => {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffTime = date - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                        // Check if time is set using UTC (not 00:00)
-                        const utcHours = examDate.getUTCHours();
-                        const utcMinutes = examDate.getUTCMinutes();
-                        const hasTime = utcHours !== 0 || utcMinutes !== 0;
-                        const timeStr = hasTime ? ' ' + examDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+        const dayName = date.toLocaleDateString('tr-TR', { weekday: 'short' });
+        const formattedDate = date.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' });
 
-                        // Font size decreases: 1.05rem -> 0.8rem
-                        const fontSize = Math.max(0.8, 1.05 - (index * 0.05));
+        return { dayName, formattedDate, diffDays };
+    };
 
-                        // Opacity decreases: 1.0 -> 0.5
-                        const opacity = Math.max(0.5, 1 - (index * 0.1));
-
-                        return {
-                            text: `${course.code} - ${dayName}, ${formattedDate}${timeStr}`,
-                            bold: index === 0,
-                            fontSize: `${fontSize}rem`,
-                            opacity: opacity
-                        };
-                    })
-                    : [{ text: 'Henüz sınav tarihi girilmemiş', bold: false }],
-            authMessage: "Sınav takvimi için giriş yap."
-        }
-    ];
+    // Hide the entire section if not logged in
+    if (status !== 'authenticated') {
+        return null;
+    }
 
     return (
-        <div className="features-grid">
-            {features.map((feature, index) => (
-                <div key={index} className="feature-card-wrapper">
-                    <div className="feature-gradient-bg" style={{
-                        background: feature.gradient
-                    }} />
+        <div className="features-wrapper">
 
-                    <div className="feature-card">
-                        <div className="feature-icon" style={{
-                            background: feature.gradient
-                        }}>
-                            {feature.icon}
+            {/* Sınavlar Card */}
+            <div className="feature-card exams-theme">
+                <div className="card-header">
+                    <div className="header-left">
+                        <span className="card-icon exams-icon">📅</span>
+                        <div>
+                            <h2>Yaklaşan Sınavlar</h2>
+                            <p>Hazırlıklı ol, başarılı ol</p>
                         </div>
-
-                        <h3 className="feature-title">
-                            {feature.title}
-                        </h3>
-
-                        <p className="feature-description">
-                            {feature.description}
-                        </p>
-
-                        {status === 'authenticated' ? (
-                            <div className="feature-content">
-                                <ul className="feature-list">
-                                    {feature.content.map((item, i) => {
-                                        const isObject = typeof item === 'object';
-                                        const text = isObject ? item.text : item;
-                                        const isBold = isObject ? item.bold : false;
-                                        const hasBadge = isObject ? item.badge : false;
-                                        const fontSize = isObject ? item.fontSize : '0.95rem';
-                                        const opacity = isObject && item.opacity !== undefined ? item.opacity : 1;
-
-                                        return (
-                                            <li key={i} className="feature-list-item" style={{ fontSize }}>
-                                                <span className="feature-bullet">•</span>
-
-                                                <span style={{
-                                                    fontWeight: isBold ? '700' : '400',
-                                                    opacity: opacity
-                                                }}>
-                                                    {text}
-                                                </span>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                                {feature.linkText && (
-                                    <Link href={feature.link} className="feature-link">
-                                        <span className="feature-link-text">
-                                            {feature.linkText} &rarr;
-                                        </span>
-                                    </Link>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="feature-auth-message">
-                                <p>
-                                    {feature.authMessage}
-                                </p>
-                            </div>
-                        )}
                     </div>
                 </div>
-            ))}
+
+                <div className="card-body">
+                    {status !== 'authenticated' ? (
+                        <div className="auth-message">
+                            <span>🔐</span>
+                            <p>Sınav takvimine erişmek için</p>
+                            <Link href="/login" className="auth-btn">
+                                Giriş Yap
+                            </Link>
+                        </div>
+                    ) : loading ? (
+                        <div className="loading-items">
+                            {[1, 2, 3].map(i => <div key={i} className="loading-item" />)}
+                        </div>
+                    ) : upcomingExams.length > 0 ? (
+                        <div className="content-list">
+                            {upcomingExams.map((exam, idx) => {
+                                const { dayName, formattedDate, diffDays } = formatExamDate(exam.examDate);
+                                const isUrgent = diffDays <= 3;
+
+                                return (
+                                    <div key={idx} className={`exam-item ${isUrgent ? 'urgent' : ''}`}>
+                                        <div className="exam-date">
+                                            <span className="date-day">{dayName}</span>
+                                            <span className="date-num">{formattedDate}</span>
+                                        </div>
+                                        <div className="exam-info">
+                                            <h4>{exam.code}</h4>
+                                            <span className={`countdown ${isUrgent ? 'urgent-text' : ''}`}>
+                                                {diffDays === 0 ? '⚡ Bugün!' :
+                                                    diffDays === 1 ? '⚠️ Yarın' :
+                                                        `${diffDays} gün kaldı`}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="empty-message">
+                            <span>🎉</span>
+                            <p>Yaklaşan sınav yok. Rahatla!</p>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             <style jsx>{`
-                .features-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-                    gap: 2.5rem;
-                    padding: 2rem 0;
-                }
-
-                .feature-card-wrapper {
-                    position: relative;
-                    background: var(--secondary);
-                    border-radius: 24px;
-                    padding: 2px;
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
-                    cursor: default;
-                }
-
-                .feature-card-wrapper:hover {
-                    transform: translateY(-10px);
-                    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-                }
-
-                .feature-gradient-bg {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    border-radius: 24px;
-                    opacity: 0.5;
-                    z-index: 0;
+                .features-wrapper {
+                    display: flex;
+                    justify-content: center;
+                    gap: 1.5rem;
+                    padding-bottom: 3rem;
                 }
 
                 .feature-card {
-                    position: relative;
-                    background: var(--background);
-                    border-radius: 22px;
-                    padding: 2.5rem;
-                    height: 100%;
+                    background: var(--secondary);
+                    border: 1px solid var(--border);
+                    border-radius: 20px;
+                    padding: 1.5rem;
                     display: flex;
                     flex-direction: column;
-                    z-index: 1;
+                    transition: all 0.3s ease;
                 }
 
-                .feature-icon {
-                    width: 60px;
-                    height: 60px;
-                    border-radius: 50%;
+                .feature-card:hover {
+                    border-color: rgba(249, 115, 22, 0.3);
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+                }
+
+                .exams-theme:hover {
+                    border-color: rgba(236, 72, 153, 0.3);
+                }
+
+                .card-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.25rem;
+                    padding-bottom: 1rem;
+                    border-bottom: 1px solid var(--border);
+                }
+
+                .header-left {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                }
+
+                .card-icon {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 12px;
+                    background: linear-gradient(135deg, #f97316, #fbbf24);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 2rem;
-                    margin-bottom: 1.5rem;
-                    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                    font-size: 1.25rem;
                 }
 
-                .feature-title {
-                    font-size: 1.5rem;
-                    margin-bottom: 0.5rem;
+                .exams-icon {
+                    background: linear-gradient(135deg, #ec4899, #f97316);
+                }
+
+                .card-header h2 {
+                    font-size: 1.15rem;
+                    margin: 0;
                     color: var(--text);
-                    font-weight: bold;
+                    font-weight: 700;
                 }
 
-                .feature-description {
+                .card-header p {
+                    font-size: 0.8rem;
+                    margin: 0.15rem 0 0;
                     color: var(--text-secondary);
-                    margin-bottom: 2rem;
-                    line-height: 1.6;
                 }
 
-                .feature-content {
-                    margin-top: auto;
+                .card-body {
+                    flex: 1;
+                    min-height: 180px;
+                    margin-bottom: 1rem;
                 }
 
-                .feature-list {
-                    padding-left: 0;
-                    list-style: none;
-                    margin-bottom: 1.5rem;
+                .auth-message {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 180px;
+                    text-align: center;
+                    color: var(--text-secondary);
                 }
 
-                .feature-list-item {
-                    margin-bottom: 0.8rem;
-                    color: var(--text);
+                .auth-message span {
+                    font-size: 2rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                .auth-message p {
+                    margin: 0 0 0.75rem;
+                }
+
+                .auth-btn {
+                    display: inline-block;
+                    padding: 0.6rem 1.5rem;
+                    background: linear-gradient(135deg, #ec4899, #f97316);
+                    color: white;
+                    text-decoration: none;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    border-radius: 10px;
+                    transition: all 0.3s ease;
+                }
+
+                .auth-btn:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
+                }
+
+                .loading-items {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.6rem;
+                }
+
+                .loading-item {
+                    height: 52px;
+                    background: linear-gradient(90deg, var(--border) 0%, var(--background) 50%, var(--border) 100%);
+                    background-size: 200% 100%;
+                    border-radius: 12px;
+                    animation: shimmer 1.5s infinite;
+                }
+
+                @keyframes shimmer {
+                    0% { background-position: 200% 0; }
+                    100% { background-position: -200% 0; }
+                }
+
+                .content-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+
+                .post-item {
                     display: flex;
                     align-items: center;
-                    gap: 0.5rem;
-                }
-
-                .feature-bullet {
-                    color: var(--primary);
-                    font-size: 1.2rem;
-                }
-
-                .feature-link {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    text-decoration: none;
-                }
-
-                .feature-link-text {
-                    color: var(--text);
-                    font-weight: bold;
-                    font-size: 1rem;
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 50px;
+                    gap: 0.75rem;
+                    padding: 0.65rem 0.75rem;
+                    background: var(--background);
                     border: 1px solid var(--border);
-                    transition: all 0.2s ease;
-                    display: inline-block;
-                }
-
-                .feature-link:hover .feature-link-text {
-                    background: var(--gradient);
-                    color: white;
-                    border-color: transparent;
-                }
-
-                .feature-auth-message {
-                    margin-top: auto;
-                    padding: 1rem;
-                    background: var(--secondary);
                     border-radius: 12px;
+                    text-decoration: none !important;
+                    transition: all 0.2s ease;
+                }
+
+                .post-item:hover {
+                    border-color: rgba(249, 115, 22, 0.5);
+                    background: rgba(249, 115, 22, 0.03);
+                }
+
+                .post-item * {
+                    text-decoration: none !important;
+                }
+
+                .post-rank {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0.35rem 0.5rem;
+                    background: linear-gradient(135deg, #f97316, #fbbf24);
+                    border-radius: 8px;
+                    min-width: 32px;
+                    min-height: 32px;
+                }
+
+                .rank-num {
+                    font-size: 0.85rem;
+                    color: white;
+                    font-weight: 700;
+                }
+
+                .post-info {
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                .post-info h4 {
+                    font-size: 0.85rem;
+                    color: var(--text);
+                    margin: 0 0 0.1rem;
+                    font-weight: 600;
+                    text-decoration: none !important;
+                }
+
+                .post-meta {
+                    font-size: 0.75rem;
+                    color: var(--text-secondary);
+                    text-decoration: none !important;
+                }
+
+                .exam-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.65rem 0.75rem;
+                    background: var(--background);
+                    border: 1px solid var(--border);
+                    border-radius: 12px;
+                    transition: all 0.2s ease;
+                }
+
+                .exam-item.urgent {
+                    border-color: #ef4444;
+                    background: rgba(239, 68, 68, 0.05);
+                }
+
+                .exam-date {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: 0.35rem 0.5rem;
+                    background: linear-gradient(135deg, #ec4899, #f97316);
+                    border-radius: 8px;
+                    min-width: 48px;
+                }
+
+                .date-day {
+                    font-size: 0.55rem;
+                    color: rgba(255,255,255,0.85);
+                    text-transform: uppercase;
+                }
+
+                .date-num {
+                    font-size: 0.7rem;
+                    color: white;
+                    font-weight: 700;
+                }
+
+                .exam-info {
+                    flex: 1;
+                }
+
+                .exam-info h4 {
+                    font-size: 0.85rem;
+                    color: var(--text);
+                    margin: 0 0 0.1rem;
+                    font-weight: 600;
+                }
+
+                .countdown {
+                    font-size: 0.75rem;
+                    color: var(--text-secondary);
+                }
+
+                .urgent-text {
+                    color: #ef4444;
+                    font-weight: 600;
+                }
+
+                .empty-message {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 180px;
                     text-align: center;
                 }
 
-                .feature-auth-message p {
+                .empty-message span {
+                    font-size: 2.5rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                .empty-message p {
                     color: var(--text-secondary);
-                    font-size: 0.9rem;
                     margin: 0;
                 }
 
-                @media (max-width: 767px) {
-                    .features-grid {
+                .card-action {
+                    text-decoration: none !important;
+                    display: block;
+                }
+
+                .action-btn {
+                    width: 100%;
+                    padding: 0.85rem;
+                    border: none;
+                    border-radius: 12px;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    transition: all 0.3s ease;
+                    font-family: inherit;
+                    text-decoration: none;
+                }
+
+                .primary-btn {
+                    background: var(--primary-gradient);
+                    color: white;
+                }
+
+                .primary-btn:hover {
+                    transform: scale(1.02);
+                    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+                }
+
+                .secondary-btn {
+                    background: linear-gradient(135deg, #ec4899, #f97316);
+                    color: white;
+                }
+
+                .secondary-btn:hover {
+                    transform: scale(1.02);
+                    box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+                }
+
+                .btn-arrow {
+                    transition: transform 0.3s ease;
+                }
+
+                .action-btn:hover .btn-arrow {
+                    transform: translateX(4px);
+                }
+
+                @media (max-width: 900px) {
+                    .features-wrapper {
                         grid-template-columns: 1fr;
-                        gap: 1.5rem;
-                        padding: 1rem 0;
-                    }
-
-                    .feature-card {
-                        padding: 2rem 1.5rem;
-                    }
-
-                    .feature-icon {
-                        width: 50px;
-                        height: 50px;
-                        font-size: 1.75rem;
-                        margin-bottom: 1rem;
-                    }
-
-                    .feature-title {
-                        font-size: 1.3rem;
-                    }
-
-                    .feature-description {
-                        font-size: 0.95rem;
-                        margin-bottom: 1.5rem;
-                    }
-
-                    .feature-list-item {
-                        font-size: 0.9rem;
-                        margin-bottom: 0.6rem;
-                    }
-
-                    .feature-link-text {
-                        font-size: 0.95rem;
-                        padding: 0.7rem 1.2rem;
-                        width: 100%;
-                        text-align: center;
-                    }
-
-                    .feature-card-wrapper:hover {
-                        transform: translateY(-5px);
                     }
                 }
 
-                @media (max-width: 360px) {
+                @media (max-width: 767px) {
+                    .features-wrapper {
+                        gap: 1rem;
+                        padding-bottom: 2rem;
+                    }
+
                     .feature-card {
-                        padding: 1.5rem 1rem;
+                        padding: 1.25rem;
+                        border-radius: 16px;
                     }
 
-                    .feature-title {
-                        font-size: 1.2rem;
+                    .card-icon {
+                        width: 38px;
+                        height: 38px;
+                        font-size: 1.1rem;
                     }
 
-                    .feature-description {
-                        font-size: 0.9rem;
+                    .card-header h2 {
+                        font-size: 1.05rem;
+                    }
+
+                    .card-body {
+                        min-height: 150px;
+                    }
+
+                    .item-content h4, .exam-info h4 {
+                        font-size: 0.8rem;
+                    }
+
+                    .item-meta {
+                        font-size: 0.65rem;
                     }
                 }
             `}</style>
