@@ -11,11 +11,15 @@ export async function POST(req) {
             return NextResponse.json({ success: false, error: 'Invalid input' }, { status: 400 });
         }
 
-        // Fetch posts to simulate activity on (no time limit, get mix of recent and popular)
+        // Fetch posts to simulate activity on (only posts from last 5 hours)
+        const fiveHoursAgo = new Date(Date.now() - 5 * 60 * 60 * 1000);
         const posts = await prisma.post.findMany({
             where: {
                 isDeleted: false,
-                isVisible: true
+                isVisible: true,
+                createdAt: {
+                    gte: fiveHoursAgo
+                }
             },
             select: { id: true, createdAt: true, viewCount: true },
             take: 30,
@@ -26,11 +30,10 @@ export async function POST(req) {
             return NextResponse.json({ success: true, message: 'No posts to update' });
         }
 
-        // Optimized probability based on active users
-        // Higher base probabilities for more visible activity
-        // activeUsers = 60 -> viewProb = 0.4, voteProb = 0.08
-        const viewProbability = Math.min(activeUsers / 150, 0.6);
-        const voteProbability = Math.min(activeUsers / 750, 0.12);
+        // Reduced probability based on active users to lower bot impact
+        // activeUsers = 60 -> viewProb = 0.2, voteProb = 0.04
+        const viewProbability = Math.min(activeUsers / 300, 0.3);
+        const voteProbability = Math.min(activeUsers / 1500, 0.06);
 
         const updates = [];
 

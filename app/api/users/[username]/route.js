@@ -99,9 +99,21 @@ export async function GET(req, { params }) {
         // Only fetch posts and replies if profile is public OR viewing own profile
         if (!isProfilePrivate) {
             // Get user's forum posts
-            posts = await prisma.post.findMany({
+            const rawPosts = await prisma.post.findMany({
                 where: { authorId: user.id },
-                include: {
+                select: {
+                    id: true,
+                    title: true,
+                    content: true,
+                    tags: true,
+                    fileUrls: true,
+                    authorId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    viewCount: true,
+                    fakeViewCount: true,
+                    fakeVoteCount: true,
+                    noteId: true,
                     author: {
                         select: {
                             username: true,
@@ -112,7 +124,8 @@ export async function GET(req, { params }) {
                     },
                     _count: {
                         select: {
-                            replies: true
+                            replies: true,
+                            votes: true
                         }
                     }
                 },
@@ -120,6 +133,16 @@ export async function GET(req, { params }) {
                     createdAt: 'desc'
                 }
             });
+
+            // Merge fake counts with real counts
+            posts = rawPosts.map(post => ({
+                ...post,
+                viewCount: (post.viewCount || 0) + (post.fakeViewCount || 0),
+                _count: {
+                    ...post._count,
+                    votes: (post._count?.votes || 0) + (post.fakeVoteCount || 0)
+                }
+            }));
 
             // Get user's replies
             replies = await prisma.reply.findMany({

@@ -467,8 +467,6 @@ export default function PostDetailClient({ initialPost, postId }) {
                                     <span>{post.author.university}{post.author.university && post.author.department && ' • '}{post.author.department}</span>
                                 )}
                                 <span>• <TimeAgo date={post.createdAt} /></span>
-                                <span>• {readTime}</span>
-                                <span>• 👁️ {post.viewCount || 0}</span>
                             </div>
                         </div>
                     </div>
