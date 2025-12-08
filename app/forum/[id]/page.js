@@ -60,12 +60,12 @@ export async function generateMetadata({ params }) {
 
     if (!post) {
         return {
-            title: 'Tartışma Bulunamadı | Notvarmı Forum',
+            title: 'Tartışma Bulunamadı | Notvarmı Topluluk',
             description: 'Aradığınız tartışma bulunamadı.',
         };
     }
 
-    const cleanTitle = post.title.replace('(Not Paylaşıldı) ', '');
+    const cleanTitle = post.title;
     const description = post.content.length > 160
         ? post.content.substring(0, 157) + '...'
         : post.content;
@@ -73,9 +73,9 @@ export async function generateMetadata({ params }) {
     const baseUrl = 'https://www.notvarmi.com';
 
     return {
-        title: `${cleanTitle} | Notvarmı Forum`,
+        title: `${cleanTitle} | Notvarmı Topluluk`,
         description: description,
-        keywords: [...keywords, 'üniversite', 'forum', 'soru cevap', 'ders notları', 'sınav soruları'],
+        keywords: [...keywords, 'üniversite', 'topluluk', 'soru cevap', 'ders notları', 'sınav soruları'],
         openGraph: {
             title: cleanTitle,
             description: description,
@@ -123,7 +123,7 @@ export default async function PostPage({ params }) {
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'DiscussionForumPosting',
-        headline: post.title.replace('(Not Paylaşıldı) ', ''),
+        headline: post.title,
         text: post.content,
         datePublished: new Date(post.createdAt).toISOString(),
         dateModified: new Date(post.updatedAt).toISOString(),
@@ -174,7 +174,7 @@ export default async function PostPage({ params }) {
 
             {/* SEO-friendly content for search engines */}
             <article style={{ display: 'none' }} aria-hidden="true">
-                <h1>{post.title.replace('(Not Paylaşıldı) ', '')}</h1>
+                <h1>{post.title}</h1>
                 <p>{post.content}</p>
                 <span>Yazar: {post.author.name || 'Anonim'}</span>
                 <time dateTime={new Date(post.createdAt).toISOString()}>

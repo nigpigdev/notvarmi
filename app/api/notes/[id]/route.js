@@ -60,7 +60,7 @@ export async function PUT(req, { params }) {
                 await prisma.post.update({
                     where: { id: existingPost.id },
                     data: {
-                        title: `(Not Paylaşıldı) ${body.title}`,
+                        title: body.title,
                         content: body.description,
                         tags: body.tags || 'Ders Notu',
                     }
@@ -69,7 +69,7 @@ export async function PUT(req, { params }) {
                 // Create new post if it doesn't exist
                 await prisma.post.create({
                     data: {
-                        title: `(Not Paylaşıldı) ${body.title}`,
+                        title: body.title,
                         content: body.description,
                         tags: body.tags || 'Ders Notu',
                         fileUrls: existingNote.fileUrls, // Use existing file URLs

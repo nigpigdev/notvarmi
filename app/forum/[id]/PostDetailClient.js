@@ -211,7 +211,7 @@ export default function PostDetailClient({ initialPost, postId }) {
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔍</div>
                     <h2 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>Tartışma bulunamadı</h2>
-                    <Link href="/forum" style={{ color: '#f97316' }}>Foruma dön →</Link>
+                    <Link href="/forum" style={{ color: '#f97316' }}>Topluluğa dön →</Link>
                 </div>
             </div>
         );
@@ -221,7 +221,7 @@ export default function PostDetailClient({ initialPost, postId }) {
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'DiscussionForumPosting',
-        headline: post.title.replace('(Not Paylaşıldı) ', ''),
+        headline: post.title,
         text: post.content,
         datePublished: new Date(post.createdAt).toISOString(),
         author: { '@type': 'Person', name: post.author.name },
@@ -286,7 +286,7 @@ export default function PostDetailClient({ initialPost, postId }) {
                         e.currentTarget.style.borderColor = 'var(--border)';
                         e.currentTarget.style.color = 'var(--text)';
                     }}>
-                    ← Foruma Dön
+                    ← Topluluğa Dön
                 </Link>
 
                 {/* Main Post Card */}
@@ -322,7 +322,7 @@ export default function PostDetailClient({ initialPost, postId }) {
                                     #{tag.trim()}
                                 </span>
                             ))}
-                            {post.title.startsWith('(Not Paylaşıldı)') && (
+                            {post.noteId && (
                                 <span style={{
                                     padding: '0.4rem 1rem',
                                     borderRadius: '20px',
@@ -331,7 +331,7 @@ export default function PostDetailClient({ initialPost, postId }) {
                                     fontSize: '0.8rem',
                                     fontWeight: '600'
                                 }}>
-                                    📚 Doküman
+                                    📁 Arşiv
                                 </span>
                             )}
                         </div>
@@ -418,7 +418,7 @@ export default function PostDetailClient({ initialPost, postId }) {
                         lineHeight: 1.3,
                         marginBottom: '1.5rem'
                     }}>
-                        {post.title.replace('(Not Paylaşıldı) ', '')}
+                        {post.title}
                     </h1>
 
                     {/* Author Info */}

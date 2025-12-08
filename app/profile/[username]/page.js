@@ -177,6 +177,21 @@ export default function UserProfile({ params }) {
 
     const { user, posts, replies, isPrivate } = profileData;
 
+    // Calculate user's document count (PDF files) and total views
+    const userDocuments = posts.reduce((count, post) => {
+        if (post.fileUrls) {
+            try {
+                const files = JSON.parse(post.fileUrls);
+                return count + files.filter(url => url.toLowerCase().endsWith('.pdf')).length;
+            } catch (e) {
+                return count;
+            }
+        }
+        return count;
+    }, 0);
+
+    const userTotalViews = posts.reduce((total, post) => total + (post.viewCount || 0), 0);
+
     return (
         <div style={{
             minHeight: '100vh',
@@ -214,7 +229,7 @@ export default function UserProfile({ params }) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
-                    Foruma Dön
+                    Topluluğa Dön
                 </Link>
 
                 {/* Profile Card */}
@@ -770,7 +785,7 @@ export default function UserProfile({ params }) {
                 {!isPrivate && (
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))',
+                        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
                         gap: isMobile ? '1rem' : '1.5rem',
                         marginBottom: isMobile ? '1rem' : '2rem'
                     }}>
@@ -794,21 +809,21 @@ export default function UserProfile({ params }) {
                                 e.currentTarget.style.borderColor = 'var(--border)';
                             }}>
                             <div style={{
-                                width: '60px',
-                                height: '60px',
+                                width: isMobile ? '50px' : '60px',
+                                height: isMobile ? '50px' : '60px',
                                 background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%)',
                                 borderRadius: '15px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 margin: '0 auto 1rem',
-                                fontSize: '1.8rem',
+                                fontSize: isMobile ? '1.5rem' : '1.8rem',
                                 color: 'white'
                             }}>
                                 📝
                             </div>
                             <div style={{
-                                fontSize: '2.5rem',
+                                fontSize: isMobile ? '2rem' : '2.5rem',
                                 fontWeight: 'bold',
                                 color: '#f97316',
                                 marginBottom: '0.5rem'
@@ -817,7 +832,7 @@ export default function UserProfile({ params }) {
                             </div>
                             <div style={{
                                 color: 'var(--text-secondary)',
-                                fontSize: '1rem',
+                                fontSize: isMobile ? '0.85rem' : '1rem',
                                 fontWeight: '600'
                             }}>
                                 Tartışmalar
@@ -844,21 +859,21 @@ export default function UserProfile({ params }) {
                                 e.currentTarget.style.borderColor = 'var(--border)';
                             }}>
                             <div style={{
-                                width: '60px',
-                                height: '60px',
+                                width: isMobile ? '50px' : '60px',
+                                height: isMobile ? '50px' : '60px',
                                 background: 'linear-gradient(135deg, var(--accent-blue) 0%, #00f2fe 100%)',
                                 borderRadius: '15px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 margin: '0 auto 1rem',
-                                fontSize: '1.8rem',
+                                fontSize: isMobile ? '1.5rem' : '1.8rem',
                                 color: 'white'
                             }}>
                                 💬
                             </div>
                             <div style={{
-                                fontSize: '2.5rem',
+                                fontSize: isMobile ? '2rem' : '2.5rem',
                                 fontWeight: 'bold',
                                 color: 'var(--accent-blue)',
                                 marginBottom: '0.5rem'
@@ -867,10 +882,110 @@ export default function UserProfile({ params }) {
                             </div>
                             <div style={{
                                 color: 'var(--text-secondary)',
-                                fontSize: '1rem',
+                                fontSize: isMobile ? '0.85rem' : '1rem',
                                 fontWeight: '600'
                             }}>
                                 Yanıtlar
+                            </div>
+                        </div>
+
+                        <div style={{
+                            background: 'var(--secondary)',
+                            borderRadius: isMobile ? '16px' : '20px',
+                            padding: isMobile ? '1.5rem' : '2rem',
+                            textAlign: 'center',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+                            transition: 'all 0.3s ease',
+                            border: '1px solid var(--border)'
+                        }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-5px)';
+                                e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.12)';
+                                e.currentTarget.style.borderColor = '#14b8a6';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.08)';
+                                e.currentTarget.style.borderColor = 'var(--border)';
+                            }}>
+                            <div style={{
+                                width: isMobile ? '50px' : '60px',
+                                height: isMobile ? '50px' : '60px',
+                                background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+                                borderRadius: '15px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 1rem',
+                                fontSize: isMobile ? '1.5rem' : '1.8rem',
+                                color: 'white'
+                            }}>
+                                📄
+                            </div>
+                            <div style={{
+                                fontSize: isMobile ? '2rem' : '2.5rem',
+                                fontWeight: 'bold',
+                                color: '#14b8a6',
+                                marginBottom: '0.5rem'
+                            }}>
+                                {userDocuments}
+                            </div>
+                            <div style={{
+                                color: 'var(--text-secondary)',
+                                fontSize: isMobile ? '0.85rem' : '1rem',
+                                fontWeight: '600'
+                            }}>
+                                Dosyalar
+                            </div>
+                        </div>
+
+                        <div style={{
+                            background: 'var(--secondary)',
+                            borderRadius: isMobile ? '16px' : '20px',
+                            padding: isMobile ? '1.5rem' : '2rem',
+                            textAlign: 'center',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+                            transition: 'all 0.3s ease',
+                            border: '1px solid var(--border)'
+                        }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-5px)';
+                                e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.12)';
+                                e.currentTarget.style.borderColor = '#3b82f6';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.08)';
+                                e.currentTarget.style.borderColor = 'var(--border)';
+                            }}>
+                            <div style={{
+                                width: isMobile ? '50px' : '60px',
+                                height: isMobile ? '50px' : '60px',
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                borderRadius: '15px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 1rem',
+                                fontSize: isMobile ? '1.5rem' : '1.8rem',
+                                color: 'white'
+                            }}>
+                                👁️
+                            </div>
+                            <div style={{
+                                fontSize: isMobile ? '2rem' : '2.5rem',
+                                fontWeight: 'bold',
+                                color: '#3b82f6',
+                                marginBottom: '0.5rem'
+                            }}>
+                                {userTotalViews}
+                            </div>
+                            <div style={{
+                                color: 'var(--text-secondary)',
+                                fontSize: isMobile ? '0.85rem' : '1rem',
+                                fontWeight: '600'
+                            }}>
+                                Görüntülenmeler
                             </div>
                         </div>
                     </div>

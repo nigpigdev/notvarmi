@@ -186,7 +186,7 @@ export async function POST(req) {
         if (isPublic) {
             await prisma.post.create({
                 data: {
-                    title: `(Not Paylaşıldı) ${title}`,
+                    title: title,
                     content: description,
                     tags: tags || 'Ders Notu',
                     fileUrls: JSON.stringify(fileUrls),

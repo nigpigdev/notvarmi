@@ -427,7 +427,7 @@ function SearchPageContent() {
                 {/* Header */}
                 <div style={headerStyle}>
                     <h1 style={titleStyle}>Ara</h1>
-                    <p style={subtitleStyle}>Forum, kullanıcı, not veya ders ara</p>
+                    <p style={subtitleStyle}>Topluluk, kullanıcı, not veya ders ara</p>
                 </div>
 
                 {/* Search Box */}

@@ -655,9 +655,9 @@ export default function UploadNote() {
                                 color: 'var(--text-secondary)'
                             }}>
                                 {files.length === 0
-                                    ? 'Forumda paylaşmak için dosya yükle'
+                                    ? 'Toplulukta paylaşmak için dosya yükle'
                                     : isPublic
-                                        ? 'Forumda yayınlanacak'
+                                        ? 'Toplulukta yayınlanacak'
                                         : 'Sadece sen görebilirsin'
                                 }
                             </div>

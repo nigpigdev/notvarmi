@@ -160,6 +160,43 @@ export default function Notes() {
         }
     };
 
+    const handleShareToForum = async (note, e) => {
+        e.stopPropagation(); // Prevent opening edit modal
+
+        if (note.isPublic) {
+            await showAlert('Bu dosya zaten toplulukta paylaşılmış!', 'info');
+            return;
+        }
+
+        const confirmed = await showConfirm(
+            `"${note.title}" dosyasını topluluğa göndermek ve herkese açık paylaşmak istiyor musunuz?\n\nBu işlem geri alınamaz.`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const res = await fetch(`/api/notes/${note.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...note,
+                    isPublic: true
+                })
+            });
+
+            if (res.ok) {
+                const updated = await res.json();
+                setNotes(notes.map(n => n.id === updated.id ? { ...n, isPublic: true } : n));
+                await showAlert('Dosya toplulukta başarıyla paylaşıldı! 🎉', 'success');
+            } else {
+                await showAlert('Paylaşım sırasında bir hata oluştu', 'error');
+            }
+        } catch (error) {
+            console.error('Error sharing to forum:', error);
+            await showAlert('Paylaşım sırasında bir hata oluştu', 'error');
+        }
+    };
+
     const filteredNotes = notes.filter(note =>
         note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         note.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -566,16 +603,58 @@ export default function Notes() {
                                             }}>
                                                 📅 {new Date(note.createdAt).toLocaleDateString()}
                                             </span>
-                                            <span style={{
-                                                padding: '0.4rem 0.8rem',
-                                                background: 'rgba(249, 115, 22, 0.1)',
-                                                borderRadius: '8px',
-                                                fontSize: '0.8rem',
-                                                color: '#f97316',
-                                                fontWeight: '600'
-                                            }}>
-                                                ✏️ Düzenle
-                                            </span>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                {/* Share to Forum Button */}
+                                                <button
+                                                    onClick={(e) => handleShareToForum(note, e)}
+                                                    title={note.isPublic ? 'Toplulukta paylaşıldı' : 'Toplulukta paylaş'}
+                                                    style={{
+                                                        padding: '0.4rem 0.6rem',
+                                                        background: note.isPublic
+                                                            ? 'rgba(34, 197, 94, 0.15)'
+                                                            : 'rgba(59, 130, 246, 0.1)',
+                                                        border: note.isPublic
+                                                            ? '1px solid rgba(34, 197, 94, 0.3)'
+                                                            : '1px solid rgba(59, 130, 246, 0.2)',
+                                                        borderRadius: '8px',
+                                                        fontSize: '0.9rem',
+                                                        color: note.isPublic ? '#22c55e' : '#3b82f6',
+                                                        cursor: note.isPublic ? 'default' : 'pointer',
+                                                        transition: 'all 0.2s ease',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.3rem'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (!note.isPublic) {
+                                                            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.2)';
+                                                            e.currentTarget.style.transform = 'scale(1.05)';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (!note.isPublic) {
+                                                            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)';
+                                                            e.currentTarget.style.transform = 'scale(1)';
+                                                        }
+                                                    }}
+                                                >
+                                                    {note.isPublic ? '✓' : '↗'}
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: '600' }}>
+                                                        {note.isPublic ? 'Paylaşıldı' : 'Paylaş'}
+                                                    </span>
+                                                </button>
+                                                {/* Edit Button */}
+                                                <span style={{
+                                                    padding: '0.4rem 0.8rem',
+                                                    background: 'rgba(249, 115, 22, 0.1)',
+                                                    borderRadius: '8px',
+                                                    fontSize: '0.8rem',
+                                                    color: '#f97316',
+                                                    fontWeight: '600'
+                                                }}>
+                                                    ✏️ Düzenle
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -657,7 +736,7 @@ export default function Notes() {
                                             marginBottom: '0.75rem',
                                             border: '1px solid rgba(139, 92, 246, 0.25)'
                                         }}>
-                                            💬 Forum Tartışması
+                                            💬 Topluluk Tartışması
                                         </div>
 
                                         {/* Title */}
@@ -667,7 +746,7 @@ export default function Notes() {
                                             color: 'var(--text)',
                                             marginBottom: '0.75rem',
                                             lineHeight: '1.4'
-                                        }}>{saved.post.title.replace('(Not Paylaşıldı) ', '')}</h3>
+                                        }}>{saved.post.title}</h3>
 
                                         {/* Content */}
                                         <p style={{
@@ -822,7 +901,7 @@ export default function Notes() {
                                     fontSize: '1.25rem'
                                 }}>Henüz kayıtlı tartışma yok</h3>
                                 <p style={{ color: 'var(--text-secondary)' }}>
-                                    Forum'dan tartışmaları kaydetmek için "Kaydet" butonuna tıklayın.
+                                    Topluluktan tartışmaları kaydetmek için "Kaydet" butonuna tıklayın.
                                 </p>
                             </div>
                         )}

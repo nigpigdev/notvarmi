@@ -17,7 +17,7 @@ export default function Forum() {
     const [loading, setLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
     const [savedPosts, setSavedPosts] = useState({});
-    const [userStats, setUserStats] = useState({ posts: 0, replies: 0, documents: 0, views: 0 });
+    const [forumStats, setForumStats] = useState({ totalPosts: 0, totalDocuments: 0 });
     const { t } = useLanguage();
 
     useEffect(() => {
@@ -37,38 +37,32 @@ export default function Forum() {
         fetchQuestions();
     }, []);
 
-    // Fetch user-specific stats
+    // Calculate forum-wide stats
     useEffect(() => {
-        const fetchUserStats = async () => {
-            if (!session?.user?.id) return;
-            try {
-                // Calculate user's posts
-                const userPosts = questions.filter(q => q.author?.id === session.user.id);
-                const postCount = userPosts.length;
-                const documentCount = userPosts.filter(q => q.title.startsWith('(Not Paylaşıldı)')).length;
-                const viewCount = userPosts.reduce((acc, q) => acc + (q.viewCount || 0), 0);
+        const calculateForumStats = () => {
+            if (questions.length === 0) return;
 
-                // Fetch user's reply count
-                let replyCount = 0;
-                try {
-                    const res = await fetch('/api/forum/user-stats');
-                    if (res.ok) {
-                        const data = await res.json();
-                        replyCount = data.replyCount || 0;
+            // Total posts in forum
+            const totalPosts = questions.length;
+
+            // Count all PDF files across all posts
+            let totalDocuments = 0;
+            for (const post of questions) {
+                if (post.fileUrls) {
+                    try {
+                        const files = JSON.parse(post.fileUrls);
+                        totalDocuments += files.filter(url => url.toLowerCase().endsWith('.pdf')).length;
+                    } catch (e) {
+                        // Invalid JSON, skip
                     }
-                } catch (e) {
-                    console.error('Error fetching reply count:', e);
                 }
-
-                setUserStats({ posts: postCount, replies: replyCount, documents: documentCount, views: viewCount });
-            } catch (error) {
-                console.error('Error calculating user stats:', error);
             }
+
+            setForumStats({ totalPosts, totalDocuments });
         };
-        if (questions.length > 0) {
-            fetchUserStats();
-        }
-    }, [session, questions]);
+
+        calculateForumStats();
+    }, [questions]);
 
     useEffect(() => {
         const fetchSavedStatus = async () => {
@@ -130,7 +124,7 @@ export default function Forum() {
         const matchesSearch = q.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             q.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
             q.tags.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesNoteFilter = !showOnlyNotes || q.title.startsWith('(Not Paylaşıldı)');
+        const matchesNoteFilter = !showOnlyNotes || (q.fileUrls && JSON.parse(q.fileUrls).length > 0);
         return matchesSearch && matchesNoteFilter;
     });
 
@@ -254,64 +248,38 @@ export default function Forum() {
                     )}
                 </header>
 
-                {/* Stats Bar - User's Forum Activity */}
-                {session && (
+                {/* Stats Bar - Forum-wide Statistics */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '1rem',
+                    marginBottom: '2rem'
+                }}>
                     <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-                        gap: '1rem',
-                        marginBottom: '2rem'
+                        padding: '1rem',
+                        background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))',
+                        borderRadius: '14px',
+                        border: '1px solid rgba(249, 115, 22, 0.2)',
+                        textAlign: 'center'
                     }}>
-                        <div style={{
-                            padding: '1rem',
-                            background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))',
-                            borderRadius: '14px',
-                            border: '1px solid rgba(249, 115, 22, 0.2)',
-                            textAlign: 'center'
-                        }}>
-                            <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f97316' }}>
-                                {userStats.posts}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Gönderi</div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f97316' }}>
+                            {forumStats.totalPosts}
                         </div>
-                        <div style={{
-                            padding: '1rem',
-                            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1))',
-                            borderRadius: '14px',
-                            border: '1px solid rgba(139, 92, 246, 0.2)',
-                            textAlign: 'center'
-                        }}>
-                            <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#8b5cf6' }}>
-                                {userStats.replies}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Yanıt</div>
-                        </div>
-                        <div style={{
-                            padding: '1rem',
-                            background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(13, 148, 136, 0.1))',
-                            borderRadius: '14px',
-                            border: '1px solid rgba(20, 184, 166, 0.2)',
-                            textAlign: 'center'
-                        }}>
-                            <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#14b8a6' }}>
-                                {userStats.documents}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Doküman</div>
-                        </div>
-                        <div style={{
-                            padding: '1rem',
-                            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1))',
-                            borderRadius: '14px',
-                            border: '1px solid rgba(59, 130, 246, 0.2)',
-                            textAlign: 'center'
-                        }}>
-                            <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#3b82f6' }}>
-                                {userStats.views}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Görüntülenme</div>
-                        </div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Gönderi</div>
                     </div>
-                )}
+                    <div style={{
+                        padding: '1rem',
+                        background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(13, 148, 136, 0.1))',
+                        borderRadius: '14px',
+                        border: '1px solid rgba(20, 184, 166, 0.2)',
+                        textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#14b8a6' }}>
+                            {forumStats.totalDocuments}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Dosya</div>
+                    </div>
+                </div>
 
                 {/* Search & Filter Bar */}
                 <div style={{
@@ -360,7 +328,7 @@ export default function Forum() {
                                 justifyContent: 'center'
                             }}
                         >
-                            📄 Sadece Dokümanlar
+                            📄 Sadece Dosyalar
                         </button>
                     </div>
                 </div>
@@ -540,9 +508,9 @@ export default function Forum() {
                                             margin: 0,
                                             flex: 1
                                         }}>
-                                            {q.title.replace('(Not Paylaşıldı) ', '')}
+                                            {q.title}
                                         </h2>
-                                        {q.title.startsWith('(Not Paylaşıldı)') && (
+                                        {q.noteId && (
                                             <span style={{
                                                 display: 'inline-flex',
                                                 alignItems: 'center',
@@ -557,7 +525,7 @@ export default function Forum() {
                                                 whiteSpace: 'nowrap',
                                                 flexShrink: 0
                                             }}>
-                                                📚 Not
+                                                📁 Arşiv
                                             </span>
                                         )}
                                     </div>

@@ -834,7 +834,7 @@ export default function Calendar() {
                                     }}>
                                         {[
                                             { color: '#f97316', label: 'Hatırlatıcı' },
-                                            { color: '#ec4899', label: 'Forum' },
+                                            { color: '#ec4899', label: 'Topluluk' },
                                             { color: '#3b82f6', label: 'Sınav' }
                                         ].map(item => (
                                             <div key={item.label} style={{

@@ -73,7 +73,7 @@ export default function Hero() {
                                 e.currentTarget.style.transform = 'translateY(0)';
                                 e.currentTarget.style.boxShadow = '0 10px 25px rgba(249, 115, 22, 0.3)';
                             }}>
-                            Foruma Git
+                            Topluluğa Git
                         </Link>
                     ) : (
                         <>
@@ -123,7 +123,7 @@ export default function Hero() {
                                     e.currentTarget.style.borderColor = 'var(--border)';
                                     e.currentTarget.style.backgroundColor = 'transparent';
                                 }}>
-                                Foruma Git
+                                Topluluğa Git
                             </Link>
                         </>
                     )}

@@ -30,25 +30,24 @@ export default function FeaturesSection() {
 
     const fetchDynamicContent = async () => {
         try {
-            // Fetch forum posts (exclude "Not Paylaşıldı", sort by views)
+            // Fetch forum posts (sort by views)
             const forumRes = await fetch('/api/forum/posts');
             if (forumRes.ok) {
                 const forumData = await forumRes.json();
                 const posts = forumData.posts || [];
                 const filtered = posts
-                    .filter(post => !post.title.includes('Not Paylaşıldı') && !post.title.includes('Paylaş'))
                     .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
                     .slice(0, 6); // Get top 6 for rotation
                 setForumPosts(filtered);
             }
 
-            // Fetch shared notes (only "Not Paylaşıldı" posts)
+            // Fetch shared notes (posts with files attached)
             const notesRes = await fetch('/api/forum/posts');
             if (notesRes.ok) {
                 const notesData = await notesRes.json();
                 const posts = notesData.posts || [];
                 const shared = posts
-                    .filter(post => post.title.includes('Not Paylaşıldı') || post.title.includes('Paylaş'))
+                    .filter(post => post.fileUrls && JSON.parse(post.fileUrls).length > 0)
                     .slice(0, 6); // Get 6 for rotation
                 setSharedNotes(shared);
             }
@@ -110,7 +109,7 @@ export default function FeaturesSection() {
             icon: "💬",
             gradient: "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)",
             link: "/forum",
-            linkText: "Foruma Git",
+            linkText: "Topluluğa Git",
             content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
                 forumPosts.length > 0
                     ? getRotatedItems(forumPosts).map(post => ({
@@ -131,9 +130,8 @@ export default function FeaturesSection() {
             content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
                 sharedNotes.length > 0
                     ? getRotatedItems(sharedNotes).map(note => ({
-                        text: note.title.replace('(Not Paylaşıldı) ', '').substring(0, 60),
-                        bold: true,
-                        badge: true
+                        text: note.title.substring(0, 60),
+                        bold: true
                     }))
                     : [{ text: 'Henüz not paylaşılmamış', bold: false }, { text: 'İlk notu sen paylaş!', bold: false }],
             authMessage: "Notları görmek için giriş yap."
@@ -213,22 +211,7 @@ export default function FeaturesSection() {
                                         return (
                                             <li key={i} className="feature-list-item" style={{ fontSize }}>
                                                 <span className="feature-bullet">•</span>
-                                                {hasBadge && (
-                                                    <span style={{
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '0.3rem',
-                                                        padding: '0.2rem 0.5rem',
-                                                        borderRadius: '6px',
-                                                        background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
-                                                        color: 'white',
-                                                        fontSize: '0.65rem',
-                                                        fontWeight: '600',
-                                                        marginRight: '0.4rem'
-                                                    }}>
-                                                        📚 Not
-                                                    </span>
-                                                )}
+
                                                 <span style={{
                                                     fontWeight: isBold ? '700' : '400',
                                                     opacity: opacity

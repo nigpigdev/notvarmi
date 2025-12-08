@@ -36,7 +36,7 @@ export const metadata = {
         template: '%s | Notvarmı',
     },
     description: 'Üniversite öğrencileri için not paylaşım, ders bilgileri ve akademik yardımlaşma platformu. Derslerinizi takip edin, notlarınızı paylaşın ve sorularınıza cevap bulun.',
-    keywords: ['üniversite notları', 'ders notları', 'öğrenci platformu', 'akademik yardımlaşma', 'not paylaşımı', 'forum', 'ders takibi', 'öğrenci forumu'],
+    keywords: ['üniversite notları', 'ders notları', 'öğrenci platformu', 'akademik yardımlaşma', 'not paylaşımı', 'topluluk', 'ders takibi', 'öğrenci topluluğu'],
     manifest: '/manifest.json',
     appleWebApp: {
         capable: true,

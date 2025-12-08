@@ -163,7 +163,7 @@ export default function CreatePost() {
                         e.currentTarget.style.borderColor = 'var(--border)';
                         e.currentTarget.style.color = 'var(--text)';
                     }}>
-                    ← {t.forumDetail?.backToForum || 'Foruma Dön'}
+                    ← {t.forumDetail?.backToForum || 'Topluluğa Dön'}
                 </a>
 
                 {/* Header */}

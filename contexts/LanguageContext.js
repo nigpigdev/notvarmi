@@ -10,7 +10,7 @@ export const translations = {
         navbar: {
             courses: 'Dersler',
             notes: 'Arşiv',
-            forum: 'Forum',
+            forum: 'Topluluk',
             profile: 'Profil',
             logout: 'Çıkış',
             login: 'Giriş Yap',
@@ -56,7 +56,7 @@ export const translations = {
         },
         // Forum Detail
         forumDetail: {
-            backToForum: 'Foruma Dön',
+            backToForum: 'Topluluğa Dön',
             loading: 'Yükleniyor...',
             postNotFound: 'Gönderi bulunamadı',
             postNotFoundDesc: 'Aradığınız gönderi mevcut değil veya kaldırılmış olabilir.',
@@ -131,7 +131,7 @@ export const translations = {
             credits: 'Kredi',
             createCourse: 'Ders Oluştur',
             publicWarning: 'Herkesle Paylaşım Onayı',
-            publicWarningMessage: 'Bu notu herkese açık olarak paylaşacaksınız. Not otomatik olarak forumda da paylaşılacak ve tüm öğrenciler görebilecek. Devam etmek istiyor musunuz?',
+            publicWarningMessage: 'Bu notu herkese açık olarak paylaşacaksınız. Not otomatik olarak toplulukta da paylaşılacak ve tüm öğrenciler görebilecek. Devam etmek istiyor musunuz?',
             sharePublic: 'Evet, Paylaş'
         },
         // Courses
@@ -180,7 +180,7 @@ export const translations = {
         navbar: {
             courses: 'Courses',
             notes: 'Archive',
-            forum: 'Forum',
+            forum: 'Community',
             profile: 'Profile',
             logout: 'Logout',
             login: 'Login',
@@ -226,7 +226,7 @@ export const translations = {
         },
         // Forum Detail
         forumDetail: {
-            backToForum: 'Back to Forum',
+            backToForum: 'Back to Community',
             loading: 'Loading...',
             postNotFound: 'Post Not Found',
             postNotFoundDesc: 'The post you are looking for does not exist or may have been removed.',
@@ -301,7 +301,7 @@ export const translations = {
             credits: 'Credits',
             createCourse: 'Create Course',
             publicWarning: 'Share Publicly Confirmation',
-            publicWarningMessage: 'You are about to share this note publicly. The note will also be automatically posted to the forum and visible to all students. Do you want to continue?',
+            publicWarningMessage: 'You are about to share this note publicly. The note will also be automatically posted to the community and visible to all students. Do you want to continue?',
             sharePublic: 'Yes, Share'
         },
         // Courses

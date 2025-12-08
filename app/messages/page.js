@@ -188,7 +188,7 @@ export default function MessagesPage() {
                             e.currentTarget.style.borderColor = 'var(--border)';
                             e.currentTarget.style.color = 'var(--text)';
                         }}>
-                        ← Foruma Dön
+                        ← Topluluğa Dön
                     </Link>
                 </div>
 
@@ -297,7 +297,7 @@ export default function MessagesPage() {
                                 e.currentTarget.style.transform = 'translateY(0)';
                                 e.currentTarget.style.boxShadow = '0 8px 25px rgba(249, 115, 22, 0.35)';
                             }}>
-                            🚀 Forumu Keşfet
+                            🚀 Topluluğu Keşfet
                         </Link>
                     </div>
                 ) : (

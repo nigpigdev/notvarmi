@@ -26,25 +26,7 @@ export default function Card({ title, description, children, icon }) {
             {icon && <div style={{ marginBottom: '1rem' }}>{icon}</div>}
             {title && (
                 <h3 style={{ marginTop: 0, color: 'var(--text-secondary)', fontSize: '1.4rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {typeof title === 'string' && title.startsWith('(Not Paylaşıldı)') ? (
-                        <>
-                            <span style={{
-                                backgroundColor: 'rgba(225, 48, 108, 0.15)',
-                                color: 'var(--primary)',
-                                fontSize: '0.8rem',
-                                padding: '0.2rem 0.6rem',
-                                borderRadius: '6px',
-                                border: '1px solid rgba(225, 48, 108, 0.3)',
-                                whiteSpace: 'nowrap',
-                                fontWeight: '600'
-                            }}>
-                                Not Paylaşıldı
-                            </span>
-                            {title.replace('(Not Paylaşıldı)', '').trim()}
-                        </>
-                    ) : (
-                        title
-                    )}
+                    {title}
                 </h3>
             )}
             {description && <p style={{ color: '#8892b0', marginBottom: '1.5rem' }}>{description}</p>}
