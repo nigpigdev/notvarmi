@@ -50,6 +50,12 @@ export default async function sitemap() {
             changeFrequency: 'monthly',
             priority: 0.6,
         },
+        {
+            url: `${baseUrl}/arsiv`,
+            lastModified: new Date(),
+            changeFrequency: 'daily',
+            priority: 0.7,
+        },
     ];
 
     try {

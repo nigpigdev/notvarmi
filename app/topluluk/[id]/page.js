@@ -94,7 +94,7 @@ export async function generateMetadata({ params }) {
             description: description,
         },
         alternates: {
-            canonical: `${baseUrl}/forum/${post.id}`,
+            canonical: `${baseUrl}/topluluk/${post.id}`,
         },
         robots: {
             index: true,
