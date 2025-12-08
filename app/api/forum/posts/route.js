@@ -34,13 +34,29 @@ export async function GET(req) {
                 isDeleted: false,
                 isVisible: true
             },
-            include: {
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                tags: true,
+                fileUrls: true,
+                authorId: true,
+                createdAt: true,
+                updatedAt: true,
+                isVisible: true,
+                isDeleted: true,
+                viewCount: true,
+                fakeViewCount: true,
+                fakeVoteCount: true,
+                noteId: true,
                 author: {
                     select: {
                         id: true,
                         name: true,
                         username: true,
-                        avatar: true
+                        avatar: true,
+                        university: true,
+                        department: true
                     }
                 },
                 _count: {
@@ -58,6 +74,16 @@ export async function GET(req) {
             take: limit
         });
 
+        // Merge fake counts with real counts
+        const enrichedPosts = posts.map(post => ({
+            ...post,
+            viewCount: (post.viewCount || 0) + (post.fakeViewCount || 0),
+            _count: {
+                ...post._count,
+                votes: (post._count?.votes || 0) + (post.fakeVoteCount || 0)
+            }
+        }));
+
         const total = await prisma.post.count({
             where: {
                 isDeleted: false,
@@ -66,7 +92,7 @@ export async function GET(req) {
         });
 
         return NextResponse.json({
-            posts,
+            posts: enrichedPosts,
             pagination: {
                 total,
                 pages: Math.ceil(total / limit),

@@ -55,26 +55,19 @@ export async function GET(req, { params }) {
             return NextResponse.json({ error: 'Post not found' }, { status: 404 });
         }
 
-        // Increment view count (Unique per user)
+        // Increment view count
         try {
             const session = await getServerSession(authOptions);
 
-            // Only count views for logged-in users
             if (session && session.user) {
+                // For logged-in users: unique view tracking
                 const userEmail = session.user.email;
-
-                // We need the user ID. Since we don't have it in the session directly (usually),
-                // we might need to fetch it or rely on the session structure.
-                // Assuming session.user.id exists or we fetch the user.
-
-                // Let's try to find the user first to be safe
                 const currentUser = await prismaClient.user.findUnique({
                     where: { email: userEmail },
                     select: { id: true }
                 });
 
                 if (currentUser) {
-                    // Check if this user has already viewed this post
                     const existingView = await prismaClient.postView.findUnique({
                         where: {
                             userId_postId: {
@@ -85,7 +78,6 @@ export async function GET(req, { params }) {
                     });
 
                     if (!existingView) {
-                        // Create a view record and increment the count transactionally
                         await prismaClient.$transaction([
                             prismaClient.postView.create({
                                 data: {
@@ -100,6 +92,12 @@ export async function GET(req, { params }) {
                         ]);
                     }
                 }
+            } else {
+                // For anonymous users: always increment view count
+                await prismaClient.post.update({
+                    where: { id },
+                    data: { viewCount: { increment: 1 } }
+                });
             }
         } catch (updateError) {
             console.error('Failed to update view count:', updateError);

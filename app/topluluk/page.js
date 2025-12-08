@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -20,22 +20,70 @@ export default function Forum() {
     const [forumStats, setForumStats] = useState({ totalPosts: 0, totalDocuments: 0 });
     const { t } = useLanguage();
 
-    useEffect(() => {
-        const fetchQuestions = async () => {
-            try {
-                const res = await fetch('/api/forum/posts');
-                if (res.ok) {
-                    const data = await res.json();
-                    setQuestions(data.posts || []);
+    // Infinite scroll state
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const observerRef = useRef(null);
+    const POSTS_PER_PAGE = 5;
+
+    // Fetch questions with pagination
+    const fetchQuestions = useCallback(async (pageNum, isInitial = false) => {
+        if (isInitial) setLoading(true);
+        else setLoadingMore(true);
+
+        try {
+            const res = await fetch(`/api/forum/posts?page=${pageNum}&limit=${POSTS_PER_PAGE}`);
+            if (res.ok) {
+                const data = await res.json();
+                const newPosts = data.posts || [];
+
+                if (isInitial) {
+                    setQuestions(newPosts);
+                } else {
+                    // Filter out duplicates to avoid React key warnings
+                    setQuestions(prev => {
+                        const existingIds = new Set(prev.map(p => p.id));
+                        const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.id));
+                        return [...prev, ...uniqueNewPosts];
+                    });
                 }
-            } catch (error) {
-                console.error('Failed to fetch questions', error);
-            } finally {
-                setLoading(false);
+
+                // Check if there are more posts to load
+                const totalPages = data.pagination?.pages || 1;
+                setHasMore(pageNum < totalPages);
             }
-        };
-        fetchQuestions();
+        } catch (error) {
+            console.error('Failed to fetch questions', error);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
     }, []);
+
+    // Initial load
+    useEffect(() => {
+        fetchQuestions(1, true);
+    }, [fetchQuestions]);
+
+    // Intersection Observer for infinite scroll
+    const lastPostRef = useCallback(node => {
+        if (loading || loadingMore) return;
+
+        if (observerRef.current) observerRef.current.disconnect();
+
+        observerRef.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore && !loadingMore) {
+                setPage(prev => {
+                    const nextPage = prev + 1;
+                    fetchQuestions(nextPage, false);
+                    return nextPage;
+                });
+            }
+        }, { threshold: 0.1 });
+
+        if (node) observerRef.current.observe(node);
+    }, [loading, loadingMore, hasMore, fetchQuestions]);
 
     // Calculate forum-wide stats
     useEffect(() => {
@@ -391,277 +439,281 @@ export default function Forum() {
                         </div>
                     ) : sortedQuestions.length > 0 ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {sortedQuestions.map(q => (
-                                <article
-                                    key={q.id}
-                                    onClick={() => router.push(`/topluluk/${q.id}`)}
-                                    style={{
-                                        backgroundColor: 'var(--secondary)',
-                                        borderRadius: '18px',
-                                        padding: isMobile ? '1.25rem' : '1.5rem',
-                                        border: '1px solid var(--border)',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s ease',
-                                        boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-4px)';
-                                        e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)';
-                                        e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.3)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)';
-                                        e.currentTarget.style.borderColor = 'var(--border)';
-                                    }}
-                                >
-                                    {/* Author Info */}
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.75rem',
-                                        marginBottom: '1rem'
-                                    }}>
+                            {sortedQuestions.map((q, index) => {
+                                const isLastPost = index === sortedQuestions.length - 1;
+                                return (
+                                    <article
+                                        key={q.id}
+                                        ref={isLastPost ? lastPostRef : null}
+                                        onClick={() => router.push(`/topluluk/${q.id}`)}
+                                        style={{
+                                            backgroundColor: 'var(--secondary)',
+                                            borderRadius: '18px',
+                                            padding: isMobile ? '1.25rem' : '1.5rem',
+                                            border: '1px solid var(--border)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease',
+                                            boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                            e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)';
+                                            e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.3)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)';
+                                            e.currentTarget.style.borderColor = 'var(--border)';
+                                        }}
+                                    >
+                                        {/* Author Info */}
                                         <div style={{
-                                            width: isMobile ? '36px' : '42px',
-                                            height: isMobile ? '36px' : '42px',
-                                            borderRadius: '12px',
-                                            background: 'var(--primary-gradient)',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '1rem',
-                                            color: 'white',
-                                            fontWeight: '700',
-                                            overflow: 'hidden',
-                                            flexShrink: 0
+                                            gap: '0.75rem',
+                                            marginBottom: '1rem'
                                         }}>
-                                            {q.author.avatar ? (
-                                                <img src={q.author.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            ) : (
-                                                q.author.name ? q.author.name[0].toUpperCase() : '?'
-                                            )}
-                                        </div>
-                                        <div style={{ flex: 1, minWidth: 0 }}>
                                             <div style={{
+                                                width: isMobile ? '36px' : '42px',
+                                                height: isMobile ? '36px' : '42px',
+                                                borderRadius: '12px',
+                                                background: 'var(--primary-gradient)',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: '0.5rem',
-                                                flexWrap: 'wrap'
-                                            }}>
-                                                <span style={{
-                                                    fontWeight: '600',
-                                                    color: 'var(--text)',
-                                                    fontSize: isMobile ? '0.9rem' : '0.95rem'
-                                                }}>
-                                                    {q.author.name || 'Anonim'}
-                                                </span>
-                                                {q.author.username && (
-                                                    <Link
-                                                        href={`/profile/${q.author.username}`}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        style={{
-                                                            color: '#f97316',
-                                                            fontSize: '0.8rem',
-                                                            textDecoration: 'none'
-                                                        }}
-                                                    >
-                                                        @{q.author.username}
-                                                    </Link>
-                                                )}
-                                            </div>
-                                            {(q.author.university || q.author.department) && (
-                                                <div style={{
-                                                    fontSize: '0.75rem',
-                                                    color: 'var(--text-secondary)',
-                                                    marginTop: '0.15rem',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap'
-                                                }}>
-                                                    {q.author.university}{q.author.university && q.author.department && ' • '}{q.author.department}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <time style={{
-                                            fontSize: '0.8rem',
-                                            color: 'var(--text-secondary)',
-                                            flexShrink: 0
-                                        }} dateTime={q.createdAt}>
-                                            {new Date(q.createdAt).toLocaleDateString('tr-TR')}
-                                        </time>
-                                    </div>
-
-                                    {/* Title & Badge */}
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'flex-start',
-                                        gap: '0.75rem',
-                                        flexWrap: 'wrap',
-                                        marginBottom: '0.75rem'
-                                    }}>
-                                        <h2 style={{
-                                            fontSize: isMobile ? '1.05rem' : '1.15rem',
-                                            fontWeight: '700',
-                                            color: 'var(--text)',
-                                            lineHeight: '1.4',
-                                            margin: 0,
-                                            flex: 1
-                                        }}>
-                                            {q.title}
-                                        </h2>
-                                        {q.noteId && (
-                                            <span style={{
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '0.3rem',
-                                                padding: '0.3rem 0.7rem',
-                                                borderRadius: '8px',
-                                                background: 'var(--primary-gradient)',
+                                                justifyContent: 'center',
+                                                fontSize: '1rem',
                                                 color: 'white',
-                                                fontSize: '0.7rem',
-                                                fontWeight: '600',
-                                                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)',
-                                                whiteSpace: 'nowrap',
+                                                fontWeight: '700',
+                                                overflow: 'hidden',
                                                 flexShrink: 0
                                             }}>
-                                                📁 Arşiv
-                                            </span>
-                                        )}
-                                    </div>
+                                                {q.author.avatar ? (
+                                                    <img src={q.author.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    q.author.name ? q.author.name[0].toUpperCase() : '?'
+                                                )}
+                                            </div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem',
+                                                    flexWrap: 'wrap'
+                                                }}>
+                                                    <span style={{
+                                                        fontWeight: '600',
+                                                        color: 'var(--text)',
+                                                        fontSize: isMobile ? '0.9rem' : '0.95rem'
+                                                    }}>
+                                                        {q.author.name || 'Anonim'}
+                                                    </span>
+                                                    {q.author.username && (
+                                                        <Link
+                                                            href={`/profile/${q.author.username}`}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            style={{
+                                                                color: '#f97316',
+                                                                fontSize: '0.8rem',
+                                                                textDecoration: 'none'
+                                                            }}
+                                                        >
+                                                            @{q.author.username}
+                                                        </Link>
+                                                    )}
+                                                </div>
+                                                {(q.author.university || q.author.department) && (
+                                                    <div style={{
+                                                        fontSize: '0.75rem',
+                                                        color: 'var(--text-secondary)',
+                                                        marginTop: '0.15rem',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap'
+                                                    }}>
+                                                        {q.author.university}{q.author.university && q.author.department && ' • '}{q.author.department}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <time style={{
+                                                fontSize: '0.8rem',
+                                                color: 'var(--text-secondary)',
+                                                flexShrink: 0
+                                            }} dateTime={q.createdAt}>
+                                                {new Date(q.createdAt).toLocaleDateString('tr-TR')}
+                                            </time>
+                                        </div>
 
-                                    {/* Content Preview */}
-                                    <p style={{
-                                        color: 'var(--text-secondary)',
-                                        fontSize: isMobile ? '0.9rem' : '0.95rem',
-                                        lineHeight: '1.6',
-                                        marginBottom: '1rem',
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 2,
-                                        WebkitBoxOrient: 'vertical',
-                                        overflow: 'hidden'
-                                    }}>
-                                        {q.content?.substring(0, 150)}{q.content?.length > 150 ? '...' : ''}
-                                    </p>
-
-                                    {/* Tags */}
-                                    <div style={{
-                                        display: 'flex',
-                                        gap: '0.4rem',
-                                        marginBottom: '1rem',
-                                        flexWrap: 'wrap'
-                                    }}>
-                                        {q.tags.split(',').slice(0, isMobile ? 3 : 5).map((tag, idx) => (
-                                            <span key={tag} style={{
-                                                fontSize: '0.75rem',
-                                                padding: '0.25rem 0.7rem',
-                                                borderRadius: '8px',
-                                                backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                                                color: '#f97316',
-                                                fontWeight: '500',
-                                                border: '1px solid rgba(249, 115, 22, 0.2)'
+                                        {/* Title & Badge */}
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            gap: '0.75rem',
+                                            flexWrap: 'wrap',
+                                            marginBottom: '0.75rem'
+                                        }}>
+                                            <h2 style={{
+                                                fontSize: isMobile ? '1.05rem' : '1.15rem',
+                                                fontWeight: '700',
+                                                color: 'var(--text)',
+                                                lineHeight: '1.4',
+                                                margin: 0,
+                                                flex: 1
                                             }}>
-                                                #{tag.trim()}
-                                            </span>
-                                        ))}
-                                    </div>
+                                                {q.title}
+                                            </h2>
+                                            {q.noteId && (
+                                                <span style={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.3rem',
+                                                    padding: '0.3rem 0.7rem',
+                                                    borderRadius: '8px',
+                                                    background: 'var(--primary-gradient)',
+                                                    color: 'white',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: '600',
+                                                    boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)',
+                                                    whiteSpace: 'nowrap',
+                                                    flexShrink: 0
+                                                }}>
+                                                    📁 Arşiv
+                                                </span>
+                                            )}
+                                        </div>
 
-                                    {/* Footer: Files & Stats */}
-                                    <div style={{
-                                        display: 'flex',
-                                        flexDirection: isMobile ? 'column' : 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: isMobile ? 'stretch' : 'center',
-                                        paddingTop: '1rem',
-                                        borderTop: '1px solid var(--border)',
-                                        gap: isMobile ? '0.75rem' : '0.75rem'
-                                    }}>
-                                        {/* Files */}
-                                        {q.fileUrls && (() => {
-                                            try {
-                                                const urls = JSON.parse(q.fileUrls);
-                                                if (urls.length > 0) {
-                                                    return (
-                                                        <div style={{
-                                                            display: 'flex',
-                                                            gap: '0.4rem',
-                                                            flexWrap: 'wrap',
-                                                            minWidth: 0
-                                                        }}>
-                                                            {urls.slice(0, isMobile ? 2 : 2).map((url, index) => (
-                                                                <FileBadge key={index} url={url} />
-                                                            ))}
-                                                            {urls.length > 2 && (
-                                                                <span style={{
-                                                                    fontSize: '0.75rem',
-                                                                    color: 'var(--text-secondary)',
-                                                                    padding: '0.25rem 0.5rem'
-                                                                }}>
-                                                                    +{urls.length - 2} dosya
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                }
-                                            } catch (e) { return null; }
-                                        })()}
+                                        {/* Content Preview */}
+                                        <p style={{
+                                            color: 'var(--text-secondary)',
+                                            fontSize: isMobile ? '0.9rem' : '0.95rem',
+                                            lineHeight: '1.6',
+                                            marginBottom: '1rem',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden'
+                                        }}>
+                                            {q.content?.substring(0, 150)}{q.content?.length > 150 ? '...' : ''}
+                                        </p>
 
-                                        {/* Stats */}
+                                        {/* Tags */}
                                         <div style={{
                                             display: 'flex',
                                             gap: '0.4rem',
-                                            flexWrap: 'wrap',
-                                            justifyContent: isMobile ? 'flex-start' : 'flex-end',
-                                            flexShrink: 0
+                                            marginBottom: '1rem',
+                                            flexWrap: 'wrap'
                                         }}>
-                                            {/* Views */}
-                                            <span style={{
-                                                backgroundColor: 'rgba(107, 114, 128, 0.1)',
-                                                color: 'var(--text-secondary)',
-                                                padding: '0.3rem 0.6rem',
-                                                borderRadius: '10px',
-                                                fontSize: '0.75rem',
-                                                fontWeight: '600',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.25rem'
-                                            }}>
-                                                👁️ {q.viewCount || 0}
-                                            </span>
-
-                                            {/* Likes */}
-                                            <span style={{
-                                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                                                color: '#16a34a',
-                                                padding: '0.3rem 0.6rem',
-                                                borderRadius: '10px',
-                                                fontSize: '0.75rem',
-                                                fontWeight: '600',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.25rem'
-                                            }}>
-                                                👍 {q.votes?.filter(v => v.type === 'LIKE').length || 0}
-                                            </span>
-
-                                            {/* Replies */}
-                                            <span style={{
-                                                backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                                                color: '#8b5cf6',
-                                                padding: '0.3rem 0.6rem',
-                                                borderRadius: '10px',
-                                                fontSize: '0.75rem',
-                                                fontWeight: '600',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.25rem'
-                                            }}>
-                                                💬 {q._count?.replies || 0}
-                                            </span>
+                                            {q.tags.split(',').slice(0, isMobile ? 3 : 5).map((tag, idx) => (
+                                                <span key={tag} style={{
+                                                    fontSize: '0.75rem',
+                                                    padding: '0.25rem 0.7rem',
+                                                    borderRadius: '8px',
+                                                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                                                    color: '#f97316',
+                                                    fontWeight: '500',
+                                                    border: '1px solid rgba(249, 115, 22, 0.2)'
+                                                }}>
+                                                    #{tag.trim()}
+                                                </span>
+                                            ))}
                                         </div>
-                                    </div>
-                                </article>
-                            ))}
+
+                                        {/* Footer: Files & Stats */}
+                                        <div style={{
+                                            display: 'flex',
+                                            flexDirection: isMobile ? 'column' : 'row',
+                                            justifyContent: 'space-between',
+                                            alignItems: isMobile ? 'stretch' : 'center',
+                                            paddingTop: '1rem',
+                                            borderTop: '1px solid var(--border)',
+                                            gap: isMobile ? '0.75rem' : '0.75rem'
+                                        }}>
+                                            {/* Files */}
+                                            {q.fileUrls && (() => {
+                                                try {
+                                                    const urls = JSON.parse(q.fileUrls);
+                                                    if (urls.length > 0) {
+                                                        return (
+                                                            <div style={{
+                                                                display: 'flex',
+                                                                gap: '0.4rem',
+                                                                flexWrap: 'wrap',
+                                                                minWidth: 0
+                                                            }}>
+                                                                {urls.slice(0, isMobile ? 2 : 2).map((url, index) => (
+                                                                    <FileBadge key={index} url={url} />
+                                                                ))}
+                                                                {urls.length > 2 && (
+                                                                    <span style={{
+                                                                        fontSize: '0.75rem',
+                                                                        color: 'var(--text-secondary)',
+                                                                        padding: '0.25rem 0.5rem'
+                                                                    }}>
+                                                                        +{urls.length - 2} dosya
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    }
+                                                } catch (e) { return null; }
+                                            })()}
+
+                                            {/* Stats */}
+                                            <div style={{
+                                                display: 'flex',
+                                                gap: '0.4rem',
+                                                flexWrap: 'wrap',
+                                                justifyContent: isMobile ? 'flex-start' : 'flex-end',
+                                                flexShrink: 0
+                                            }}>
+                                                {/* Views */}
+                                                <span style={{
+                                                    backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                                                    color: 'var(--text-secondary)',
+                                                    padding: '0.3rem 0.6rem',
+                                                    borderRadius: '10px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.25rem'
+                                                }}>
+                                                    👁️ {q.viewCount || 0}
+                                                </span>
+
+                                                {/* Likes */}
+                                                <span style={{
+                                                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                                                    color: '#16a34a',
+                                                    padding: '0.3rem 0.6rem',
+                                                    borderRadius: '10px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.25rem'
+                                                }}>
+                                                    👍 {q.votes?.filter(v => v.type === 'LIKE').length || 0}
+                                                </span>
+
+                                                {/* Replies */}
+                                                <span style={{
+                                                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                                    color: '#8b5cf6',
+                                                    padding: '0.3rem 0.6rem',
+                                                    borderRadius: '10px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.25rem'
+                                                }}>
+                                                    💬 {q._count?.replies || 0}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </article>
+                                );
+                            })}
                         </div>
                     ) : (
                         <div style={{

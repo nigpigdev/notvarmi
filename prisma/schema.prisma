@@ -98,6 +98,8 @@ model Post {
   isVisible Boolean     @default(true)
   isDeleted Boolean     @default(false)
   viewCount Int         @default(0)
+  fakeViewCount Int     @default(0)
+  fakeVoteCount Int     @default(0)
   author    User        @relation(fields: [authorId], references: [id])
   postViews PostView[]
   replies   Reply[]

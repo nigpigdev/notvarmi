@@ -94,7 +94,16 @@ export default function Hero() {
                 const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
                 const newValue = prev + change;
                 // Keep within reasonable bounds
-                return Math.max(Math.floor(stats.users * 0.15), Math.min(newValue, Math.floor(stats.users * 0.35)));
+                const nextVal = Math.max(Math.floor(stats.users * 0.15), Math.min(newValue, Math.floor(stats.users * 0.35)));
+
+                // Trigger simulation heartbeat
+                fetch('/api/cron/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ activeUsers: nextVal })
+                }).catch(() => { }); // Ignore errors silently
+
+                return nextVal;
             });
         };
 
