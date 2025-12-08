@@ -80,7 +80,7 @@ export async function generateMetadata({ params }) {
             title: cleanTitle,
             description: description,
             type: 'article',
-            url: `${baseUrl}/forum/${post.id}`,
+            url: `${baseUrl}/topluluk/${post.id}`,
             siteName: 'Notvarmı',
             locale: 'tr_TR',
             publishedTime: new Date(post.createdAt).toISOString(),
@@ -141,7 +141,7 @@ export default async function PostPage({ params }) {
         },
         mainEntityOfPage: {
             '@type': 'WebPage',
-            '@id': `https://www.notvarmi.com/forum/${post.id}`,
+            '@id': `https://www.notvarmi.com/topluluk/${post.id}`,
         },
         interactionStatistic: [
             {

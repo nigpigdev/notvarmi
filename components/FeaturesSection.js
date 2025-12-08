@@ -108,7 +108,7 @@ export default function FeaturesSection() {
             description: "Takıldığın yerleri sor, diğer öğrencilerden yardım al.",
             icon: "💬",
             gradient: "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)",
-            link: "/forum",
+            link: "/topluluk",
             linkText: "Topluluğa Git",
             content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
                 forumPosts.length > 0
@@ -125,7 +125,7 @@ export default function FeaturesSection() {
             description: "En çok indirilen ve beğenilen ders notları.",
             icon: "📝",
             gradient: "linear-gradient(135deg, #f97316 0%, #ec4899 100%)",
-            link: "/forum?showNotes=true",
+            link: "/topluluk?showNotes=true",
             linkText: "Notlara Göz At",
             content: loading ? [{ text: 'Yükleniyor...', bold: false }] :
                 sharedNotes.length > 0

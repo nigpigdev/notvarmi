@@ -110,6 +110,27 @@ const nextConfig = {
                 destination: '/',
                 permanent: true,
             },
+            // Redirect old paths to new paths
+            {
+                source: '/notes',
+                destination: '/arsiv',
+                permanent: true,
+            },
+            {
+                source: '/notes/:path*',
+                destination: '/arsiv/:path*',
+                permanent: true,
+            },
+            {
+                source: '/forum',
+                destination: '/topluluk',
+                permanent: true,
+            },
+            {
+                source: '/forum/:path*',
+                destination: '/topluluk/:path*',
+                permanent: true,
+            },
         ];
     },
 };

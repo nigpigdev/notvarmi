@@ -51,7 +51,7 @@ export default function Hero() {
                 </p>
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: isMobile ? 'center' : 'flex-start' }}>
                     {status === 'authenticated' ? (
-                        <Link href="/forum" style={{
+                        <Link href="/topluluk" style={{
                             padding: '1.2rem 2.5rem',
                             background: 'var(--primary-gradient)',
                             color: 'white',
@@ -101,7 +101,7 @@ export default function Hero() {
                                 }}>
                                 Hemen Başla
                             </Link>
-                            <Link href="/forum" style={{
+                            <Link href="/topluluk" style={{
                                 padding: '1.2rem 2.5rem',
                                 backgroundColor: 'transparent',
                                 color: 'var(--text)',

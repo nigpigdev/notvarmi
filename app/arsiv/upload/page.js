@@ -147,7 +147,7 @@ export default function UploadNote() {
             });
 
             if (res.ok) {
-                router.push('/notes');
+                router.push('/arsiv');
             } else {
                 const error = await res.json();
                 await showAlert(error.message || t.notes.uploadError, 'error');
@@ -197,7 +197,7 @@ export default function UploadNote() {
                 zIndex: 1
             }}>
                 {/* Back Button */}
-                <Link href="/notes" style={{
+                <Link href="/arsiv" style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',

@@ -155,7 +155,7 @@ export default function Courses() {
 
     const handleViewNotes = (courseId, e) => {
         e.stopPropagation();
-        router.push(`/notes?courseId=${courseId}`);
+        router.push(`/arsiv?courseId=${courseId}`);
     };
 
     const inputStyle = {

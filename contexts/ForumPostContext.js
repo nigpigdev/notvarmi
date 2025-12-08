@@ -34,7 +34,7 @@ export function ForumPostProvider({ children }) {
             finalizeSubmission(postData);
         }, 10000);
 
-        router.push('/forum');
+        router.push('/topluluk');
     };
 
     const cancelSubmission = () => {
@@ -42,7 +42,7 @@ export function ForumPostProvider({ children }) {
         if (countdownTimer.current) clearInterval(countdownTimer.current);
         setIsPending(false);
         setCountdown(10);
-        router.push('/forum/create');
+        router.push('/topluluk/create');
     };
 
     const finalizeSubmission = async (data) => {

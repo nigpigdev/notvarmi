@@ -166,7 +166,7 @@ export default function MessagesPage() {
                             </p>
                         </div>
                     </div>
-                    <Link href="/forum" style={{
+                    <Link href="/topluluk" style={{
                         padding: '0.65rem 1.25rem',
                         background: 'var(--secondary)',
                         color: 'var(--text)',
@@ -275,7 +275,7 @@ export default function MessagesPage() {
                         }}>
                             Bir kullanıcının profiline giderek mesaj göndermeye başlayın!
                         </p>
-                        <Link href="/forum" style={{
+                        <Link href="/topluluk" style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '0.5rem',

@@ -201,7 +201,7 @@ export default function UserProfile({ params }) {
         }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                 {/* Header */}
-                <Link href="/forum" style={{
+                <Link href="/topluluk" style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',
@@ -1070,7 +1070,7 @@ export default function UserProfile({ params }) {
                         {posts.length > 0 ? posts.map(post => (
                             <Link
                                 key={post.id}
-                                href={`/forum/${post.id}`}
+                                href={`/topluluk/${post.id}`}
                                 style={{
                                     background: 'var(--secondary)',
                                     borderRadius: '20px',
@@ -1149,7 +1149,7 @@ export default function UserProfile({ params }) {
                         {replies.length > 0 ? replies.map(reply => (
                             <Link
                                 key={reply.id}
-                                href={`/forum/${reply.post.id}`}
+                                href={`/topluluk/${reply.post.id}`}
                                 style={{
                                     background: 'var(--secondary)',
                                     borderRadius: '20px',

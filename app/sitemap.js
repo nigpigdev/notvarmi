@@ -27,7 +27,7 @@ export default async function sitemap() {
             priority: 0.5,
         },
         {
-            url: `${baseUrl}/forum`,
+            url: `${baseUrl}/topluluk`,
             lastModified: new Date(),
             changeFrequency: 'hourly',
             priority: 0.9,
@@ -70,7 +70,7 @@ export default async function sitemap() {
         });
 
         const postPages = posts.map((post) => ({
-            url: `${baseUrl}/forum/${post.id}`,
+            url: `${baseUrl}/topluluk/${post.id}`,
             lastModified: post.updatedAt,
             changeFrequency: 'weekly',
             priority: 0.8,

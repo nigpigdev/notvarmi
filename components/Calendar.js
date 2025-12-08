@@ -88,7 +88,7 @@ export default function Calendar() {
                         date: new Date(post.createdAt),
                         type: 'forum',
                         color: '#ec4899',
-                        link: `/forum/${post.id}`
+                        link: `/topluluk/${post.id}`
                     });
                 });
             }

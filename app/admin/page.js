@@ -953,7 +953,7 @@ export default function AdminPage() {
                                 >
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                                         <div style={{ flex: 1 }}>
-                                            <Link href="/notes" style={{ textDecoration: 'none' }}>
+                                            <Link href="/arsiv" style={{ textDecoration: 'none' }}>
                                                 <h3 style={{
                                                     color: 'var(--text)',
                                                     marginBottom: '0.5rem',

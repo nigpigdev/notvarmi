@@ -211,7 +211,7 @@ export default function PostDetailClient({ initialPost, postId }) {
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔍</div>
                     <h2 style={{ color: 'var(--text)', marginBottom: '0.5rem' }}>Tartışma bulunamadı</h2>
-                    <Link href="/forum" style={{ color: '#f97316' }}>Topluluğa dön →</Link>
+                    <Link href="/topluluk" style={{ color: '#f97316' }}>Topluluğa dön →</Link>
                 </div>
             </div>
         );

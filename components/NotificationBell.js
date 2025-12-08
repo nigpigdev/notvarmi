@@ -222,7 +222,7 @@ export default function NotificationBell() {
                                 const isMessage = notif.type === 'message';
                                 const href = isMessage
                                     ? `/messages/${notif.message?.sender?.id}`
-                                    : `/forum/${notif.postId}`;
+                                    : `/topluluk/${notif.postId}`;
 
                                 const author = isMessage ? notif.message?.sender : notif.reply?.author;
                                 const actionText = isMessage

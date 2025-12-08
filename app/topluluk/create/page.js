@@ -137,8 +137,8 @@ export default function CreatePost() {
             }}>
                 {/* Back Button */}
                 <a
-                    href="/forum"
-                    onClick={(e) => handleLinkClick(e, '/forum')}
+                    href="/topluluk"
+                    onClick={(e) => handleLinkClick(e, '/topluluk')}
                     style={{
                         display: 'inline-flex',
                         alignItems: 'center',

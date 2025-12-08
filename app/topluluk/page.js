@@ -221,7 +221,7 @@ export default function Forum() {
                     </p>
 
                     {session && (
-                        <Link href="/forum/create" style={{
+                        <Link href="/topluluk/create" style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '0.5rem',
@@ -394,7 +394,7 @@ export default function Forum() {
                             {sortedQuestions.map(q => (
                                 <article
                                     key={q.id}
-                                    onClick={() => router.push(`/forum/${q.id}`)}
+                                    onClick={() => router.push(`/topluluk/${q.id}`)}
                                     style={{
                                         backgroundColor: 'var(--secondary)',
                                         borderRadius: '18px',

@@ -591,7 +591,7 @@ function SearchPageContent() {
                                 <h2 style={sectionTitleStyle}>💬 Gönderiler</h2>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     {results.posts.map(post => (
-                                        <Link key={post.id} href={`/forum/${post.id}`} style={{
+                                        <Link key={post.id} href={`/topluluk/${post.id}`} style={{
                                             ...cardStyle,
                                             textDecoration: 'none'
                                         }}
@@ -702,7 +702,7 @@ function SearchPageContent() {
                                 <h2 style={sectionTitleStyle}>📝 Notlar</h2>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     {results.notes.map(note => (
-                                        <Link key={note.id} href={`/notes/${note.id}`} style={{
+                                        <Link key={note.id} href={`/arsiv/${note.id}`} style={{
                                             ...cardStyle,
                                             textDecoration: 'none'
                                         }}

@@ -6,7 +6,7 @@ export const metadata = {
         title: 'Notvarmı Forum - Öğrenci Tartışma Platformu',
         description: 'Dersler, sınavlar ve üniversite hayatı hakkında her şey. Binlerce öğrenci ile bilgi paylaşın.',
         type: 'website',
-        url: 'https://www.notvarmi.com/forum',
+        url: 'https://www.notvarmi.com/topluluk',
         siteName: 'Notvarmı',
         locale: 'tr_TR',
     },
@@ -16,7 +16,7 @@ export const metadata = {
         description: 'Dersler, sınavlar ve üniversite hayatı hakkında her şey',
     },
     alternates: {
-        canonical: 'https://www.notvarmi.com/forum',
+        canonical: 'https://www.notvarmi.com/topluluk',
     },
     robots: {
         index: true,
@@ -37,7 +37,7 @@ const forumJsonLd = {
     '@type': 'DiscussionForumPosting',
     'name': 'Notvarmı Forum',
     'description': 'Üniversite öğrencileri için soru cevap ve not paylaşım forumu',
-    'url': 'https://www.notvarmi.com/forum',
+    'url': 'https://www.notvarmi.com/topluluk',
     'publisher': {
         '@type': 'Organization',
         'name': 'Notvarmı',

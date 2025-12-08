@@ -400,7 +400,7 @@ export default function Notes() {
                         </div>
 
                         {/* Upload Button */}
-                        <Link href="/notes/upload" style={{
+                        <Link href="/arsiv/upload" style={{
                             padding: '1rem 1.75rem',
                             background: 'var(--primary-gradient)',
                             color: 'white',
@@ -710,7 +710,7 @@ export default function Notes() {
                                             transition: 'all 0.3s ease',
                                             boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
                                         }}
-                                        onClick={() => router.push(`/forum/${saved.post.id}`)}
+                                        onClick={() => router.push(`/topluluk/${saved.post.id}`)}
                                         onMouseEnter={(e) => {
                                             e.currentTarget.style.transform = 'translateY(-6px)';
                                             e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)';

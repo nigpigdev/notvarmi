@@ -111,7 +111,7 @@ export default function Navbar() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/forum" onClick={isMobile ? closeMobileMenu : undefined}>📢 {t.navbar.forum}</Link>
+                                <Link href="/topluluk" onClick={isMobile ? closeMobileMenu : undefined}>📢 {t.navbar.forum}</Link>
                             </li>
                             <li>
                                 <Link href="/messages" onClick={isMobile ? closeMobileMenu : undefined} style={{ position: 'relative' }}>
@@ -145,10 +145,10 @@ export default function Navbar() {
                                 <Link href="/courses" onClick={isMobile ? closeMobileMenu : undefined}>📚 {t.navbar.courses}</Link>
                             </li>
                             <li>
-                                <Link href="/notes" onClick={isMobile ? closeMobileMenu : undefined}>📝 {t.navbar.notes}</Link>
+                                <Link href="/arsiv" onClick={isMobile ? closeMobileMenu : undefined}>📝 {t.navbar.notes}</Link>
                             </li>
                             <li>
-                                <Link href="/forum" onClick={isMobile ? closeMobileMenu : undefined}>📢 {t.navbar.forum}</Link>
+                                <Link href="/topluluk" onClick={isMobile ? closeMobileMenu : undefined}>📢 {t.navbar.forum}</Link>
                             </li>
                             <li>
                                 <Link href="/messages" onClick={isMobile ? closeMobileMenu : undefined} style={{ position: 'relative' }}>
