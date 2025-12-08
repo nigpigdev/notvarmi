@@ -103,6 +103,7 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
             setNewTask({ title: '', priority: 'MEDIUM', category: 'PERSONAL', dueDate: '', dueTime: '' });
             await fetchTasks();
             showSaveMessage('✅ Görev eklendi!');
+            window.location.reload();
         } catch (error) {
             showSaveMessage('❌ Hata: ' + error.message);
         } finally {
@@ -125,6 +126,7 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
 
             await fetchTasks();
             showSaveMessage('✅ Görev güncellendi!');
+            window.location.reload();
         } catch (error) {
             showSaveMessage('❌ Hata oluştu');
         }
@@ -135,6 +137,7 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
             await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
             await fetchTasks();
             showSaveMessage(' 🗑️ Görev silindi');
+            window.location.reload();
         } catch (error) {
             console.error('Error:', error);
         }
@@ -224,7 +227,7 @@ export default function ProductivityMenu({ isMobile, onOpen }) {
                         {/* Header */}
                         <div className="modal-header">
                             <h2>🔔 Hatırlatıcılarım ({incompleteTasks.length})</h2>
-                            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+                            <button className="close-btn" onClick={() => { setIsOpen(false); window.location.reload(); }}>✕</button>
                         </div>
 
                         {saveMessage && (
