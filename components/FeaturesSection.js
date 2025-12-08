@@ -104,32 +104,20 @@ export default function FeaturesSection() {
     return (
         <div className="features-wrapper">
 
-            {/* Sınavlar Card */}
-            <div className="feature-card exams-theme">
-                <div className="card-header">
-                    <div className="header-left">
-                        <span className="card-icon exams-icon">📅</span>
-                        <div>
-                            <h2>Yaklaşan Sınavlar</h2>
-                            <p>Hazırlıklı ol, başarılı ol</p>
+            {/* Sınavlar Card - Only show if there are upcoming exams */}
+            {!loading && upcomingExams.length > 0 && (
+                <div className="feature-card exams-theme">
+                    <div className="card-header">
+                        <div className="header-left">
+                            <span className="card-icon exams-icon">📅</span>
+                            <div>
+                                <h2>Yaklaşan Sınavlar</h2>
+                                <p>Hazırlıklı ol, başarılı ol</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="card-body">
-                    {status !== 'authenticated' ? (
-                        <div className="auth-message">
-                            <span>🔐</span>
-                            <p>Sınav takvimine erişmek için</p>
-                            <Link href="/login" className="auth-btn">
-                                Giriş Yap
-                            </Link>
-                        </div>
-                    ) : loading ? (
-                        <div className="loading-items">
-                            {[1, 2, 3].map(i => <div key={i} className="loading-item" />)}
-                        </div>
-                    ) : upcomingExams.length > 0 ? (
+                    <div className="card-body">
                         <div className="content-list">
                             {upcomingExams.map((exam, idx) => {
                                 const { dayName, formattedDate, diffDays } = formatExamDate(exam.examDate);
@@ -153,14 +141,9 @@ export default function FeaturesSection() {
                                 );
                             })}
                         </div>
-                    ) : (
-                        <div className="empty-message">
-                            <span>🎉</span>
-                            <p>Yaklaşan sınav yok. Rahatla!</p>
-                        </div>
-                    )}
+                    </div>
                 </div>
-            </div>
+            )}
 
             <style jsx>{`
                 .features-wrapper {
@@ -487,41 +470,84 @@ export default function FeaturesSection() {
 
                 @media (max-width: 900px) {
                     .features-wrapper {
-                        grid-template-columns: 1fr;
+                        flex-direction: column;
+                        align-items: center;
+                    }
+                    
+                    .feature-card {
+                        width: 100%;
+                        max-width: 500px;
                     }
                 }
 
                 @media (max-width: 767px) {
                     .features-wrapper {
+                        flex-direction: column;
                         gap: 1rem;
                         padding-bottom: 2rem;
+                        width: 100%;
                     }
 
                     .feature-card {
-                        padding: 1.25rem;
-                        border-radius: 16px;
+                        padding: 1rem;
+                        border-radius: 14px;
+                        width: 100%;
+                        max-width: 100%;
                     }
 
                     .card-icon {
-                        width: 38px;
-                        height: 38px;
-                        font-size: 1.1rem;
+                        width: 36px;
+                        height: 36px;
+                        font-size: 1rem;
+                        border-radius: 10px;
+                    }
+
+                    .card-header {
+                        margin-bottom: 1rem;
+                        padding-bottom: 0.75rem;
                     }
 
                     .card-header h2 {
-                        font-size: 1.05rem;
+                        font-size: 0.95rem;
+                    }
+
+                    .card-header p {
+                        font-size: 0.7rem;
                     }
 
                     .card-body {
-                        min-height: 150px;
+                        min-height: auto;
+                        margin-bottom: 0;
                     }
 
-                    .item-content h4, .exam-info h4 {
+                    .exam-item {
+                        padding: 0.5rem 0.6rem;
+                        gap: 0.6rem;
+                    }
+
+                    .exam-date {
+                        min-width: 42px;
+                        padding: 0.3rem 0.4rem;
+                    }
+
+                    .date-day {
+                        font-size: 0.5rem;
+                    }
+
+                    .date-num {
+                        font-size: 0.65rem;
+                    }
+
+                    .exam-info h4 {
                         font-size: 0.8rem;
                     }
 
-                    .item-meta {
-                        font-size: 0.65rem;
+                    .countdown {
+                        font-size: 0.7rem;
+                    }
+
+                    .content-list {
+                        gap: 0.4rem;
                     }
                 }
             `}</style>
