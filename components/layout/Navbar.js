@@ -6,8 +6,8 @@ import styles from './Navbar.module.css';
 import { useSession, signOut } from 'next-auth/react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-import ThemeToggle from './ThemeToggle';
-import UserMenu from './UserMenu';
+import ThemeToggle from '../ui/ThemeToggle';
+import UserMenu from '../ui/UserMenu';
 
 export default function Navbar() {
     const { data: session, status } = useSession();

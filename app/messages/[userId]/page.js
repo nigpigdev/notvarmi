@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import ChatInterface from '@/components/ChatInterface';
+import ChatInterface from '@/components/features/ChatInterface';
 
 export default function ConversationPage({ params }) {
     const { data: session, status } = useSession();

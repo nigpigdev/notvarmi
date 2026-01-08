@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
-import LoadingScreen from '@/components/LoadingScreen';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 import Image from 'next/image';
 
 export default function UserProfile({ params }) {

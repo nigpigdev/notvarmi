@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useForumPost } from '@/contexts/ForumPostContext';
 import { useAlert } from '@/contexts/AlertContext';
-import FilePreview from '@/components/FilePreview';
+import FilePreview from '@/components/features/FilePreview';
 
 export default function CreatePost() {
     const [title, setTitle] = useState('');

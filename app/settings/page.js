@@ -6,10 +6,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import universities from '@/lib/universities';
 import departments from '@/lib/departments';
-import ToggleSwitch from '@/components/ToggleSwitch';
-import LoadingScreen from '@/components/LoadingScreen';
+import ToggleSwitch from '@/components/ui/ToggleSwitch';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 import { useAlert } from '@/contexts/AlertContext';
-import { useTheme } from '@/components/ThemeProvider';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 export default function SettingsPage() {
     const { data: session, status, update: updateSession } = useSession();

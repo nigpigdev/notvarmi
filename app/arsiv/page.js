@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Card from '@/components/Card';
+import Card from '@/components/ui/Card';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAlert } from '@/contexts/AlertContext';
-import FileBadge from '@/components/FileBadge';
+import FileBadge from '@/components/features/FileBadge';
 
 export default function Notes() {
     const [notes, setNotes] = useState([]);

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import FileBadge from '@/components/FileBadge';
+import FileBadge from '@/components/features/FileBadge';
 
 export default function Forum() {
     const router = useRouter();

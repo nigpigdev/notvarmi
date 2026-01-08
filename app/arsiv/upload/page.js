@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAlert } from '@/contexts/AlertContext';
-import FilePreview from '@/components/FilePreview';
+import FilePreview from '@/components/features/FilePreview';
 
 export default function UploadNote() {
     const { data: session, status } = useSession();

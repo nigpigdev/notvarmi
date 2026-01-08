@@ -5,7 +5,7 @@ import { generateMetaTags } from '@/lib/seo';
 // Note: In Next.js 13+, metadata should ideally be exported from server components
 // Since this is a client component, metadata is handled in layout.js
 
-import Card from '@/components/Card';
+import Card from '@/components/ui/Card';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
@@ -17,7 +17,7 @@ import { useSession } from 'next-auth/react';
 // Best approach: I will assume I can move them to public/images.
 // I'll add a step to move images to public/images.
 
-import Hero from '@/components/Hero';
+import Hero from '@/components/home/Hero';
 
 export default function Home() {
     const { status } = useSession();
