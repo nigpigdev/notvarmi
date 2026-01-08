@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
+import { randomUUID } from 'crypto';
 import path from 'path';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
 import { logSecurityEvent, getSecurityInfo } from '@/lib/security';
-import { validateUpload, sanitizeFilename } from '@/lib/file-validator';
+import { validateUpload, sanitizeFilename, getFileExtension } from '@/lib/file-validator';
 
 // Allowed MIME types for this upload endpoint
 const ALLOWED_MIME_TYPES = [
@@ -75,11 +76,11 @@ export async function POST(req) {
             await mkdir(uploadDir, { recursive: true });
         }
 
-        // Generate secure filename
-        const randomId = Math.random().toString(36).substring(2, 8);
-        const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, ''));
-        const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
-        const filename = `${safeOriginalName}_${randomId}.${extension}`;
+        // Generate secure filename using UUID
+        const uniqueId = randomUUID().replace(/-/g, '').substring(0, 12);
+        const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, '').substring(0, 50));
+        const extension = getFileExtension(file.name);
+        const filename = `${safeOriginalName}_${uniqueId}.${extension}`;
         const filepath = path.join(uploadDir, filename);
 
         // Save file

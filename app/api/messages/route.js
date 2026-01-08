@@ -70,18 +70,24 @@ export async function GET(request) {
             partnerIds.add(partnerId);
         });
 
-        // Fetch lastSeen for these users using raw query (workaround for outdated client)
+        // Fetch lastSeen for these users
         let lastSeenMap = new Map();
         if (partnerIds.size > 0) {
             try {
-                // Create a string of IDs for the IN clause
-                const ids = Array.from(partnerIds).map(id => `'${id}'`).join(',');
-                const rawUsers = await prisma.$queryRawUnsafe(`SELECT id, "lastSeen" FROM "User" WHERE id IN (${ids})`);
+                const rawUsers = await prisma.user.findMany({
+                    where: {
+                        id: { in: Array.from(partnerIds) }
+                    },
+                    select: {
+                        id: true,
+                        lastSeen: true
+                    }
+                });
                 rawUsers.forEach(u => {
                     lastSeenMap.set(u.id, u.lastSeen);
                 });
             } catch (e) {
-                console.error('Failed to fetch lastSeen raw:', e);
+                console.error('Failed to fetch lastSeen:', e);
             }
         }
 

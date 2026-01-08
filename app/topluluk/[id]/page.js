@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import PostDetailClient from './PostDetailClient';
+import { safeJsonLd } from '@/lib/security';
 
 const prisma = global.prisma || new PrismaClient();
 if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
@@ -169,7 +170,7 @@ export default async function PostPage({ params }) {
             {/* JSON-LD Structured Data */}
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
             />
 
             {/* SEO-friendly content for search engines */}

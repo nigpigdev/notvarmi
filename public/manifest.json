@@ -1,13 +1,14 @@
 {
     "name": "Notvarmı",
     "short_name": "Notvarmı",
-    "description": "University Student Platform",
+    "description": "Üniversite öğrencileri için not paylaşım ve topluluk platformu.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0f172a",
     "theme_color": "#f97316",
     "orientation": "portrait-primary",
-    "version": "2.0.0",
+    "lang": "tr",
+    "version": "2.1.0",
     "icons": [
         {
             "src": "/icon-192x192.png",
@@ -39,5 +40,44 @@
             "type": "image/svg+xml",
             "purpose": "any maskable"
         }
+    ],
+    "shortcuts": [
+        {
+            "name": "Topluluk",
+            "short_name": "Forum",
+            "url": "/topluluk",
+            "icons": [
+                {
+                    "src": "/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Dersler",
+            "short_name": "Dersler",
+            "url": "/courses",
+            "icons": [
+                {
+                    "src": "/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Mesajlar",
+            "short_name": "Mesajlar",
+            "url": "/messages",
+            "icons": [
+                {
+                    "src": "/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "categories": [
+        "education",
+        "social"
     ]
 }

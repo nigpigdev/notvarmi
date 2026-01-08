@@ -18,7 +18,6 @@ import { useSession } from 'next-auth/react';
 // I'll add a step to move images to public/images.
 
 import Hero from '@/components/Hero';
-import FeaturesSection from '@/components/FeaturesSection';
 
 export default function Home() {
     const { status } = useSession();
@@ -26,7 +25,6 @@ export default function Home() {
     return (
         <div>
             <Hero />
-            <FeaturesSection />
         </div>
     )
 }

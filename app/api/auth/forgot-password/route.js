@@ -1,27 +1,33 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
-
-const globalForPrisma = global;
-const prisma = globalForPrisma.prisma || new PrismaClient();
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+import { sanitizeInput, isValidEmail } from '@/lib/security';
+import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
+import prisma from '@/lib/prisma';
 
 export async function POST(req) {
     try {
-        const { email } = await req.json();
+        // Apply rate limiting
+        const rateLimit = applyRateLimit(req, rateLimiters.auth);
+        if (rateLimit.limited) {
+            return NextResponse.json(rateLimit.response.body, { status: 429 });
+        }
 
-        if (!email) {
-            return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+        const body = await req.json();
+        const email = sanitizeInput(body.email);
+
+        if (!email || !isValidEmail(email)) {
+            return NextResponse.json({ error: 'Geçersiz e-posta adresi' }, { status: 400 });
         }
 
         // Check if user exists
         const user = await prisma.user.findUnique({
-            where: { email }
+            where: { email: email.toLowerCase() }
         });
 
+        // Standard response for security (prevents user enumeration)
         if (!user) {
-            return NextResponse.json({ error: 'Bu e-posta adresi sistemde kayıtlı değil' }, { status: 404 });
+            // Even if user doesn't exist, we return success to prevent enumeration
+            return NextResponse.json({ success: true, message: 'If an account exists for this email, a reset code has been sent.' });
         }
 
         // Generate 6-digit code
@@ -37,7 +43,10 @@ export async function POST(req) {
             }
         });
 
-        console.log(`Reset code for ${email}: ${resetCode}`);
+        // In production, we don't log the code
+        if (process.env.NODE_ENV !== 'production') {
+            console.log(`Reset code for ${email}: ${resetCode}`);
+        }
 
         // Send email
         // Note: In production, use environment variables for SMTP config

@@ -11,6 +11,7 @@ import ShareButton from '@/components/ShareButton';
 import TimeAgo from '@/components/TimeAgo';
 import readingTime from 'reading-time';
 import { toast } from 'react-hot-toast';
+import { safeJsonLd } from '@/lib/security';
 
 export default function PostDetailClient({ initialPost, postId }) {
     const router = useRouter();
@@ -246,7 +247,7 @@ export default function PostDetailClient({ initialPost, postId }) {
             }} />
 
             {/* Structured Data */}
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(structuredData) }} />
 
             <ReportModal
                 isOpen={reportModal.isOpen}

@@ -10,11 +10,11 @@ export async function GET(request, { params }) {
         // Join the path segments
         const fullPath = Array.isArray(filePath) ? filePath.join('/') : filePath;
 
-        // Construct the file path
-        const absolutePath = path.join(process.cwd(), 'public', fullPath);
+        // Construct the file path and normalize it
+        const publicDir = path.resolve(process.cwd(), 'public');
+        const absolutePath = path.resolve(publicDir, fullPath);
 
         // Security check: ensure the path is within public directory
-        const publicDir = path.join(process.cwd(), 'public');
         if (!absolutePath.startsWith(publicDir)) {
             return NextResponse.json({ error: 'Invalid file path' }, { status: 403 });
         }
@@ -59,6 +59,8 @@ export async function GET(request, { params }) {
                 'Content-Disposition': `inline; filename="${path.basename(absolutePath)}"`,
                 'Cache-Control': 'public, max-age=31536000, immutable',
                 'Access-Control-Allow-Origin': '*',
+                'Content-Security-Policy': "default-src 'none'; sandbox",
+                'X-Content-Type-Options': 'nosniff',
             },
         });
     } catch (error) {

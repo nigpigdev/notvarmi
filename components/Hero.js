@@ -147,549 +147,463 @@ export default function Hero() {
 
     return (
         <section className={`hero-section ${isVisible ? 'visible' : ''}`}>
-            {/* Static Floating Particles */}
-            <div className="hero-particles">
-                {[...Array(12)].map((_, i) => (
-                    <div key={i} className="particle" style={{
-                        '--delay': `${i * 1}s`,
-                        '--x': `${10 + Math.random() * 80}%`,
-                        '--size': `${4 + Math.random() * 4}px`,
-                        '--duration': `${25 + Math.random() * 15}s`
-                    }} />
-                ))}
-            </div>
-
-            <div className="hero-content">
-                <h1 className="hero-title">
-                    Notvarmı ile <br />
-                    <span className="hero-title-gradient">Bağlantıda Kal.</span>
-                </h1>
-                <p className="hero-description">
-                    Üniversite hayatını kolaylaştır. Notlarını paylaş, sorularını sor ve sınavlarına hazırlan.
-                </p>
-
-                {/* Live Stats Counter */}
-                <div className="hero-stats">
-                    <div className="stat-item">
-                        <span className="stat-number">{displayStats.posts}+</span>
-                        <span className="stat-label">Gönderi</span>
+            <div className="hero-container">
+                <div className="hero-content">
+                    <div className="hero-badge">
+                        ✨ Notvarmı v2.1 yayında!
                     </div>
-                    <div className="stat-divider"></div>
-                    <div className="stat-item">
-                        <span className="stat-number">{displayStats.users}+</span>
-                        <span className="stat-label">Kullanıcı</span>
-                    </div>
-                    <div className="stat-divider"></div>
-                    <div className="stat-item">
-                        <span className="stat-number">{displayStats.files}+</span>
-                        <span className="stat-label">Dosya</span>
-                    </div>
-                </div>
+                    <h1 className="hero-title">
+                        Notvarmı ile <br />
+                        <span className="hero-title-gradient">Bağlantıda Kal.</span>
+                    </h1>
+                    <p className="hero-description">
+                        Üniversite hayatını kolaylaştır. Notlarını paylaş, sorularını sor ve sınavlarına hazırlan. Tamamen ücretsiz ve öğrenci odaklı.
+                    </p>
 
-                <div className="hero-buttons">
-                    {status === 'authenticated' ? (
-                        <>
-                            <Link href="/topluluk">
-                                <button className="hero-btn-primary">
-                                    🚀 Topluluğa Git
-                                </button>
-                            </Link>
-                            <Link href="/courses">
-                                <button className="hero-btn-secondary">
-                                    📚 Dersleri Gör
-                                </button>
-                            </Link>
-                        </>
-                    ) : (
-                        <>
-                            <Link href="/register">
-                                <button className="hero-btn-primary">
-                                    ✨ Hemen Başla
-                                </button>
-                            </Link>
-                            <Link href="/topluluk">
-                                <button className="hero-btn-secondary">
-                                    Keşfet
-                                </button>
-                            </Link>
-                        </>
-                    )}
-                </div>
-            </div>
+                    <div className="hero-buttons">
+                        {status === 'authenticated' ? (
+                            <>
+                                <Link href="/topluluk">
+                                    <button className="hero-btn-primary">
+                                        🚀 Topluluğa Git
+                                    </button>
+                                </Link>
+                                <Link href="/courses">
+                                    <button className="hero-btn-secondary">
+                                        📚 Dersleri Gör
+                                    </button>
+                                </Link>
+                                <Link href="/app">
+                                    <button className="hero-btn-app">
+                                        📲 Uygulamayı İndir
+                                    </button>
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link href="/register">
+                                    <button className="hero-btn-primary">
+                                        ✨ Hemen Başla
+                                    </button>
+                                </Link>
+                                <Link href="/topluluk">
+                                    <button className="hero-btn-secondary">
+                                        Keşfet
+                                    </button>
+                                </Link>
+                                <Link href="/app">
+                                    <button className="hero-btn-app">
+                                        📲 Uygulamayı İndir
+                                    </button>
+                                </Link>
+                            </>
+                        )}
+                    </div>
 
-            {/* Interactive Showcase Cards */}
-            <div className="hero-showcase">
-                <div className="showcase-container">
-                    {showcaseCards.map((card, index) => (
-                        <div
-                            key={index}
-                            className={`showcase-card ${activeCard === index ? 'active' : ''}`}
-                            onClick={() => setActiveCard(index)}
-                            style={{ '--card-color': card.color }}
-                        >
-                            <div className="showcase-icon">{card.icon}</div>
-                            <div className="showcase-content">
-                                <h3>{card.title}</h3>
-                                <p>{card.desc}</p>
-                            </div>
+                    <div className="hero-stats-glass">
+                        <div className="glass-stat">
+                            <span className="glass-num">{displayStats.posts}+</span>
+                            <span className="glass-label">Gönderi</span>
                         </div>
-                    ))}
+                        <div className="glass-stat">
+                            <span className="glass-num">{displayStats.users}+</span>
+                            <span className="glass-label">Kullanıcı</span>
+                        </div>
+                        <div className="glass-stat">
+                            <span className="glass-num">{displayStats.files}+</span>
+                            <span className="glass-label">Dosya</span>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Progress Indicators */}
-                <div className="showcase-indicators">
-                    {showcaseCards.map((_, index) => (
-                        <button
-                            key={index}
-                            className={`indicator ${activeCard === index ? 'active' : ''}`}
-                            onClick={() => setActiveCard(index)}
-                        />
-                    ))}
-                </div>
-
-                {/* Live Activity Feed - Stable count */}
-                <div className="live-feed">
-                    <div className="live-dot"></div>
-                    <span>{activeUsers} aktif kullanıcı</span>
+                <div className="hero-visual">
+                    <div className="floating-cards-wrapper">
+                        {showcaseCards.map((card, index) => (
+                            <div
+                                key={index}
+                                className={`floating-card card-${index + 1} ${activeCard === index ? 'active' : ''}`}
+                                style={{ '--accent': card.color }}
+                            >
+                                <div className="card-inner">
+                                    <span className="card-icon">{card.icon}</span>
+                                    <div className="card-text">
+                                        <h4>{card.title}</h4>
+                                        <p>{card.desc}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
             <style jsx>{`
                 .hero-section {
+                    position: relative;
+                    min-height: calc(100vh - 80px);
                     display: flex;
                     align-items: center;
-                    justify-content: space-between;
-                    padding: 5rem 0;
-                    margin-bottom: 3rem;
-                    position: relative;
+                    padding: 4rem 5%;
                     overflow: hidden;
-                    opacity: 0;
-                    transform: translateY(30px);
-                    transition: opacity 0.8s ease, transform 0.8s ease;
-                }
-
-                .hero-section.visible {
                     opacity: 1;
-                    transform: translateY(0);
                 }
 
-                .hero-particles {
-                    position: absolute;
+                .hero-section::before {
+                    content: '';
+                    position: fixed;
                     top: 0;
                     left: 0;
                     width: 100%;
                     height: 100%;
+                    z-index: -1;
                     pointer-events: none;
-                    overflow: hidden;
+                    background:
+                        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(249, 115, 22, 0.15), transparent),
+                        radial-gradient(ellipse 60% 50% at 80% 20%, rgba(236, 72, 153, 0.12), transparent),
+                        radial-gradient(ellipse 50% 40% at 60% 80%, rgba(59, 130, 246, 0.08), transparent);
+                    filter: blur(60px);
+                    opacity: 0.7;
                 }
 
-                .particle {
-                    position: absolute;
-                    width: var(--size);
-                    height: var(--size);
-                    background: linear-gradient(135deg, rgba(249, 115, 22, 0.3), rgba(236, 72, 153, 0.3));
-                    border-radius: 50%;
-                    left: var(--x);
-                    top: 100%;
-                    animation: floatUp var(--duration) linear infinite;
-                    animation-delay: var(--delay);
+                [data-theme='dark'] .hero-section::before {
+                    background:
+                        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(249, 115, 22, 0.2), transparent),
+                        radial-gradient(ellipse 60% 50% at 80% 20%, rgba(236, 72, 153, 0.15), transparent),
+                        radial-gradient(ellipse 50% 40% at 60% 80%, rgba(59, 130, 246, 0.1), transparent);
+                    opacity: 0.5;
                 }
 
-                @keyframes floatUp {
-                    0% {
-                        transform: translateY(0);
-                        opacity: 0;
-                    }
-                    5% {
-                        opacity: 0.5;
-                    }
-                    95% {
-                        opacity: 0.5;
-                    }
-                    100% {
-                        transform: translateY(-100vh);
-                        opacity: 0;
-                    }
+                .hero-container {
+                    width: 100%;
+                    max-width: 1400px;
+                    margin: 0 auto;
+                    display: grid;
+                    grid-template-columns: 1.2fr 1fr;
+                    gap: 4rem;
+                    align-items: center;
+                    z-index: 2;
                 }
 
-                .hero-content {
-                    flex: 1;
-                    padding-right: 4rem;
-                    z-index: 1;
+                .hero-badge {
+                    display: inline-block;
+                    padding: 0.6rem 1.25rem;
+                    background: rgba(249, 115, 22, 0.1);
+                    border: 1px solid rgba(249, 115, 22, 0.2);
+                    border-radius: 100px;
+                    color: #f97316;
+                    font-weight: 700;
+                    font-size: 0.85rem;
+                    margin-bottom: 2rem;
+                    backdrop-filter: blur(10px);
+                    animation: fadeInUp 0.8s ease backwards;
                 }
 
                 .hero-title {
-                    font-size: 3.5rem;
-                    margin-bottom: 1.25rem;
+                    font-size: clamp(3rem, 6vw, 4.5rem);
+                    line-height: 1.1;
+                    font-weight: 900;
                     color: var(--text);
-                    line-height: 1.15;
-                    font-weight: 800;
-                    letter-spacing: -1px;
-                    animation: fadeInUp 0.8s ease 0.3s both;
-                }
-
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    letter-spacing: -2px;
+                    margin-bottom: 1.5rem;
+                    animation: fadeInUp 0.8s ease 0.1s both;
                 }
 
                 .hero-title-gradient {
-                    background: linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ec4899 100%);
-                    background-size: 200% 200%;
+                    background: linear-gradient(
+                        90deg, 
+                        #f97316 0%, 
+                        #fb923c 15%,
+                        #ec4899 35%, 
+                        #d946ef 50%,
+                        #8b5cf6 65%,
+                        #3b82f6 85%, 
+                        #f97316 100%
+                    );
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
-                    display: inline-block;
-                    animation: gradientShift 4s ease infinite;
+                    background-clip: text;
+                    background-size: 300% 100%;
+                    animation: gradient-flow 12s ease-in-out infinite;
                 }
 
-                @keyframes gradientShift {
-                    0%, 100% { background-position: 0% 50%; }
+                @keyframes gradient-flow {
+                    0% { background-position: 0% 50%; }
                     50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
                 }
 
                 .hero-description {
-                    font-size: 1.2rem;
+                    font-size: 1.25rem;
                     color: var(--text-secondary);
-                    margin-bottom: 1.75rem;
-                    max-width: 500px;
-                    line-height: 1.6;
-                    animation: fadeInUp 0.8s ease 0.5s both;
-                }
-
-                .hero-stats {
-                    display: flex;
-                    align-items: center;
-                    gap: 1.5rem;
-                    margin-bottom: 2rem;
-                    padding: 1rem 1.5rem;
-                    background: rgba(249, 115, 22, 0.08);
-                    border: 1px solid rgba(249, 115, 22, 0.15);
-                    border-radius: 16px;
-                    width: fit-content;
-                    animation: fadeInUp 0.8s ease 0.7s both;
-                }
-
-                .stat-item {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                }
-
-                .stat-number {
-                    font-size: 1.6rem;
-                    font-weight: 800;
-                    background: var(--primary-gradient);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                }
-
-                .stat-label {
-                    font-size: 0.8rem;
-                    color: var(--text-secondary);
-                    font-weight: 500;
-                }
-
-                .stat-divider {
-                    width: 1px;
-                    height: 35px;
-                    background: var(--border);
+                    max-width: 580px;
+                    line-height: 1.7;
+                    margin-bottom: 3rem;
+                    animation: fadeInUp 0.8s ease 0.2s both;
                 }
 
                 .hero-buttons {
                     display: flex;
-                    gap: 1rem;
-                    flex-wrap: wrap;
-                    animation: fadeInUp 0.8s ease 0.9s both;
-                }
-
-                .hero-buttons a {
-                    text-decoration: none;
+                    gap: 1.25rem;
+                    margin-bottom: 4rem;
+                    animation: fadeInUp 0.8s ease 0.3s both;
                 }
 
                 .hero-btn-primary {
-                    padding: 1rem 2rem;
+                    padding: 1.15rem 2.5rem;
                     background: var(--primary-gradient);
                     color: white;
                     border: none;
-                    border-radius: 14px;
-                    font-weight: 700;
-                    font-size: 1rem;
-                    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
-                    transition: all 0.3s ease;
+                    border-radius: 18px;
+                    font-weight: 800;
+                    font-size: 1.05rem;
+                    box-shadow: 0 15px 35px rgba(249, 115, 22, 0.3);
                     cursor: pointer;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    font-family: inherit;
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .hero-btn-primary:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 12px 28px rgba(249, 115, 22, 0.4);
+                    transform: translateY(-5px);
+                    box-shadow: 0 20px 50px rgba(249, 115, 22, 0.45);
                 }
 
                 .hero-btn-secondary {
-                    padding: 1rem 2rem;
-                    background: var(--secondary);
+                    padding: 1.15rem 2.5rem;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid var(--border);
                     color: var(--text);
-                    border: 2px solid var(--border);
-                    border-radius: 14px;
+                    border-radius: 18px;
                     font-weight: 700;
-                    font-size: 1rem;
-                    transition: all 0.3s ease;
+                    font-size: 1.05rem;
                     cursor: pointer;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    font-family: inherit;
+                    transition: all 0.4s ease;
                 }
 
                 .hero-btn-secondary:hover {
-                    border-color: #f97316;
-                    background: rgba(249, 115, 22, 0.1);
+                    background: rgba(255, 255, 255, 0.1);
+                    border-color: var(--text);
                 }
 
-                .hero-showcase {
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 1.5rem;
-                    animation: fadeInRight 1s ease 0.5s both;
-                }
-
-                @keyframes fadeInRight {
-                    from {
-                        opacity: 0;
-                        transform: translateX(50px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateX(0);
-                    }
-                }
-
-                .showcase-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1rem;
-                    width: 100%;
-                    max-width: 380px;
-                }
-
-                .showcase-card {
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    padding: 1.25rem 1.5rem;
-                    background: var(--secondary);
-                    border: 2px solid var(--border);
+                .hero-btn-app {
+                    padding: 1.15rem 2rem;
+                    background: rgba(249, 115, 22, 0.08);
+                    border: 1.5px solid #f97316;
+                    color: #f97316;
                     border-radius: 18px;
+                    font-weight: 700;
+                    font-size: 1.05rem;
                     cursor: pointer;
-                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                    position: relative;
-                    overflow: hidden;
+                    transition: all 0.4s ease;
                 }
 
-                .showcase-card::before {
-                    content: '';
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    height: 100%;
-                    width: 4px;
-                    background: var(--card-color);
-                    transform: scaleY(0);
-                    transition: transform 0.3s ease;
+                .hero-btn-app:hover {
+                    background: rgba(249, 115, 22, 0.15);
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.2);
                 }
 
-                .showcase-card.active {
-                    border-color: var(--card-color);
-                    background: linear-gradient(135deg, var(--secondary) 0%, rgba(249, 115, 22, 0.05) 100%);
-                    transform: translateX(10px) scale(1.02);
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                .hero-stats-glass {
+                    display: flex;
+                    gap: 3rem;
+                    padding: 2rem;
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 24px;
+                    width: fit-content;
+                    backdrop-filter: blur(20px);
+                    animation: fadeInUp 0.8s ease 0.4s both;
                 }
 
-                .showcase-card.active::before {
-                    transform: scaleY(1);
+                .glass-stat {
+                    display: flex;
+                    flex-direction: column;
                 }
 
-                .showcase-icon {
-                    font-size: 2.5rem;
-                    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
-                    transition: transform 0.3s ease;
-                }
-
-                .showcase-card.active .showcase-icon {
-                    transform: scale(1.1);
-                }
-
-                .showcase-content h3 {
-                    font-size: 1.1rem;
+                .glass-num {
+                    font-size: 2rem;
+                    font-weight: 900;
                     color: var(--text);
+                }
+
+                .glass-label {
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+
+                /* Visual Half */
+                .hero-visual {
+                    position: relative;
+                    height: 600px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    animation: fadeIn 1.5s ease 0.5s both;
+                }
+
+                .floating-cards-wrapper {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                .floating-card {
+                    position: absolute;
+                    width: 280px;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(30px);
+                    border-radius: 24px;
+                    padding: 1.5rem;
+                    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                }
+
+                .card-inner {
+                    display: flex;
+                    align-items: center;
+                    gap: 1.25rem;
+                }
+
+                .card-icon {
+                    font-size: 2.25rem;
+                    padding: 1rem;
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 18px;
+                    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+                }
+
+                .card-text h4 {
                     margin: 0 0 0.25rem;
+                    font-size: 1.1rem;
                     font-weight: 700;
                 }
 
-                .showcase-content p {
-                    font-size: 0.85rem;
-                    color: var(--text-secondary);
+                .card-text p {
                     margin: 0;
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
                 }
 
-                .showcase-indicators {
-                    display: flex;
-                    gap: 0.5rem;
+                .card-1 { top: 10%; right: 0; z-index: 3; animation: float-icon 6s infinite ease-in-out; }
+                .card-2 { top: 40%; left: 0; z-index: 2; animation: float-icon 7s infinite ease-in-out -1s; }
+                .card-3 { bottom: 10%; right: 10%; z-index: 1; animation: float-icon 8s infinite ease-in-out -2s; }
+
+                .floating-card.active {
+                    transform: scale(1.1) translateY(-10px);
+                    border-color: var(--accent);
+                    background: rgba(255, 255, 255, 0.1);
+                    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
                 }
 
-                .indicator {
-                    width: 32px;
-                    height: 4px;
-                    border-radius: 2px;
-                    background: var(--border);
-                    border: none;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
+                @keyframes float-icon {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-20px); }
                 }
 
-                .indicator.active {
-                    background: var(--primary-gradient);
-                    width: 48px;
-                }
-
-                .live-feed {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.6rem 1.2rem;
+                .activity-indicator {
+                    position: absolute;
+                    bottom: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
                     background: rgba(34, 197, 94, 0.1);
                     border: 1px solid rgba(34, 197, 94, 0.2);
-                    border-radius: 50px;
-                    font-size: 0.85rem;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 100px;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
                     color: #22c55e;
-                    font-weight: 500;
+                    font-size: 0.95rem;
+                    backdrop-filter: blur(10px);
                 }
 
-                .live-dot {
-                    width: 8px;
-                    height: 8px;
+                .pulse-dot {
+                    width: 10px;
+                    height: 10px;
                     background: #22c55e;
                     border-radius: 50%;
-                    animation: pulse 2s ease-in-out infinite;
+                    box-shadow: 0 0 15px #22c55e;
+                    animation: pulse 2s infinite;
                 }
 
                 @keyframes pulse {
-                    0%, 100% { transform: scale(1); opacity: 1; }
+                    0% { transform: scale(1); opacity: 1; }
                     50% { transform: scale(1.5); opacity: 0.5; }
+                    100% { transform: scale(1); opacity: 1; }
                 }
 
-                /* Mobile Responsive */
-                @media (max-width: 767px) {
-                    .hero-section {
-                        flex-direction: column;
-                        padding: 3rem 0 2rem;
-                        margin-bottom: 2rem;
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                /* Responsive */
+                @media (max-width: 1100px) {
+                    .hero-container {
+                        grid-template-columns: 1fr;
+                        text-align: center;
                     }
 
                     .hero-content {
-                        padding-right: 0;
-                        text-align: center;
-                        margin-bottom: 2.5rem;
-                    }
-
-                    .hero-title {
-                        font-size: 2.25rem;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
                     }
 
                     .hero-description {
-                        font-size: 1rem;
-                        max-width: 100%;
-                        margin-bottom: 1.5rem;
+                        margin-left: auto;
+                        margin-right: auto;
                     }
 
-                    .hero-stats {
-                        gap: 1rem;
-                        padding: 0.9rem 1.25rem;
-                        margin: 0 auto 1.5rem;
+                    .hero-visual {
+                        height: 500px;
+                        margin-top: 2rem;
                     }
 
-                    .stat-number {
-                        font-size: 1.3rem;
-                    }
-
-                    .stat-label {
-                        font-size: 0.7rem;
-                    }
-
-                    .hero-buttons {
-                        justify-content: center;
-                    }
-
-                    .hero-btn-primary, .hero-btn-secondary {
-                        padding: 0.9rem 1.5rem;
-                        font-size: 0.95rem;
-                    }
-
-                    .hero-showcase {
-                        width: 100%;
-                    }
-
-                    .showcase-container {
-                        max-width: 100%;
-                    }
-
-                    .showcase-card {
-                        padding: 1rem 1.25rem;
-                    }
-
-                    .showcase-card.active {
-                        transform: translateX(5px) scale(1.01);
-                    }
-
-                    .showcase-icon {
-                        font-size: 2rem;
-                    }
-
-                    .showcase-content h3 {
-                        font-size: 1rem;
-                    }
-
-                    .showcase-content p {
-                        font-size: 0.8rem;
-                    }
-
-                    .hero-particles {
-                        opacity: 0.5;
+                    .floating-card {
+                        width: 240px;
                     }
                 }
 
-                @media (max-width: 360px) {
+                @media (max-width: 767px) {
+                    .hero-section {
+                        padding: 2rem 1.25rem;
+                    }
+
                     .hero-title {
-                        font-size: 1.9rem;
+                        font-size: 2.75rem;
+                        letter-spacing: -1px;
                     }
 
-                    .hero-btn-primary, .hero-btn-secondary {
-                        padding: 0.8rem 1.25rem;
-                        font-size: 0.9rem;
-                        flex: 1;
+                    .hero-buttons {
+                        flex-direction: column;
+                        width: 100%;
                     }
 
-                    .hero-stats {
-                        gap: 0.75rem;
-                        padding: 0.75rem 1rem;
+                    .hero-stats-glass {
+                        gap: 1.5rem;
+                        padding: 1.5rem;
+                        width: 100%;
+                        justify-content: center;
                     }
 
-                    .stat-number {
-                        font-size: 1.1rem;
+                    .glass-num {
+                        font-size: 1.5rem;
+                    }
+
+                    .hero-visual {
+                        display: none;
                     }
                 }
             `}</style>
         </section>
     );
 }
+

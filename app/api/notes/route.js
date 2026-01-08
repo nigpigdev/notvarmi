@@ -3,9 +3,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client';
 import { writeFile, mkdir } from 'fs/promises';
+import { randomUUID } from 'crypto';
 import path from 'path';
 import { existsSync } from 'fs';
-import { validateUpload, sanitizeFilename } from '@/lib/file-validator';
+import { validateUpload, sanitizeFilename, getFileExtension } from '@/lib/file-validator';
 import { logSecurityEvent, getSecurityInfo } from '@/lib/security';
 import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
 
@@ -156,10 +157,10 @@ export async function POST(req) {
                     return NextResponse.json({ error: validation.error }, { status: 400 });
                 }
 
-                const randomId = Math.random().toString(36).substring(2, 8);
-                const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, ''));
-                const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
-                const filename = `${safeOriginalName}_${randomId}.${extension}`;
+                const uniqueId = randomUUID().replace(/-/g, '').substring(0, 12);
+                const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, '').substring(0, 50));
+                const extension = getFileExtension(file.name);
+                const filename = `${safeOriginalName}_${uniqueId}.${extension}`;
                 const filepath = path.join(uploadDir, filename);
 
                 await writeFile(filepath, buffer);

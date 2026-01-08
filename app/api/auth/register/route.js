@@ -1,22 +1,34 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-
-const globalForPrisma = global;
-const prismaClient = globalForPrisma.prisma || new PrismaClient();
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prismaClient;
+import { sanitizeObject, isValidEmail, checkPasswordStrength } from '@/lib/security';
+import prisma from '@/lib/prisma';
 
 export async function POST(req) {
     try {
-        const { firstName, lastName, username, email, university, department, password } = await req.json();
+        const body = await req.json();
+        const { firstName, lastName, username, email, university, department, password } = sanitizeObject(body);
 
-        // Validation
+        // Basic presence validation
         if (!firstName || !lastName || !username || !email || !university || !department || !password) {
             return NextResponse.json({ error: 'Tüm alanlar zorunludur' }, { status: 400 });
         }
 
+        // Email format validation
+        if (!isValidEmail(email)) {
+            return NextResponse.json({ error: 'Geçersiz e-posta adresi' }, { status: 400 });
+        }
+
+        // Password strength validation
+        const passwordCheck = checkPasswordStrength(password);
+        if (!passwordCheck.isStrong) {
+            return NextResponse.json({
+                error: 'Şifre yeterince güçlü değil',
+                details: passwordCheck.issues
+            }, { status: 400 });
+        }
+
         // Check if username or email already exists
-        const existingUser = await prismaClient.user.findFirst({
+        const existingUser = await prisma.user.findFirst({
             where: {
                 OR: [
                     { username: username.toLowerCase() },
@@ -38,7 +50,7 @@ export async function POST(req) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create user
-        const user = await prismaClient.user.create({
+        const user = await prisma.user.create({
             data: {
                 firstName,
                 lastName,

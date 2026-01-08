@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { randomUUID } from 'crypto';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
@@ -7,7 +8,7 @@ import { existsSync } from 'fs';
 import path from 'path';
 import { rateLimiters, applyRateLimit } from '@/lib/rate-limiter';
 import { logSecurityEvent, getSecurityInfo } from '@/lib/security';
-import { validateUpload, sanitizeFilename } from '@/lib/file-validator';
+import { validateUpload, sanitizeFilename, getFileExtension } from '@/lib/file-validator';
 
 // Allowed MIME types for forum posts
 const ALLOWED_MIME_TYPES = [
@@ -169,10 +170,10 @@ export async function POST(req) {
                     }
 
                     // Generate secure filename
-                    const randomId = Math.random().toString(36).substring(2, 8);
-                    const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, ''));
-                    const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
-                    const filename = `${safeOriginalName}_${randomId}.${extension}`;
+                    const uniqueId = randomUUID().replace(/-/g, '').substring(0, 12);
+                    const safeOriginalName = sanitizeFilename(file.name.replace(/\.[^/.]+$/, '').substring(0, 50));
+                    const extension = getFileExtension(file.name);
+                    const filename = `${safeOriginalName}_${uniqueId}.${extension}`;
                     const filepath = path.join(uploadDir, filename);
 
                     await writeFile(filepath, buffer);
