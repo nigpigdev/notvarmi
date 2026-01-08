@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-PROJECT_DIR="/var/www/cnspocket"
+PROJECT_DIR="/var/www/notvarmi"
 APP_NAME="notvarmi-app"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════╗${NC}"

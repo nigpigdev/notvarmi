@@ -37,8 +37,8 @@ echo
 
 read -p "$(echo -e ${GREEN}Email adresiniz (SSL için): ${NC})" EMAIL
 
-read -p "$(echo -e ${GREEN}Proje dizini [/var/www/cnspocket]: ${NC})" PROJECT_DIR
-PROJECT_DIR=${PROJECT_DIR:-/var/www/cnspocket}
+read -p "$(echo -e ${GREEN}Proje dizini [/var/www/notvarmi]: ${NC})" PROJECT_DIR
+PROJECT_DIR=${PROJECT_DIR:-/var/www/notvarmi}
 
 echo -e "\n${BLUE}═══════════════════════════════════════════════${NC}"
 echo -e "${YELLOW}Kurulum Özeti:${NC}"

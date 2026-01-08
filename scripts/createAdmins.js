@@ -8,7 +8,7 @@ async function createAdminAccounts() {
 
     const adminAccounts = [
         {
-            email: 'poweruser@cnspocket.com',
+            email: 'poweruser@notvarmi.com',
             username: 'poweruser',
             firstName: 'Power',
             lastName: 'User',
@@ -18,7 +18,7 @@ async function createAdminAccounts() {
             department: 'Administration'
         },
         {
-            email: 'admin1@cnspocket.com',
+            email: 'admin1@notvarmi.com',
             username: 'admin1',
             firstName: 'Admin',
             lastName: 'One',
@@ -28,7 +28,7 @@ async function createAdminAccounts() {
             department: 'Bilgisayar Mühendisliği'
         },
         {
-            email: 'admin2@cnspocket.com',
+            email: 'admin2@notvarmi.com',
             username: 'admin2',
             firstName: 'Admin',
             lastName: 'Two',
@@ -38,7 +38,7 @@ async function createAdminAccounts() {
             department: 'Bilgisayar Mühendisliği'
         },
         {
-            email: 'admin3@cnspocket.com',
+            email: 'admin3@notvarmi.com',
             username: 'admin3',
             firstName: 'Admin',
             lastName: 'Three',
@@ -48,7 +48,7 @@ async function createAdminAccounts() {
             department: 'Bilgisayar Mühendisliği'
         },
         {
-            email: 'admin4@cnspocket.com',
+            email: 'admin4@notvarmi.com',
             username: 'admin4',
             firstName: 'Admin',
             lastName: 'Four',
@@ -58,7 +58,7 @@ async function createAdminAccounts() {
             department: 'Bilgisayar Mühendisliği'
         },
         {
-            email: 'admin5@cnspocket.com',
+            email: 'admin5@notvarmi.com',
             username: 'admin5',
             firstName: 'Admin',
             lastName: 'Five',
@@ -98,14 +98,14 @@ async function createAdminAccounts() {
 
     console.log('\n=== ADMIN CREDENTIALS ===');
     console.log('PowerUser:');
-    console.log('  Email: poweruser@cnspocket.com');
+    console.log('  Email: poweruser@notvarmi.com');
     console.log('  Password: PowerUser2024!');
     console.log('\nAdmins (all have same password):');
-    console.log('  admin1@cnspocket.com - Password: Admin2024!');
-    console.log('  admin2@cnspocket.com - Password: Admin2024!');
-    console.log('  admin3@cnspocket.com - Password: Admin2024!');
-    console.log('  admin4@cnspocket.com - Password: Admin2024!');
-    console.log('  admin5@cnspocket.com - Password: Admin2024!');
+    console.log('  admin1@notvarmi.com - Password: Admin2024!');
+    console.log('  admin2@notvarmi.com - Password: Admin2024!');
+    console.log('  admin3@notvarmi.com - Password: Admin2024!');
+    console.log('  admin4@notvarmi.com - Password: Admin2024!');
+    console.log('  admin5@notvarmi.com - Password: Admin2024!');
     console.log('========================\n');
 
     await prisma.$disconnect();

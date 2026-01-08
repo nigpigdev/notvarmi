@@ -9,7 +9,7 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-PROJECT_DIR="/var/www/cnspocket"
+PROJECT_DIR="/var/www/notvarmi"
 LOG_FILE="/var/log/notvarmi/webhook-deploy.log"
 
 # Log function

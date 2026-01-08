@@ -11,7 +11,7 @@ echo.
 REM Configuration
 set SERVER_USER=root
 set SERVER_HOST=YOUR_SERVER_IP
-set PROJECT_DIR=/var/www/cnspocket
+set PROJECT_DIR=/var/www/notvarmi
 
 REM Check for uncommitted changes
 git status -s > nul 2>&1

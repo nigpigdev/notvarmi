@@ -13,7 +13,7 @@ NC='\033[0m'
 # Configuration
 SERVER_USER="root"
 SERVER_HOST="YOUR_SERVER_IP"  # Sunucu IP'nizi buraya yazın
-PROJECT_DIR="/var/www/cnspocket"
+PROJECT_DIR="/var/www/notvarmi"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║   Local → Production Deploy                    ║${NC}"
@@ -48,7 +48,7 @@ echo -e "${GREEN}✅ Code pushed to GitHub${NC}"
 # SSH to server and deploy
 echo -e "\n${YELLOW}🚀 Deploying to production server...${NC}"
 ssh "$SERVER_USER@$SERVER_HOST" << 'ENDSSH'
-cd /var/www/cnspocket
+cd /var/www/notvarmi
 ./scripts/update.sh
 ENDSSH
 

@@ -103,8 +103,8 @@ echo -e "${GREEN}✅ SSL sertifikası başarıyla alındı!${NC}"
 
 # Copy Nginx SSL config
 echo -e "\n${YELLOW}📝 Nginx SSL konfigürasyonu uygulanıyor...${NC}"
-if [ -f "/var/www/cnspocket/config/nginx-ssl.conf" ]; then
-    cp /var/www/cnspocket/config/nginx-ssl.conf $NGINX_CONFIG
+if [ -f "/var/www/notvarmi/config/nginx-ssl.conf" ]; then
+    cp /var/www/notvarmi/config/nginx-ssl.conf $NGINX_CONFIG
     echo -e "${GREEN}✅ Nginx config kopyalandı${NC}"
 else
     echo -e "${RED}⚠️  nginx-ssl.conf bulunamadı - manuel konfigürasyon gerekli${NC}"

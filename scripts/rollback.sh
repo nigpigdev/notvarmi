@@ -11,7 +11,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 BACKUP_DIR="/backup/notvarmi"
-PROJECT_DIR="/var/www/cnspocket"
+PROJECT_DIR="/var/www/notvarmi"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║   NotVarmı - Rollback Script                   ║${NC}"

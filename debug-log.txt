@@ -32,7 +32,7 @@ Messages API: Session user email: kaymakcioglu2006@gmail.com
 Messages API: Current user found: cmigl994e0000ztjmo693xvw5
 Error fetching conversations: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -118,7 +118,7 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
 PrismaClientValidationError: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -202,36 +202,36 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
       })
 
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
-    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
-    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
-    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
-    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
-    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
-    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
-    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
-    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
-    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
-    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
-    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
-    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
-    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
-    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
-    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
-    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
-    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
-    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
-    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
-    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
-    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
-    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
-    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
-    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
-    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)
+    at wn (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\start-server.js:226:13)
 Messages API: Session user email: kaymakcioglu2006@gmail.com
 Messages API: Current user found: cmigl994e0000ztjmo693xvw5
 Error fetching conversations: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -317,7 +317,7 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
 PrismaClientValidationError: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -401,36 +401,36 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
       })
 
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
-    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
-    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
-    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
-    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
-    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
-    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
-    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
-    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
-    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
-    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
-    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
-    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
-    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
-    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
-    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
-    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
-    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
-    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
-    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
-    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
-    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
-    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
-    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
-    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
-    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)
+    at wn (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\start-server.js:226:13)
 Messages API: Session user email: kaymakcioglu2006@gmail.com
 Messages API: Current user found: cmigl994e0000ztjmo693xvw5
 Error fetching conversations: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -516,7 +516,7 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
 PrismaClientValidationError: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -600,36 +600,36 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
       })
 
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
-    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
-    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
-    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
-    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
-    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
-    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
-    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
-    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
-    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
-    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
-    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
-    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
-    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
-    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
-    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
-    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
-    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
-    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
-    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
-    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
-    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
-    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
-    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
-    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
-    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)
+    at wn (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\start-server.js:226:13)
 Messages API: Session user email: zkaymakcioglu2006@gmail.com
 Messages API: Current user found: cmigmze160005ztjmalynif4y
 Error fetching conversations: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -715,7 +715,7 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
 PrismaClientValidationError: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -799,36 +799,36 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
       })
 
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
-    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
-    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
-    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
-    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
-    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
-    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
-    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
-    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
-    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
-    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
-    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
-    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
-    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
-    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
-    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
-    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
-    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
-    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
-    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
-    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
-    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
-    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
-    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
-    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
-    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)
+    at wn (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\start-server.js:226:13)
 Messages API: Session user email: zkaymakcioglu2006@gmail.com
 Messages API: Current user found: cmigmze160005ztjmalynif4y
 Error fetching conversations: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -914,7 +914,7 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
 PrismaClientValidationError: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -998,36 +998,36 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
       })
 
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
-    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
-    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
-    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
-    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
-    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
-    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
-    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
-    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
-    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
-    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
-    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
-    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
-    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
-    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
-    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
-    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
-    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
-    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
-    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
-    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
-    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
-    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
-    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
-    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
-    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)
+    at wn (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\start-server.js:226:13)
 Messages API: Session user email: zkaymakcioglu2006@gmail.com
 Messages API: Current user found: cmigmze160005ztjmalynif4y
 Error fetching conversations: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -1113,7 +1113,7 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
 PrismaClientValidationError: 
 Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].message.findMany()` invocation in
-C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
+C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:163
 
   288 log(`Messages API: Session user email: ${userEmail}`);
   289 log(`Messages API: Current user found: ${currentUser ? currentUser.id : 'No'}`);
@@ -1197,28 +1197,28 @@ C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__6
       })
 
 Unknown field `lastSeen` for select statement on model `User`. Available options are marked with ?.
-    at wn (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:29:1363)
-    at $n.handleRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6958)
-    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6623)
-    at $n.request (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:121:6307)
-    at async l (C:\Users\huigf\Desktop\cnspocket\node_modules\@prisma\client\runtime\library.js:130:9633)
-    at async GET (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
-    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
-    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
-    at async responseGenerator (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
-    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
-    at async handleResponse (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
-    at async handler (C:\Users\huigf\Desktop\cnspocket\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
-    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1413:9)
-    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1465:24)
-    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1515:32)
-    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:1021:25)
-    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\next-server.js:394:17)
-    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\base-server.js:912:17)
-    at async C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:382:20
-    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\trace\trace.js:157:20)
-    at async DevServer.handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
-    at async invokeRender (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:240:21)
-    at async handleRequest (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:436:24)
-    at async requestHandlerImpl (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\router-server.js:484:13)
-    at async Server.requestListener (C:\Users\huigf\Desktop\cnspocket\node_modules\next\dist\server\lib\start-server.js:226:13)
+    at wn (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at $n.handleRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6958)
+    at $n.handleAndLogRequestError (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\huigf\Desktop\notvarmi\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async GET (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\[root-of-the-server]__63ad9e07._.js:291:26)
+    at async AppRouteRouteModule.do (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15485:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15547:32)
+    at async handler (C:\Users\huigf\Desktop\notvarmi\.next\dev\server\chunks\node_modules_next_7302e97a._.js:15600:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\base-server.js:912:17)
+    at async C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\huigf\Desktop\notvarmi\node_modules\next\dist\server\lib\start-server.js:226:13)

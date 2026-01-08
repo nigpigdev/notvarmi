@@ -31,7 +31,7 @@ NotVarmı, üniversite öğrencileri için ders notları paylaşma, forum, mesaj
 ```bash
 # Repository'yi klonla
 git clone <repo-url>
-cd cnspocket
+cd notvarmi
 
 # Bağımlılıkları kur
 npm install
@@ -88,7 +88,7 @@ Otomatik günlük backup için cron job kurulumu: [`BACKUP_GUIDE.md`](./BACKUP_G
 ## 📁 Proje Yapısı
 
 ```
-cnspocket/
+notvarmi/
 ├── app/                    # Next.js App Router
 │   ├── api/               # API Routes
 │   ├── forum/             # Forum sayfaları
